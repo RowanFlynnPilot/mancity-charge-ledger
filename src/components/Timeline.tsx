@@ -2,6 +2,7 @@ import { useState, type CSSProperties } from "react";
 import { cx } from "../cx";
 import { caseById, cases, eventById, events, pending } from "../data";
 import { formatDate } from "../dates";
+import { STATUS_LABEL } from "../labels";
 import { buildRows, railCells, type Cell } from "../rail";
 import type { Case, CaseEvent, CaseId, EventType } from "../types";
 import { CopyLink } from "./CopyLink";
@@ -24,8 +25,6 @@ const ROLE_LABEL: Record<Case["cityRole"], string> = {
   respondent: "City is the respondent",
   claimant: "City is the claimant",
 };
-
-const STATUS_LABEL: Record<Case["status"], string> = { open: "Open", closed: "Closed" };
 
 // Where a ruling or sanction is shown, City's recorded position goes with it.
 function cityPositions(event: CaseEvent): CaseEvent[] {
@@ -70,9 +69,11 @@ function LaneKey({ lane, role }: { lane: number; role: Case["cityRole"] }) {
   );
 }
 
+// With one case selected, every row belongs to it, so the rows do not repeat its name.
 function EventRow({ event, cells, lanes, isTarget }: {
   event: CaseEvent; cells: Cell[]; lanes: Case[]; isTarget: boolean;
 }) {
+  const nameCases = lanes.length > 1;
   return (
     <li id={event.id} tabIndex={-1} className={cx("row row-event", isTarget && "is-target")}>
       <Rail cells={cells} lanes={lanes} />
@@ -86,14 +87,17 @@ function EventRow({ event, cells, lanes, isTarget }: {
           <p>{event.summary}</p>
           {cityPositions(event).map((position) => (
             <p key={position.id} className="position-line">
-              City&rsquo;s position: <a href={`#${position.id}`}>{position.headline}</a>
+              <span className="position-label">City&rsquo;s position</span>{" "}
+              <a href={`#${position.id}`}>{position.headline}</a>
             </p>
           ))}
         </div>
         <div className="row-aside">
           <SourceList sources={event.sources} />
           <p className="row-foot">
-            <span className="case-names">{event.caseIds.map((id) => caseById[id].name).join("; ")}</span>
+            {nameCases && (
+              <span className="case-names">{event.caseIds.map((id) => caseById[id].name).join("; ")}</span>
+            )}
             <CopyLink id={event.id} />
           </p>
         </div>

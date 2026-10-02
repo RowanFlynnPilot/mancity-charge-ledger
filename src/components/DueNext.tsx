@@ -13,7 +13,7 @@ export function DueNext({ caseId }: { caseId: CaseId }) {
     <p className="standing-meta">
       Due next: <a href={`#${item.id}`}>{item.label}</a>
       {item.due && <>, <time dateTime={item.due}>{formatDate(item.due)}</time></>}
-      {note && <span className={cx("due-flag", note.passed && "due-passed")}>{note.text}</span>}
+      {note && <span className={cx(note.passed ? "due-passed" : "tag")}>{note.text}</span>}
     </p>
   );
 }

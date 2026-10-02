@@ -1,5 +1,6 @@
 import { cases, recordRunsTo } from "../data";
 import { formatDate } from "../dates";
+import { STATUS_LABEL } from "../labels";
 import { DueNext } from "./DueNext";
 
 export function Masthead() {
@@ -23,8 +24,10 @@ export function Masthead() {
         <div className="masthead-status">
           {open.map((c) => (
             <section key={c.id} className="status" aria-labelledby={`status-${c.id}`}>
-              <p className="status-label">Open case</p>
-              <h2 id={`status-${c.id}`} className="status-case"><i>{c.name}</i></h2>
+              <div className="status-head">
+                <h2 id={`status-${c.id}`} className="status-case"><i>{c.name}</i></h2>
+                <span className="tag">{STATUS_LABEL[c.status]}</span>
+              </div>
               <p>{c.outcome}</p>
               <DueNext caseId={c.id} />
             </section>

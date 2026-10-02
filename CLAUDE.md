@@ -185,7 +185,13 @@ Its own, neutral. Reference-book plain: the documents are the content.
   - The masthead puts the title on the left and the open case on the right, in a panel. Panels (the open case, the press-coverage notice) are a lighter sheet with a hairline edge. There are no shadows; structure comes from rules.
   - The site has its own mark, a ledger page (`src/components/Mark.tsx`, also the favicon). It sits in the view bar and links back to the top.
   - Every control has hover, pressed and keyboard-focus states. Motion is limited to those 140ms state changes and a brief highlight when arriving at a linked entry, and is switched off under `prefers-reduced-motion`.
-  - No gradients, no pure black or white, and the only `z-index` values are `--z-bar` and `--z-skip`.
+  - No gradients, no pure black or white on screen, and the only `z-index` values are `--z-bar` and `--z-skip`.
+  - No label sitting above a heading. A state such as "Open" or "Today" is a `.tag` beside the text it describes.
+  - No thick stripe down the side of an entry or callout. A linked entry is marked by its background alone; City's position is a labelled line under a hairline.
+  - The link to an entry is a real `<a href="#id">` that also copies the address. If copying is blocked it says the link is in the address bar, which is true because following it put it there.
+  - With one case selected in the timeline, rows do not repeat the case name.
+  - Browser surfaces are themed: text selection, scrollbar, the browser's own chrome (`theme-color`), and print. The print stylesheet forces the light palette, drops the controls and prints each source's address after its title.
+  - `public/404.html` is served on its own by GitHub Pages, so it carries its own copy of the paper and ink tokens and uses Georgia. Keep it in step by hand if the palette changes.
   - The footer says the project is independent and not affiliated with any club, league or governing body.
 
 ## Open decisions

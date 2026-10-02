@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Page not found | The Charge Ledger</title>
+    <link rel="icon" type="image/svg+xml" href="/mancity-charge-ledger/favicon.svg" />
+    <style>
+      /* Served on its own by GitHub Pages, so it carries the site's tokens itself. */
+      :root {
+        --paper: #f2f4ef;
+        --ink: #1a1d1b;
+        --ink-soft: #505752;
+        --rule-strong: #79827a;
+        color-scheme: light dark;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --paper: #141714;
+          --ink: #e7ebe5;
+          --ink-soft: #a6afa8;
+          --rule-strong: #646e67;
+        }
+      }
+      body {
+        margin: 0;
+        padding: clamp(2rem, 8vw, 6rem) clamp(1rem, 4vw, 2.5rem);
+        background: var(--paper);
+        color: var(--ink);
+        font-family: Georgia, serif;
+        font-size: 1.0625rem;
+        line-height: 1.6;
+      }
+      main {
+        max-width: 36rem;
+        margin-inline: auto;
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 6vw, 3rem);
+        font-weight: 500;
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+        text-wrap: balance;
+      }
+      p {
+        margin: 1.25rem 0 0;
+        color: var(--ink-soft);
+      }
+      a {
+        color: var(--ink);
+        text-decoration-thickness: 1px;
+        text-underline-offset: 0.18em;
+        text-decoration-color: var(--rule-strong);
+      }
+      a:hover {
+        text-decoration-color: currentColor;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>That page is not in the record</h1>
+      <p>
+        The Charge Ledger keeps everything on one page, so this address does not lead anywhere.
+        <a href="/mancity-charge-ledger/">Open the record</a>
+      </p>
+    </main>
+  </body>
+</html>

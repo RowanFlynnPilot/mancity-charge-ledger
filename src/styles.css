@@ -9,7 +9,7 @@
   --ink-soft: #505752;
   --rule: #ccd3ca;
   --rule-strong: #79827a;
-  --mark: #e3e9df; /* a linked entry */
+  --mark: #dfe6da; /* a linked entry */
   --mark-arrive: #c9d5c3; /* where its highlight starts */
 
   /* Badge hues */
@@ -59,7 +59,8 @@
   --z-bar: 10;
   --z-skip: 20;
 
-  --ease: 140ms ease-out;
+  /* State changes ease out fast and settle. */
+  --ease: 160ms cubic-bezier(0.16, 1, 0.3, 1);
 
   color-scheme: light dark;
 }
@@ -91,6 +92,8 @@
 }
 
 html {
+  background: var(--paper);
+  scrollbar-color: var(--rule-strong) var(--paper);
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
@@ -248,22 +251,20 @@ button {
   padding: var(--s6);
 }
 
-.status-label {
-  font-family: var(--sans);
-  font-stretch: var(--condensed);
-  font-size: var(--u);
-  font-weight: 600;
-  color: var(--ink-soft);
+.status-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s4);
 }
 
 .status-case {
-  margin-top: var(--s1);
   font-size: var(--t-lead);
   font-weight: 560;
   line-height: 1.3;
 }
 
-.status-case + p {
+.status-head + p {
   margin-top: var(--s2);
 }
 
@@ -318,25 +319,30 @@ button {
   color: var(--ink);
 }
 
-.due-flag {
+/* A short state in words: "Open", "Today". */
+.tag {
   display: inline-block;
-  margin-left: var(--s2);
+  flex: none;
   padding: 0 var(--s2);
   border: 1px solid var(--rule-strong);
   border-radius: 2px;
   color: var(--ink);
+  font-family: var(--sans);
+  font-stretch: var(--condensed);
   font-size: var(--u-small);
   font-weight: 600;
   line-height: 1.5;
+  white-space: nowrap;
 }
 
-.due-flag.due-passed {
+.standing-meta .tag {
+  margin-left: var(--s2);
+}
+
+.standing-meta .due-passed {
   display: block;
-  margin: var(--s1) 0 0;
-  padding: 0;
-  border: 0;
-  font-size: inherit;
-  font-weight: 400;
+  margin-top: var(--s1);
+  color: var(--ink);
 }
 
 /* ---------- View navigation ---------- */
@@ -480,17 +486,15 @@ button {
 }
 
 .case {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--s1);
-  padding: var(--s3) var(--s4) var(--s4);
+  padding: var(--s4);
   border: 0;
   border-left: 1px solid var(--rule);
-  /* Like the view links: the chosen case is marked along one edge. */
-  border-top: 3px solid transparent;
   background: none;
   text-align: left;
-  transition: border-color var(--ease);
 }
 
 .case:first-child {
@@ -498,16 +502,25 @@ button {
   padding-left: 0;
 }
 
-.case:hover {
-  border-top-color: var(--rule-strong);
+/* Like the view links: the chosen case is marked along one edge. */
+.case::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  transition: background-color var(--ease);
 }
 
-.case:active {
-  border-top-color: var(--ink-soft);
+.case:hover::before {
+  background: var(--rule-strong);
 }
 
-.case[aria-pressed="true"] {
-  border-top-color: var(--ink);
+.case:active::before {
+  background: var(--ink-soft);
+}
+
+.case[aria-pressed="true"]::before {
+  background: var(--ink);
 }
 
 .case-name {
@@ -590,7 +603,14 @@ button {
 }
 
 .copy-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s1);
   color: var(--ink-soft);
+}
+
+.copy-link svg {
+  flex: none;
 }
 
 .text-button:hover,
@@ -700,8 +720,16 @@ button {
 
 .position-line {
   margin-top: var(--s3);
-  padding-left: var(--s3);
-  border-left: 3px solid var(--ink);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--rule);
+}
+
+.position-label {
+  margin-right: var(--s1);
+  font-family: var(--sans);
+  font-stretch: var(--condensed);
+  font-size: var(--u);
+  font-weight: 600;
 }
 
 .row-aside {
@@ -777,7 +805,6 @@ tr.is-target > * {
 }
 
 .is-target > .row-margin {
-  box-shadow: inset 4px 0 0 var(--ink);
   padding-left: var(--s3);
 }
 
@@ -1071,7 +1098,6 @@ tr.is-target > * {
 }
 
 tr.is-target > :is(.ledger-ref, .seasons-key) {
-  box-shadow: inset 4px 0 0 var(--ink);
   padding-left: var(--s3);
 }
 
@@ -1245,7 +1271,7 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
   }
 
   .case:nth-child(n + 3) {
-    box-shadow: 0 -1px 0 var(--rule);
+    border-top: 1px solid var(--rule);
   }
 
   .colophon-inner {
@@ -1331,7 +1357,6 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
 
   tr.is-target {
     background: var(--mark);
-    box-shadow: inset 4px 0 0 var(--ink);
     padding-inline: var(--s3);
   }
 
@@ -1340,7 +1365,6 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
   }
 
   tr.is-target > :is(.ledger-ref, .seasons-key) {
-    box-shadow: none;
     padding-left: 0;
   }
 }
@@ -1358,6 +1382,12 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
     padding: var(--s5);
   }
 
+  /* The view links scroll sideways here. Fade the edge they run off. */
+  .views ul {
+    padding-right: var(--s7);
+    mask-image: linear-gradient(to right, #000 calc(100% - var(--s7)), transparent);
+  }
+
   .cases {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -1368,7 +1398,7 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
   }
 
   .case + .case {
-    box-shadow: 0 -1px 0 var(--rule);
+    border-top: 1px solid var(--rule);
   }
 
   /* The margin column moves above its entry. */
@@ -1447,10 +1477,53 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
 }
 
 @media print {
+  :root {
+    --paper: #ffffff;
+    --sheet: #ffffff;
+    --ink: #111311;
+    --ink-soft: #3d423e;
+    --rule: #b9c0b7;
+    --rule-strong: #6f7870;
+    --mark: #ffffff;
+    --finding: #53306f;
+    --finding-tint: #eadff2;
+    --on-finding: #ffffff;
+    --appeal: #6b4700;
+    --appeal-tint: #f3e6c6;
+    --on-appeal: #ffffff;
+    --t-body: 10.5pt;
+  }
+
   .views,
   .skip,
+  .cases,
   .toolbar,
-  .copy-link {
+  .copy-link,
+  .colophon ul {
     display: none;
+  }
+
+  .masthead {
+    padding-top: 0;
+  }
+
+  .row,
+  .status,
+  :is(.ledger, .seasons) tr,
+  .standing > div {
+    break-inside: avoid;
+  }
+
+  h2,
+  h3,
+  .row-year {
+    break-after: avoid;
+  }
+
+  /* A printed link cannot be followed, so sources print their address. */
+  .sources a::after {
+    content: " <" attr(href) ">";
+    color: var(--ink-soft);
+    overflow-wrap: anywhere;
   }
 }
