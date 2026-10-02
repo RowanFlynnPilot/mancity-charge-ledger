@@ -1,22 +1,16 @@
 [
   {
-    "id": "appeal-deadline",
+    "id": "appeal-board-decision",
     "caseId": "pl-2023",
-    "label": "Deadline for City to appeal the Commission's findings",
-    "due": "2026-10-02",
-    "detail": "City has said it will appeal. An appeal is heard by a three-member Appeal Board under Section W of the League's rules.",
+    "label": "Appeal Board hearing and decision",
+    "due": null,
+    "detail": "A three-member Appeal Board, appointed by the Chair of the Judicial Panel, hears City's appeal in private. It can allow the appeal, dismiss it or vary the Commission's decision. No date has been published.",
     "sources": [
       {
-        "title": "Premier League Statement: Manchester City FC (29 Sep 2026)",
+        "title": "Premier League statement: Manchester City FC appeal decision of independent Commission (2 Oct 2026)",
         "publisher": "Premier League",
-        "url": "https://www.premierleague.com/en/news/4727779/premier-league-statement-manchester-city-fc",
+        "url": "https://www.premierleague.com/en/news/4729207/premier-league-statement-manchester-city-fc-appeal-decision-of-independent-commission-02-october-2026",
         "kind": "primary"
-      },
-      {
-        "title": "Man City to appeal guilty verdict in Premier League breaches case",
-        "publisher": "ESPN",
-        "url": "https://www.espn.com/soccer/story/_/id/50065250/man-city-appeal-guilty-verdict-premier-league-breaches-case",
-        "kind": "press"
       }
     ]
   },

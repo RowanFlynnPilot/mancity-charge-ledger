@@ -16,7 +16,7 @@ As of 1 Oct 2026:
 - Live since 2 Oct 2026 at the Pages URL. Pages is set to deploy from GitHub Actions.
 - The Core Decision was read in full on 2 Oct 2026 (build step 2). No `null` period could be filled. See "What the Core Decision does and does not establish" below.
 - The season view (v1.1) is built: `data/seasons.json` from the Premier League's final tables, and a Seasons view between the charge ledger and What's next.
-- The story is live. The Commission's Core Decision was published 29 Sep 2026. The appeal deadline is 2 Oct 2026. Sanction is undecided.
+- The story is live. The Commission's Core Decision was published 29 Sep 2026. City lodged its appeal on 1 Oct 2026, and the League confirmed it on 2 Oct. Neither statement lists the findings appealed; the nine charges found against City are recorded as `appeal: "pending"` because City calls the appeal comprehensive, and Charge 4(B), which City won, stays `none`. Sanction is undecided.
 
 ## Editorial rules
 
