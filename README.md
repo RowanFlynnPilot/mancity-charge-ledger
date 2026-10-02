@@ -60,6 +60,8 @@ There is no database, no server and no login. The record is a handful of JSON fi
 - **The record and the coverage are kept apart.** A scheduled workflow reads three news feeds and keeps the headlines that mention the cases. They are stored in `feed/`, outside the record, and shown under their own label. A headline becomes part of the record only when a person writes a sourced entry for it.
 - **The edit history is public.** The record changes only through commits to `data/`, and the site links to [that history](https://github.com/RowanFlynnPilot/mancity-charge-ledger/commits/main/data).
 - **Published numbers are pinned.** The count of alleged breaches is computed from the transcribed statement, not typed in, and a test holds it at its published value so a data edit cannot change it unnoticed.
+- **Every address is rendered before a deploy.** A test builds the whole page from the real data for each view and each entry, and follows every link within it. A data edit that would leave an entry unreachable fails the check.
+- **Sources are checked weekly.** A workflow requests each document the record cites and fails if one has gone. A few sites refuse automated requests; those are listed for checking by hand.
 - **No third-party requests.** Fonts are served from the site itself. There are no trackers and no analytics.
 - **Built to be read in any setting.** Light and dark themes, a print stylesheet that prints each source's address, keyboard focus states throughout, and colour used for meaning in one place only, always with a text label beside it.
 
@@ -69,10 +71,10 @@ There is no database, no server and no login. The record is a handful of JSON fi
 | --- | --- |
 | `data/` | The record: cases, events, charges, pending items, the League's statement, funding figures, season table. |
 | `feed/updates.json` | Press headlines. Written by the pipeline only. |
-| `pipeline/` | The validator, the feed fetcher, the season-table builder, and their tests. Python standard library only. |
+| `pipeline/` | The validator, the feed fetcher, the season-table builder, the link checker, and their tests. Python standard library only. |
 | `src/` | The site: React components, the data contract, routing by URL fragment, one stylesheet. |
 | `design/social-card.html` | Draws the image shown when a link to the site is shared. |
-| `.github/workflows/` | `deploy.yml` checks, builds and publishes. `updates.yml` fetches the feeds on a schedule. |
+| `.github/workflows/` | `deploy.yml` checks, builds and publishes. `updates.yml` fetches the feeds on a schedule. `links.yml` checks the cited sources weekly. |
 | `CLAUDE.md` | The working brief: editorial rules, data rules and design decisions in full. |
 
 ## Run it

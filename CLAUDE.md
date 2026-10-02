@@ -57,7 +57,9 @@ feed/updates.json         news feed, newest first             written by the pip
 pipeline/validate.py      raises on first contract violation
 pipeline/fetch_updates.py RSS → feed/updates.json
 pipeline/build_seasons.py Premier League final tables → seasons.json, run by hand
+pipeline/check_links.py   requests every cited source; raises if one is dead
 pipeline/test_*.py        unittest, stdlib only
+src/render.test.tsx       renders the whole page with the real data, for every address
 src/data.ts               the JSON, typed, plus lookups
 src/route.ts              URL fragment → view and entry
 src/dates.ts              date formatting, "today" in London, due notes
@@ -66,7 +68,7 @@ src/board.ts              charge groups for the findings board, and money totals
 src/allegations.ts        counting the League's statement rule by season
 src/components/           one file per view, plus shared pieces
 src/styles.css            all styles and the design tokens
-.github/workflows/        deploy.yml (check, build, Pages), updates.yml (cron fetch)
+.github/workflows/        deploy.yml (check, build, Pages), updates.yml (cron fetch), links.yml (weekly link check)
 ```
 
 ## Commands
@@ -76,6 +78,7 @@ python pipeline/validate.py              validate data/
 python -m unittest discover pipeline     pipeline tests
 python pipeline/fetch_updates.py         refresh feed/updates.json from the feeds
 python pipeline/build_seasons.py         rebuild data/seasons.json from the League's tables
+python pipeline/check_links.py           request every cited source and report the dead ones
 npm run dev                              dev server (base path /mancity-charge-ledger/)
 npm test                                 app tests (vitest)
 npm run build                            typecheck, then build to dist/
@@ -121,6 +124,29 @@ Workflows:
 
 - `updates.yml`: cron every 3 hours → `fetch_updates.py` → `validate.py` → commit `feed/updates.json` if it changed → call `deploy.yml`. The call is needed because a push made with the workflow's own token does not trigger other workflows.
 - `deploy.yml`: on push to `main`, pull request, manual run, or a call from `updates.yml`. Runs `validate.py`, the pipeline tests, the app tests and the build. Off pull requests it then deploys to Pages.
+- `links.yml`: Mondays, by hand, or on a pull request that changes the checker. Runs `check_links.py`. It is kept out of `deploy.yml` so that another site being down cannot block a deploy.
+
+## Pipeline: `check_links.py`
+
+One job: request every source address in `data/` and say which are dead. The press feed is not checked; it is not part of the record.
+
+- It checks every address before it raises, so one run names every dead link.
+- Alive means a 2xx answer. For an address ending in `.pdf` the body must also start with `%PDF`, because `tas-cas.org` answers 200 with a web page for a file that has gone.
+- Anything else is dead: any other status, no such host, a refused connection, a timeout. There is no retry. A site that was down for a moment makes a red run; run it again.
+- It uses the same `User-Agent` as the feed fetcher, which names the project. It does not pose as a browser.
+- `UNCHECKED_HOSTS` lists the sites that refuse the script: `www.mancity.com`, `www.uefa.com` and `www.farrer.co.uk` everywhere, and `www.pressreader.com` and `www.thelawyer.com` when it runs on GitHub's runners (they answer from a home connection). On 2 Oct 2026 that was 11 of the 37 addresses cited, among them every UEFA and club statement. Their links are printed as "not checked" and are not requested. Nothing checks them automatically; open them by hand when the weekly run is read. Add a host only after seeing it refuse the script while the page opens in a browser.
+- A redirect counts as alive. The script does not report where a link ended up.
+
+## App tests: `render.test.tsx`
+
+The app casts the JSON to its types and reaches across records with `!`. TypeScript cannot see whether those joins hold; this test can.
+
+- It renders `<App />` to markup for every view, for every record id, and for `#allegations`, with the real data. There is no browser: it stubs `window.location.hash`, which is the only thing the page reads from the browser while rendering.
+- Every record's address must produce a page with that record's element on it. Every `href="#…"` on any view must lead to an element. So a link to an entry that has been renamed or removed fails the check.
+- It fails if `undefined`, `NaN` or `[object Object]` appears in any view but Latest, whose headlines are not ours.
+- Every `type`, `finding`, `appeal`, `status` and `cityRole` in the data must have a label. This is where drift between `validate.py` and the app shows up.
+- Editorial rule 3 is tested: the opening and the ledger must link to the entry recording City's position for each case that has charges.
+- A component that reads `window` or `document` while rendering will break this test. Keep those reads in effects and event handlers.
 
 ## UI
 

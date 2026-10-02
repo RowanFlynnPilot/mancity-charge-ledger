@@ -9,7 +9,7 @@ import { PositionLine } from "./CityPosition";
 import { CopyLink } from "./CopyLink";
 import { SourceList } from "./SourceList";
 
-const TYPE_LABEL: Record<EventType, string> = {
+export const TYPE_LABEL: Record<EventType, string> = {
   report: "Report",
   investigation: "Investigation",
   charge: "Charge",
@@ -22,7 +22,7 @@ const TYPE_LABEL: Record<EventType, string> = {
   filing: "Filing",
 };
 
-const ROLE_LABEL: Record<Case["cityRole"], string> = {
+export const ROLE_LABEL: Record<Case["cityRole"], string> = {
   respondent: "City is the respondent",
   claimant: "City is the claimant",
 };
