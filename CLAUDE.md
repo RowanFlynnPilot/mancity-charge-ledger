@@ -13,7 +13,9 @@ A personal project by Rowan Flynn, hosted under the `RowanFlynnPilot` GitHub acc
 As of 1 Oct 2026:
 
 - Done: data contract (`src/types.ts`), validator (`pipeline/validate.py`), seed data (4 cases, 19 events, 10 charges, 3 pending items), feed fetcher (`pipeline/fetch_updates.py`), the Vite app with all four views, the methodology note and linkable entries, and both workflows.
-- Not done: the first push and Pages enablement (Settings → Pages → Source: GitHub Actions). Build step 2 (reading the Core Decision PDF to fill the `null` periods). Step 6 (`seasons.json` and the season view).
+- Live since 2 Oct 2026 at the Pages URL. Pages is set to deploy from GitHub Actions.
+- The Core Decision was read in full on 2 Oct 2026 (build step 2). No `null` period could be filled. See "What the Core Decision does and does not establish" below.
+- Not done: step 6 (`seasons.json` and the season view).
 - The story is live. The Commission's Core Decision was published 29 Sep 2026. The appeal deadline is 2 Oct 2026. Sanction is undecided.
 
 ## Editorial rules
@@ -134,11 +136,30 @@ How the views are built:
 ## Build order
 
 1. Done. Vite (React + TS) in the repo root, keeping `src/types.ts`. `validate.py` runs in CI.
-2. Read the full Core Decision PDF. Fill the `null` periods in `charges.json` where the published text states them. Add any dated events it establishes.
+2. Done, with nothing to fill. The published text does not state the missing periods. Repeat when the appendices are published.
 3. Done. Feed list confirmed, `fetch_updates.py` built, cron workflow added.
 4. Done. The four views, the methodology note and linkable entries.
-5. Workflow written. Still needs the first push and Pages switched on with GitHub Actions as the source.
+5. Done. Deployed by `deploy.yml`.
 6. `seasons.json` and the season view.
+
+## What the Core Decision does and does not establish
+
+From a full read of the redacted Core Decision (40 pages, 160 paragraphs) on 2 Oct 2026. Paragraph numbers are the decision's own.
+
+The PDF is a scan. Pages 12–14, 19–21, 24–25 and 40 have no text layer, so text extraction skips them. They must be read as images. Redactions are burned in; no redacted text is recoverable, and none may be filled in from elsewhere.
+
+Periods:
+
+- 1(A) and 1(D): nine seasons, 2009/10 to 2017/18 (paras 81, 101, 113, 143). Already recorded.
+- 2: the decision speaks of "the seasons to which Charge 2 relates" without listing them. The recorded 2013/14 to 2017/18 rests on para 81(b), which says the club's UEFA submissions in those seasons relied on the disputed figures.
+- 3: 2015/16 to 2017/18 rests on para 81(a)(ii) in the same way.
+- 1(B): four, six and one seasons for its three limbs (paras 118, 125, 132). The seasons themselves are redacted (para 101(b)–(d)). Stays `null`.
+- 1(C): the seasons are redacted (para 101(e)). Footnote 12 names 2014/15 and 2017/18 only in connection with sums not paid. Stays `null`.
+- 4(A)–(D): no period is stated. The detail is in Appendices 33 and 34, which are not published. Stays `null`.
+
+Dates. The decision confirms dates already in `events.json`: proceedings began February 2023 (para 1); the hearing sat on 42 days from 16 Sep to 6 Dec 2024 (page 1, para 16); 27 factual witnesses (para 27); the UEFA settlement was May 2014 (para 102); the Der Spiegel articles were November 2018 (para 103). The decision itself carries no visible date: the signature block on page 40 is redacted. It gives two further dates, neither of which is a step in a case, so neither is an event: ADUG bought 90% of the club in September 2008 (para 49), and an episode on 25 May 2013 that the Commission uses as an example (paras 88–89).
+
+Figures the decision states exactly: £949.94 million recorded as sponsorship income from Abu Dhabi sponsors across 2009/10 to 2017/18, of which £119.25 million was paid by the sponsors and £830.69 million by ADUG (para 72, with a season-by-season table in footnote 8).
 
 ## Visual identity
 
