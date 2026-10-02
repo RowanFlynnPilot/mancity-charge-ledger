@@ -54,6 +54,8 @@ VALID = {
             ],
         }],
     },
+    "moved": {"sanction-deadline": "decision"},
+    "archives": {SOURCE["url"]: f"https://web.archive.org/web/20261001120000/{SOURCE['url']}"},
     "updates": [{"id": hashlib.sha1(URL.encode()).hexdigest(), "title": "Story", "url": URL,
                  "publisher": "Paper", "publishedAt": "2026-10-01T21:41:00Z"}],
 }
@@ -202,6 +204,39 @@ class Validate(unittest.TestCase):
     def test_press_tally_must_be_a_count(self):
         self.data["allegations"]["pressTally"]["count"] = "115"
         self.assert_rejected("bad count")
+
+    def test_id_reserved_for_a_place_on_the_page(self):
+        self.data["pending"][0]["id"] = "content"
+        self.assert_rejected("reserved or used by another record")
+
+    def test_moved_id_must_have_left_the_record(self):
+        self.data["moved"] = {"appeal-deadline": "decision"}
+        self.assert_rejected("still in use")
+
+    def test_moved_id_must_lead_to_a_record(self):
+        self.data["moved"] = {"sanction-deadline": "missing"}
+        self.assert_rejected("is not an event, charge, pending item or season")
+
+    def test_moved_id_cannot_lead_to_a_case(self):
+        self.data["moved"] = {"sanction-deadline": "pl-2023"}
+        self.assert_rejected("is not an event, charge, pending item or season")
+
+    def test_moved_id_must_be_a_url_fragment(self):
+        self.data["moved"] = {"sanction deadline": "decision"}
+        self.assert_rejected("not a valid URL fragment")
+
+    def test_archived_copy_must_belong_to_a_cited_address(self):
+        url = "https://example.com/never-cited"
+        self.data["archives"] = {url: f"https://web.archive.org/web/20261001120000/{url}"}
+        self.assert_rejected("does not cite this address")
+
+    def test_archived_copy_must_be_a_dated_wayback_address(self):
+        self.data["archives"] = {SOURCE["url"]: f"https://web.archive.org/web/2026/{SOURCE['url']}"}
+        self.assert_rejected("must be https://web.archive.org/web/")
+
+    def test_archived_copy_must_be_of_the_address_it_is_filed_under(self):
+        self.data["archives"] = {SOURCE["url"]: f"https://web.archive.org/web/20261001120000/{PRESS['url']}"}
+        self.assert_rejected("must be https://web.archive.org/web/")
 
     def test_update_id_must_be_sha1_of_url(self):
         self.data["updates"][0]["id"] = "abc"

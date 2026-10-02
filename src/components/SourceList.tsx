@@ -1,3 +1,4 @@
+import { archiveOf } from "../data";
 import type { Source, SourceKind } from "../types";
 
 const KIND_LABEL: Record<SourceKind, string> = {
@@ -10,17 +11,22 @@ const isPdf = (url: string) => new URL(url).pathname.toLowerCase().endsWith(".pd
 export function SourceList({ sources }: { sources: Source[] }) {
   return (
     <ul className="sources" aria-label="Sources">
-      {sources.map((source) => (
-        <li key={source.url}>
-          <span className={`source-kind source-kind-${source.kind}`}>{KIND_LABEL[source.kind]}</span>
-          <span>
-            <a href={source.url} rel="noopener">{source.title}</a>
-            <span className="source-publisher">
-              {isPdf(source.url) && " (PDF)"}, {source.publisher}
+      {sources.map((source) => {
+        // A copy held by the Internet Archive, for when the page itself has moved or gone.
+        const archive = archiveOf.get(source.url);
+        return (
+          <li key={source.url}>
+            <span className={`source-kind source-kind-${source.kind}`}>{KIND_LABEL[source.kind]}</span>
+            <span>
+              <a href={source.url} rel="noopener">{source.title}</a>
+              <span className="source-publisher">
+                {isPdf(source.url) && " (PDF)"}, {source.publisher}
+                {archive && <>. <a href={archive} rel="noopener">Archived copy</a></>}
+              </span>
             </span>
-          </span>
-        </li>
-      ))}
+          </li>
+        );
+      })}
     </ul>
   );
 }

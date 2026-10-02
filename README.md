@@ -49,19 +49,22 @@ The subject is contested, so the project is built around a short set of editoria
 ```mermaid
 flowchart LR
   record["The record<br>data/*.json<br>edited by hand"] --> validate
-  feeds["News feeds<br>RSS"] -->|every three hours| fetch["fetch_updates.py"] --> coverage["feed/updates.json"] --> validate
+  feeds["News feeds<br>RSS"] -->|every hour| fetch["fetch_updates.py"] --> coverage["feed/updates.json"] --> validate
   tables["The League's<br>final tables"] -->|run by hand| seasons["build_seasons.py"] --> record
-  validate["validate.py<br>stops at the first error"] --> build["Vite build<br>React and TypeScript"] --> pages["GitHub Pages"]
+  validate["validate.py<br>stops at the first error"] --> build["Vite build<br>React and TypeScript"] --> static["Page, feed and data<br>written into the build"] --> pages["GitHub Pages"]
 ```
 
 There is no database, no server and no login. The record is a handful of JSON files, and the site is built from them.
 
 - **One contract, enforced twice.** [`src/types.ts`](src/types.ts) defines the shape of the data. [`pipeline/validate.py`](pipeline/validate.py) enforces the same rules on the files and stops at the first violation. It runs before every deploy, so a bad edit cannot reach the site.
-- **The record and the coverage are kept apart.** A scheduled workflow reads three news feeds and keeps the headlines that mention the cases. They are stored in `feed/`, outside the record, and shown under their own label. A headline becomes part of the record only when a person writes a sourced entry for it.
+- **The record and the coverage are kept apart.** A scheduled workflow reads three news feeds and keeps the headlines that mention the cases. They are stored in `feed/`, outside the record, and shown under their own label, with opinion columns tagged where the publisher marks them. A headline becomes part of the record only when a person writes a sourced entry for it.
 - **The edit history is public.** The record changes only through commits to `data/`, and the site links to [that history](https://github.com/RowanFlynnPilot/mancity-charge-ledger/commits/main/data).
 - **Published numbers are pinned.** The count of alleged breaches is computed from the transcribed statement, not typed in, and a test holds it at its published value so a data edit cannot change it unnoticed.
 - **Every address is rendered before a deploy.** A test builds the whole page from the real data for each view and each entry, and follows every link within it. A data edit that would leave an entry unreachable fails the check.
 - **Sources are checked weekly.** A workflow requests each document the record cites and fails if one has gone. A few sites refuse automated requests; those are listed for checking by hand.
+- **Archived copies, where they hold up.** A source links to its copy on the Internet Archive when one exists and has been read to confirm it shows what is cited.
+- **The page is in the HTML.** The build renders the timeline into the page it serves, and the app takes that markup over. The record does not wait for a script, and a reader without JavaScript still gets it.
+- **Links outlive edits.** Every entry has an address. When an entry is replaced, its old address is recorded and leads to what replaced it. An address that names nothing says so.
 - **No third-party requests.** Fonts are served from the site itself. There are no trackers and no analytics.
 - **Built to be read in any setting.** Light and dark themes, a print stylesheet that prints each source's address, keyboard focus states throughout, and colour used for meaning in one place only, always with a text label beside it.
 
@@ -69,12 +72,13 @@ There is no database, no server and no login. The record is a handful of JSON fi
 
 | Path | What it is |
 | --- | --- |
-| `data/` | The record: cases, events, charges, pending items, the League's statement, funding figures, season table. |
+| `data/` | The record: cases, events, charges, pending items, the League's statement, funding figures, season table, the ids that have moved, and archived copies of sources. |
 | `feed/updates.json` | Press headlines. Written by the pipeline only. |
 | `pipeline/` | The validator, the feed fetcher, the season-table builder, the link checker, and their tests. Python standard library only. |
 | `src/` | The site: React components, the data contract, routing by URL fragment, one stylesheet. |
+| `scripts/write-static.mjs` | The last step of the build: writes the rendered page, the Atom feed and the data files into the site. |
 | `design/social-card.html` | Draws the image shown when a link to the site is shared. |
-| `.github/workflows/` | `deploy.yml` checks, builds and publishes. `updates.yml` fetches the feeds on a schedule. `links.yml` checks the cited sources weekly. |
+| `.github/workflows/` | `deploy.yml` checks, builds and publishes. `updates.yml` fetches the feeds every hour. `links.yml` checks the cited sources weekly. Actions are pinned to a commit. |
 | `CLAUDE.md` | The working brief: editorial rules, data rules and design decisions in full. |
 
 ## Run it
@@ -87,8 +91,25 @@ python -m unittest discover pipeline     # pipeline tests
 npm install
 npm test                                 # site tests
 npm run dev                              # local site
-npm run build                            # typecheck, then build to dist/
+npm run build                            # typecheck, build to dist/, render the page into it
 ```
+
+## Use the data
+
+The record is published as JSON alongside the site, and as a feed:
+
+| What | Address |
+| --- | --- |
+| The timeline | <https://rowanflynnpilot.github.io/mancity-charge-ledger/data/events.json> |
+| The charges | <https://rowanflynnpilot.github.io/mancity-charge-ledger/data/charges.json> |
+| The cases | <https://rowanflynnpilot.github.io/mancity-charge-ledger/data/cases.json> |
+| What is due | <https://rowanflynnpilot.github.io/mancity-charge-ledger/data/pending.json> |
+| The League's statement, rule by season | <https://rowanflynnpilot.github.io/mancity-charge-ledger/data/allegations.json> |
+| The funding figures | <https://rowanflynnpilot.github.io/mancity-charge-ledger/data/funding.json> |
+| The season table | <https://rowanflynnpilot.github.io/mancity-charge-ledger/data/seasons.json> |
+| Entries, as an Atom feed | <https://rowanflynnpilot.github.io/mancity-charge-ledger/atom.xml> |
+
+[`src/types.ts`](src/types.ts) describes the shape of each file. The terms of reuse are in [LICENSE-DATA.md](LICENSE-DATA.md).
 
 ## Corrections
 

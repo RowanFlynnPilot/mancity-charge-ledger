@@ -1,4 +1,15 @@
-import { EDIT_HISTORY } from "../site";
+import { ADDRESS, ATOM_FILE, EDIT_HISTORY, LICENCE } from "../site";
+
+// The record's files, as the build publishes them under data/.
+const FILES = [
+  ["cases", "the cases"],
+  ["events", "the timeline"],
+  ["charges", "the charges"],
+  ["pending", "what is due"],
+  ["allegations", "the League’s statement"],
+  ["funding", "the funding figures"],
+  ["seasons", "the season table"],
+] as const;
 
 export function Method() {
   return (
@@ -12,7 +23,8 @@ export function Method() {
               Every entry links to where it comes from. A primary document is a decision, award,
               rule or statement published by a regulator, a tribunal, a court or the club. A press
               report is journalism about one. Each source is labelled as one or the other, and the
-              charge ledger cites primary documents only.
+              charge ledger cites primary documents only. Where the Internet Archive holds a copy
+              that shows what is cited, the source links to that archived copy as well.
             </p>
           </dd>
         </div>
@@ -51,6 +63,22 @@ export function Method() {
             <p>
               The latest coverage list is gathered automatically from news feeds. It is not part
               of the record and is not checked entry by entry.
+            </p>
+          </dd>
+        </div>
+        <div>
+          <dt>Reuse</dt>
+          <dd>
+            <p>
+              The record may be reused with credit, under{" "}
+              <a href={LICENCE} rel="noopener">CC BY 4.0</a>. Its files are published as JSON:{" "}
+              {FILES.map(([file, label], i) => (
+                <span key={file}>
+                  {i > 0 && ", "}
+                  <a href={`${ADDRESS}data/${file}.json`}>{label}</a>
+                </span>
+              ))}
+              . Entries are also published as <a href={ADDRESS + ATOM_FILE}>an Atom feed</a>.
             </p>
           </dd>
         </div>

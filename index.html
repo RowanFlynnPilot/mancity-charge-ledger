@@ -30,10 +30,23 @@
     <meta name="theme-color" content="#f2f4ef" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#141714" media="(prefers-color-scheme: dark)" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href="https://rowanflynnpilot.github.io/mancity-charge-ledger/" />
+    <!-- The record's own feed, written by the build. Not the press feed in feed/. -->
+    <link
+      rel="alternate"
+      type="application/atom+xml"
+      title="The Charge Ledger: entries in the record"
+      href="https://rowanflynnpilot.github.io/mancity-charge-ledger/atom.xml"
+    />
   </head>
   <body>
+    <noscript>
+      <p style="margin: 0; padding: 0.5rem 1rem; font: 0.875rem/1.4 system-ui, sans-serif">
+        Without JavaScript this page shows the timeline. The other views need JavaScript.
+      </p>
+    </noscript>
+    <!-- The build renders the page into this element. It must stay empty here. -->
     <div id="root"></div>
-    <noscript>The Charge Ledger needs JavaScript to display the record.</noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

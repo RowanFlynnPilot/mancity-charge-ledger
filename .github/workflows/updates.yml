@@ -1,10 +1,14 @@
 name: Fetch updates
 
-# Reads the news feeds every three hours and commits feed/updates.json if it
-# changed. A failed run is the alert that a feed is down or has changed shape.
+# Reads the news feeds every hour and commits feed/updates.json if it changed.
+# A failed run is the alert that a feed is down or has changed shape.
+#
+# Hourly, because GitHub drops scheduled runs when it is busy: on a three-hour
+# schedule the gaps reached eight hours, longer than the shortest feed holds its
+# items. A run that finds nothing new commits nothing and deploys nothing.
 on:
   schedule:
-    - cron: "17 */3 * * *"
+    - cron: "17 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -22,8 +26,8 @@ jobs:
     outputs:
       changed: ${{ steps.commit.outputs.changed }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.14"
       - run: python pipeline/fetch_updates.py

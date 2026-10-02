@@ -17,6 +17,7 @@ As of 1 Oct 2026:
 - The Core Decision was read in full on 2 Oct 2026 (build step 2). No `null` period could be filled. See "What the Core Decision does and does not establish" below.
 - The season view (v1.1) is built: `data/seasons.json` from the Premier League's final tables, and a Seasons view between the charge ledger and What's next.
 - The story is live. The Commission's Core Decision was published 29 Sep 2026. City lodged its appeal on 1 Oct 2026, and the League confirmed it on 2 Oct. Neither statement lists the findings appealed; the nine charges found against City are recorded as `appeal: "pending"` because City calls the appeal comprehensive, and Charge 4(B), which City won, stays `none`. Sanction is undecided.
+- A review on 2 Oct 2026 led to: a README, licences and a social card; primary documents for every event but one; a test that renders every address; a weekly link check; old addresses that still arrive (`moved.json`); the page rendered into the HTML at build time; the record published as JSON and as an Atom feed; an hourly feed job, pinned actions and Dependabot. What was left for a decision is under "Open decisions".
 
 ## Editorial rules
 
@@ -33,7 +34,7 @@ These are not style preferences. They are what makes the tool publishable.
 
 ## Stack
 
-Python pipeline → static JSON in `data/` and `feed/` → GitHub Actions → React + Vite + TypeScript → GitHub Pages. It is a standalone site, not an embed.
+Python pipeline → static JSON in `data/` and `feed/` → GitHub Actions → React + Vite + TypeScript → GitHub Pages. It is a standalone site, not an embed. The build renders the page into the HTML, so the record is there before any script runs.
 
 No database. No server. No auth.
 
@@ -53,6 +54,8 @@ data/pending.json         due but not yet happened            hand-edited
 data/allegations.json     the League's statement, rule by season   hand-edited, from the charge statement
 data/funding.json         sponsorship money by season         hand-edited, from the Core Decision
 data/seasons.json         final tables, 2009/10 to 2017/18    written by build_seasons.py only
+data/moved.json           ids that left the record → the record each became   hand-edited
+data/archives.json        cited address → its copy on the Wayback Machine      hand-edited, after reading the copy
 feed/updates.json         news feed, newest first             written by the pipeline only
 pipeline/validate.py      raises on first contract violation
 pipeline/fetch_updates.py RSS → feed/updates.json
@@ -60,6 +63,11 @@ pipeline/build_seasons.py Premier League final tables → seasons.json, run by h
 pipeline/check_links.py   requests every cited source; raises if one is dead
 pipeline/test_*.py        unittest, stdlib only
 src/render.test.tsx       renders the whole page with the real data, for every address
+src/static.tsx            what the build writes besides the app: the page as markup, the Atom feed
+src/atom.ts               the record's own feed, one entry per event
+src/today.ts              today's date in London, known only in the browser
+src/opinion.ts            which press headlines are opinion, as far as a headline shows it
+scripts/write-static.mjs  last step of the build: writes the page, atom.xml and data/ into dist/
 src/data.ts               the JSON, typed, plus lookups
 src/route.ts              URL fragment → view and entry
 src/dates.ts              date formatting, "today" in London, due notes
@@ -69,6 +77,7 @@ src/allegations.ts        counting the League's statement rule by season
 src/components/           one file per view, plus shared pieces
 src/styles.css            all styles and the design tokens
 .github/workflows/        deploy.yml (check, build, Pages), updates.yml (cron fetch), links.yml (weekly link check)
+.github/dependabot.yml    monthly update proposals for the actions and the packages
 ```
 
 ## Commands
@@ -81,7 +90,7 @@ python pipeline/build_seasons.py         rebuild data/seasons.json from the Leag
 python pipeline/check_links.py           request every cited source and report the dead ones
 npm run dev                              dev server (base path /mancity-charge-ledger/)
 npm test                                 app tests (vitest)
-npm run build                            typecheck, then build to dist/
+npm run build                            typecheck, build to dist/, then render the page, the feed and data/ into it
 ```
 
 The pipeline uses the Python standard library only. There is no `requirements.txt`.
@@ -93,16 +102,20 @@ The pipeline uses the Python standard library only. There is no `requirements.tx
 - `events.json` stays sorted by date ascending. The validator fails otherwise.
 - An event can belong to more than one case (`caseIds`). The Der Spiegel leak sits in two lanes.
 - `Charge.period` is `null` until the period is read from the published decision or another primary document. `null` renders as nothing, not as a placeholder.
-- When a pending item happens, add it to `events.json` and delete it from `pending.json` in the same commit.
+- When a pending item happens, add it to `events.json`, delete it from `pending.json`, and add its id to `moved.json` pointing at the new event, all in the same commit. See "When the case moves" below.
+- `moved.json` maps an id that has left the record to the id of the record it became. The app follows it, so a link someone shared to the old id still arrives, and rewrites the address to the current id. The validator checks that the old id is no longer in use and that the new one is an event, charge, pending item or season. An id in `moved.json` is never used again. Nothing can check that a deleted id was added here; that is on the person making the edit.
 - `updates.json` is never hand-edited. A feed item becomes part of the record only when a person writes an event for it.
-- `updates.json` lives in `feed/`, not `data/`. A workflow commits it every few hours, and the methodology note links to the commit history of `data/` as the record's edit history. Keeping the feed out of `data/` keeps that history to edits a person made.
+- `updates.json` lives in `feed/`, not `data/`. A workflow commits it every hour, and the methodology note links to the commit history of `data/` as the record's edit history. Keeping the feed out of `data/` keeps that history to edits a person made.
 - `seasons.json` is never hand-edited. `build_seasons.py` reads the Premier League's own standings for each season and raises unless it gets a complete final table (20 clubs, 38 matches each). Each row cites that season's table page on premierleague.com as a primary source. The validator checks that `cityPosition` agrees with `champion` and `runnerUp`. The file records the tables as the League publishes them: if a decision ever alters a final table, re-run the script.
 - Charge ids are the Commission's number and letter (`1A`, `2`, `4B`). The validator enforces this, and the findings board groups charges by the number.
 - `funding.json` holds the season-by-season sponsorship figures behind one finding (`chargeId`), entered by hand from the decision. Each season's two parts must add up to the recorded figure; the validator fails otherwise. Amounts are £ million. `locator` says where in the source the figures are. It is a single object, not a list.
 - `allegations.json` transcribes the League's charge statement of 6 Feb 2023: the rule numbers it cites, season by season, in the statement's own groups. `chargeIds` on each group is this record's own match to the Commission's charges, made from the rule numbers the two documents share; the UI says so. `pressTally` holds the press figure and its source. The count is not stored. It is computed: each rule once per season, a range such as `E.52 to E.60` as nine. It comes to 130, and `src/allegations.test.ts` pins that number so a data edit cannot change the published count unnoticed. For 2009/10 the statement cites four rules before 10 September 2009 and five after; the data holds the five and a `note` says so.
-- Record ids are URL fragments. They use letters, digits and single hyphens, and are unique across cases, events, charges, pending items and seasons. `timeline`, `ledger`, `seasons`, `next`, `latest`, `method`, `funding` and `allegations` are reserved for the app.
+- Record ids are URL fragments. They use letters, digits and single hyphens, and are unique across cases, events, charges, pending items and seasons. `timeline`, `ledger`, `seasons`, `next`, `latest`, `method`, `funding`, `allegations`, `content` and `not-found` are reserved for the app.
 - `Case.cityPositionEventId` points at the `statement` event that records City's position. It is required for any case that has charges; the validator fails otherwise. This is how editorial rule 3 is enforced: the ledger and the timeline read City's position from that event. When City's position changes, add a new statement event and repoint the field.
 - One URL is always cited with the same title, publisher and kind. The validator fails on a mismatch.
+- `archives.json` maps a cited address to the same page as the Wayback Machine held it at one moment. The source list shows it as "Archived copy". The validator checks that the address is one the record cites and that the copy is `https://web.archive.org/web/<14 digits>/` followed by that address. An address with no entry shows no link.
+- Read an archived copy before adding it. It must show what the record cites the page for. Three kinds of copy were left out on 2 Oct 2026 for failing that: the League's table pages, whose copies are empty shells because the table is loaded by script; a BBC report whose only copy was taken before the report was rewritten to cover the appeal; and pages the Archive holds no copy of, which is most of them (7 of 37 addresses have a copy). Nothing has been submitted to the Archive; only copies it already held are linked.
+- `check_links.py` does not request the archived copies.
 - `Update.publishedAt` is UTC, `YYYY-MM-DDTHH:MM:SSZ`, so string order is time order. `Update.id` must equal the sha1 of `Update.url`.
 
 ## Pipeline: `fetch_updates.py`
@@ -110,11 +123,12 @@ The pipeline uses the Python standard library only. There is no `requirements.tx
 One job: read RSS feeds, keep the items about these cases, write `feed/updates.json`.
 
 - Feeds are a fixed list at the top of the file. All three were requested on 1 Oct 2026 and returned valid RSS.
-  - `https://www.skysports.com/rss/12040` (Sky Sports news, all sports). 20 items, spanning about 5.5 hours when checked, so a 3-hour cron does not miss items.
+  - `https://www.skysports.com/rss/12040` (Sky Sports news, all sports). 20 items, spanning about 5.5 hours when checked. That is the shortest of the three, and it sets how often the feeds must be read.
   - `https://feeds.bbci.co.uk/sport/football/rss.xml` (BBC Sport football).
   - `https://www.theguardian.com/football/manchestercity/rss` (The Guardian, Manchester City).
 - Keep an item when title + description mention the club (`Man City` or `Manchester City`) and at least one case term: `charges`, `commission`, `appeal`, `sanction`, `verdict`, `breach`, `tribunal`, `APT`, `points deduction`, `expulsion`, `financial rules`, `guilty`, `ruling`, `findings`, `hearing`. Terms match at the start of a word (`appeal` catches `appeals`). `APT` is case-sensitive and whole-word, so it does not hit `captain` or `apt`. Markup is stripped before matching.
 - The filter is loose by design. It lets through the odd unrelated item that mentions the club and a term in passing. The Latest view is labelled as unchecked press coverage for that reason.
+- Opinion columns stay in the feed and are tagged "Opinion" in the Latest view. The tag is worked out in the app (`src/opinion.ts`), not stored: a Guardian headline that ends with a bar and a writer's name, or with `Editorial` or `Letters`. BBC and Sky do not mark their columns in a way a feed carries, so theirs are not tagged, and the view says so. Decided by Rowan on 2 Oct 2026, over leaving them out.
 - `title`, `link` and `pubDate` are required and a missing one raises. `description` may be empty; publishers do send that.
 - Sky stamps dates with `BST`, which is not an RFC 822 zone. The fetcher maps it to `+0100` and raises on any other zone name it cannot resolve.
 - The URL is stored without its query string (BBC appends tracking parameters). `id` is the sha1 of that URL. Merge with the existing file, sort newest first, keep the latest 200.
@@ -122,9 +136,12 @@ One job: read RSS feeds, keep the items about these cases, write `feed/updates.j
 
 Workflows:
 
-- `updates.yml`: cron every 3 hours → `fetch_updates.py` → `validate.py` → commit `feed/updates.json` if it changed → call `deploy.yml`. The call is needed because a push made with the workflow's own token does not trigger other workflows.
+- `updates.yml`: cron every hour → `fetch_updates.py` → `validate.py` → commit `feed/updates.json` if it changed → call `deploy.yml`. The call is needed because a push made with the workflow's own token does not trigger other workflows.
 - `deploy.yml`: on push to `main`, pull request, manual run, or a call from `updates.yml`. Runs `validate.py`, the pipeline tests, the app tests and the build. Off pull requests it then deploys to Pages.
 - `links.yml`: Mondays, by hand, or on a pull request that changes the checker. Runs `check_links.py`. It is kept out of `deploy.yml` so that another site being down cannot block a deploy.
+- The feed job is hourly because GitHub drops scheduled runs when it is busy. On the three-hour schedule, on 2 Oct 2026, runs came six and eight hours apart, longer than Sky's feed holds its items. A run that finds nothing new commits nothing and deploys nothing.
+- GitHub switches scheduled workflows off after 60 days without activity in the repo. If the feed and link runs stop, look there first.
+- Every action is pinned to a commit, with its release in a comment beside it. `.github/dependabot.yml` proposes the next pin, and package updates, once a month. Each proposal is a pull request and runs the full check.
 
 ## Pipeline: `check_links.py`
 
@@ -141,12 +158,14 @@ One job: request every source address in `data/` and say which are dead. The pre
 
 The app casts the JSON to its types and reaches across records with `!`. TypeScript cannot see whether those joins hold; this test can.
 
-- It renders `<App />` to markup for every view, for every record id, and for `#allegations`, with the real data. There is no browser: it stubs `window.location.hash`, which is the only thing the page reads from the browser while rendering.
+- It renders `<Page route={…} />` to markup for every view, for every record id, and for `#allegations`, with the real data. There is no browser and nothing is stubbed: `Page` reads nothing from the browser while rendering.
+- `<App />` must render the same markup as the timeline route. That is what the build writes into the page.
+- Every id in `moved.json` must open the record it moved to. An address that names nothing must show the notice, and no real address may.
 - Every record's address must produce a page with that record's element on it. Every `href="#…"` on any view must lead to an element. So a link to an entry that has been renamed or removed fails the check.
 - It fails if `undefined`, `NaN` or `[object Object]` appears in any view but Latest, whose headlines are not ours.
 - Every `type`, `finding`, `appeal`, `status` and `cityRole` in the data must have a label. This is where drift between `validate.py` and the app shows up.
 - Editorial rule 3 is tested: the opening and the ledger must link to the entry recording City's position for each case that has charges.
-- A component that reads `window` or `document` while rendering will break this test. Keep those reads in effects and event handlers.
+- A component that reads `window` or `document` while rendering will break this test, and the build. Keep those reads in effects and event handlers.
 
 ## UI
 
@@ -164,7 +183,7 @@ This is a personal project. No organisation logo or branding appears in the UI.
 Two things a public reference needs that the four views don't cover:
 
 - **Methodology note.** A short section on the page: what counts as a primary source, what counts as press, that findings are attributed and City's position is shown, who maintains it (Rowan Flynn), and how to report a correction.
-- **Linkable items.** Every event, charge and pending item gets a URL fragment from its `id` (`#pl-core-decision`, `#1A`), so one item can be cited or shared on its own. The fragment opens the right view, scrolls to the entry and marks it. Views are fragments too (`#ledger`).
+- **Linkable items.** Every event, charge and pending item gets a URL fragment from its `id` (`#pl-core-decision`, `#1A`), so one item can be cited or shared on its own. The fragment opens the right view, scrolls to the entry and marks it. Views are fragments too (`#ledger`). An id that has moved opens the record it became. A fragment that names nothing keeps the view and shows a notice saying so, under the view bar.
 
 The opening, above the views (built 2 Oct 2026 to give the page a focal point):
 
@@ -283,10 +302,48 @@ Its own, neutral. Reference-book plain: the documents are the content.
 - The code is MIT. The record in `data/` is CC BY 4.0, by notice in `LICENSE-DATA.md`. The headlines in `feed/updates.json` are the publishers' words and are not licensed by this project; neither are the documents the record cites.
 - The README sends corrections to GitHub issues. The corrections email for the site's methodology note is still an open decision.
 
+## The build
+
+`npm run build` does four things in order: `tsc --noEmit`, `vite build` into `dist/`, `vite build --ssr src/static.tsx` into `dist-static/`, and `node scripts/write-static.mjs`. The last step writes into `dist/`:
+
+- **The page, in `index.html`.** `src/static.tsx` renders `<App />` to markup and the script puts it into the empty root. `src/main.tsx` hydrates it. The dev server serves an empty root, so there `main.tsx` renders from scratch; that is the only difference between the two.
+- **`atom.xml`**, the record's own feed: one entry per event, newest first, each linked to its place on the site and to its sources. It is not the press feed in `feed/`. A date held to the month is given as the month's first day.
+- **`data/`**, a copy of the record's JSON, so each file has an address others can fetch. The methodology note links to both under "Reuse".
+
+It also prints what it wrote, so the build log shows the size of the markup and which fonts were preloaded. Anything missing raises and the build fails.
+
+Rules that keep the built page and the running app the same. Break one and the browser discards the built markup and renders again, with an error in the console:
+
+- `App` starts at the timeline route and moves to the address in a layout effect. It never reads the address while rendering. So the first render is always the page the build wrote, whatever address the reader arrived at.
+- `Page` renders one route and reads nothing from the browser.
+- Nothing rendered may depend on the clock. `useToday()` in `src/today.ts` gives today's date in London in the browser and `null` in the build and during hydration; the "Today" and "In 3 days" notes appear only once it is known.
+- Markup must be valid HTML as written. The browser repairs invalid nesting when it parses the built page, and the repaired tree no longer matches.
+
+Fonts: `vite.config.ts` adds a preload for the three files the first screen uses (Literata upright and italic, Archivo, Latin subset). It reads the hashed names from the build's own list of files.
+
+Not verified by any test: that hydration is clean. Check the browser console on the live site after a change to anything in the first render.
+
+## When the case moves
+
+`Case.outcome` is a sentence a person wrote. It says where the case stands and nothing checks it against the charges. Several other places hold the same state. When something happens, go through all of them in one commit:
+
+1. Add the event to `events.json`, with a primary document if one exists.
+2. If it was a pending item, delete it from `pending.json` and add its id to `moved.json`, pointing at the new event.
+3. Add any new pending item the event creates.
+4. Update `finding` or `appeal` on each charge it affects.
+5. Re-read `Case.outcome` for that case against the charges and rewrite it if it no longer agrees. Set `status` to `closed` if the case has ended.
+6. If City's position has changed, add a `statement` event and repoint `cityPositionEventId`.
+7. Update the "Status" section of this file.
+
+The social card and the README say nothing about where a case stands, so neither needs touching.
+
 ## Open decisions
 
 - The corrections email address for the methodology note. Not yet supplied. Leave the contact line out until it is.
 - Whether Premier League and club statements, which have no RSS, are worth an HTML scrape. Until decided they enter by hand as events.
+- Whether to ask the Wayback Machine to save the 30 cited pages it holds no usable copy of. Rowan chose on 2 Oct 2026 to link only copies it already held. Saving the rest would mean sending each address to archive.org.
+- `athletic-verdict-report` cites the AP timeline, not The Athletic's own article. Add the article's address when it is to hand.
+- There is no error boundary. If a render throws in the browser the page goes blank. The render test and the build both render every address first, which is the guard. A boundary was left out because it would be a fallback path.
 
 ## Engineering rules
 

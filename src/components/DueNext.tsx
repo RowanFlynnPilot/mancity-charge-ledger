@@ -1,13 +1,15 @@
 import { cx } from "../cx";
 import { pending } from "../data";
-import { byDue, dueNote, formatDate, londonDate } from "../dates";
+import { byDue, dueNote, formatDate } from "../dates";
+import { useToday } from "../today";
 import type { CaseId } from "../types";
 
 // The next pending step in a case, linked to its entry under "What's next".
 export function DueNext({ caseId }: { caseId: CaseId }) {
+  const today = useToday();
   const item = byDue(pending.filter((p) => p.caseId === caseId))[0];
   if (!item) return null;
-  const note = dueNote(item.due, londonDate(new Date()));
+  const note = today === null ? null : dueNote(item.due, today);
 
   return (
     <p className="standing-meta">

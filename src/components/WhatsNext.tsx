@@ -1,11 +1,12 @@
 import { cx } from "../cx";
 import { caseById, pending } from "../data";
-import { byDue, dueNote, formatDate, londonDate } from "../dates";
+import { byDue, dueNote, formatDate } from "../dates";
+import { useToday } from "../today";
 import { CopyLink } from "./CopyLink";
 import { SourceList } from "./SourceList";
 
 export function WhatsNext({ target }: { target: string | null }) {
-  const today = londonDate(new Date());
+  const today = useToday();
 
   return (
     <section id="next" className="view" aria-labelledby="next-title">
@@ -19,7 +20,7 @@ export function WhatsNext({ target }: { target: string | null }) {
 
       <ol className="rows">
         {byDue(pending).map((item) => {
-          const note = dueNote(item.due, today);
+          const note = today === null ? null : dueNote(item.due, today);
           return (
             <li key={item.id} id={item.id} tabIndex={-1} className={cx("row", item.id === target && "is-target")}>
               <div className="row-margin">

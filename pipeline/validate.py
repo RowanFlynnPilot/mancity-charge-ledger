@@ -18,14 +18,16 @@ DATE = re.compile(r"^\d{4}-(0[1-9]|1[0-2])(-(0[1-9]|[12]\d|3[01]))?$")
 ISO_UTC = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 # Ids become URL fragments (#pl-core-decision, #1A).
 ID = re.compile(r"^[A-Za-z0-9]+(-[A-Za-z0-9]+)*$")
-# Fragments the app uses for its own views. No record may take one.
+# Fragments the app uses for its own views and for places on the page. No record may take one.
 RESERVED_IDS = {"timeline", "ledger", "seasons", "next", "latest", "method", "funding",
-                "allegations"}
+                "allegations", "content", "not-found"}
 SEASON = re.compile(r"^(\d{4})/(\d{2})$")
 # A Premier League rule as the charge statement cites it: "B.13", "B.14.6", or a
 # range, "E.52 to E.60".
 RULE = re.compile(r"^[A-Z]\.\d+(\.\d+)?$")
 RULE_RANGE = re.compile(r"^([A-Z])\.(\d+) to \1\.(\d+)$")
+# A page as the Wayback Machine held it at one moment: the stamp is YYYYMMDDHHMMSS.
+WAYBACK = re.compile(r"^https://web\.archive\.org/web/\d{14}/https://")
 # The Commission's own numbering: Charge 2, Charge 1(A).
 CHARGE_ID = re.compile(r"^\d+[A-Z]?$")
 CLUB = "Manchester City"
@@ -82,7 +84,7 @@ def check_ids(records: list[dict], where: str) -> None:
     require(len(ids) == len(set(ids)), f"{where}: duplicate id")
 
 
-def check_fragments(*groups: list[dict]) -> None:
+def check_fragments(*groups: list[dict]) -> set[str]:
     """Every record id is a usable, unambiguous URL fragment across all files."""
     seen = set(RESERVED_IDS)
     for group in groups:
@@ -91,6 +93,19 @@ def check_fragments(*groups: list[dict]) -> None:
             require(ID.match(fragment) is not None, f"id {fragment!r}: not a valid URL fragment")
             require(fragment not in seen, f"id {fragment!r}: reserved or used by another record")
             seen.add(fragment)
+    return seen - RESERVED_IDS
+
+
+def validate_moved(moved: dict, in_use: set[str], linkable: set[str]) -> None:
+    """An id that left the record points at a record a reader can be taken to,
+    and is not used again."""
+    require(isinstance(moved, dict), "moved: must be an object of old id to current id")
+    for old, now in moved.items():
+        where = f"moved/{old}"
+        require(ID.match(old) is not None, f"{where}: not a valid URL fragment")
+        require(old not in in_use and old not in RESERVED_IDS,
+                f"{where}: still in use, so it has not moved")
+        require(now in linkable, f"{where}: {now!r} is not an event, charge, pending item or season")
 
 
 def check_sources(sources: list[dict], where: str, primary_only: bool = False) -> None:
@@ -105,14 +120,16 @@ def check_sources(sources: list[dict], where: str, primary_only: bool = False) -
     require(len(urls) == len(set(urls)), f"{where}: the same source is listed twice")
 
 
-def check_source_consistency(*groups: list[dict]) -> None:
-    """One URL is always cited with the same title, publisher and kind."""
+def check_source_consistency(*groups: list[dict]) -> set[str]:
+    """One URL is always cited with the same title, publisher and kind.
+    Returns every address the record cites."""
     cited: dict[str, dict] = {}
     for group in groups:
         for record in group:
             for s in record["sources"]:
                 require(cited.setdefault(s["url"], s) == s,
                         f"{record['id']}: {s['url']} is cited differently elsewhere")
+    return set(cited)
 
 
 def validate_cases(cases: list[dict]) -> set[str]:
@@ -191,6 +208,17 @@ def validate_city_position(cases: list[dict], events: list[dict], charges: list[
         require(event is not None, f"{where}: cityPositionEventId {position!r} is not an event")
         require(c["id"] in event["caseIds"], f"{where}: {position!r} belongs to another case")
         require(event["type"] == "statement", f"{where}: {position!r} is not a statement event")
+
+
+def validate_archives(archives: dict, cited: set[str]) -> None:
+    """An archived copy belongs to an address the record cites, and is that
+    address as the Wayback Machine holds it at one moment."""
+    require(isinstance(archives, dict), "archives: must be an object of cited address to archived copy")
+    for url, copy in archives.items():
+        where = f"archives/{url}"
+        require(url in cited, f"{where}: the record does not cite this address")
+        require(isinstance(copy, str) and WAYBACK.match(copy) is not None and copy.endswith(f"/{url}"),
+                f"{where}: must be https://web.archive.org/web/<14 digits>/ followed by the address")
 
 
 def validate_seasons(seasons: list[dict]) -> None:
@@ -290,7 +318,8 @@ def validate_updates(updates: list[dict]) -> None:
 
 
 def validate(cases: list[dict], events: list[dict], charges: list[dict], pending: list[dict],
-             seasons: list[dict], funding: dict, allegations: dict, updates: list[dict]) -> None:
+             seasons: list[dict], funding: dict, allegations: dict, moved: dict,
+             archives: dict, updates: list[dict]) -> None:
     case_ids = validate_cases(cases)
     validate_events(events, case_ids)
     validate_charges(charges, case_ids)
@@ -299,18 +328,22 @@ def validate(cases: list[dict], events: list[dict], charges: list[dict], pending
     validate_seasons(seasons)
     validate_funding(funding, charges)
     validate_allegations(allegations, charges)
-    check_fragments(cases, events, charges, pending, seasons)
-    check_source_consistency(events, charges, pending, seasons, [
+    in_use = check_fragments(cases, events, charges, pending, seasons)
+    # Cases have ids but no place on the page, so nothing can move to one.
+    validate_moved(moved, in_use, in_use - case_ids)
+    cited = check_source_consistency(events, charges, pending, seasons, [
         funding | {"id": "funding"},
         allegations | {"id": "allegations"},
         allegations["pressTally"] | {"id": "allegations/pressTally"},
     ])
+    validate_archives(archives, cited)
     validate_updates(updates)
 
 
 def main() -> None:
     validate(load("cases"), load("events"), load("charges"), load("pending"),
-             load("seasons"), load("funding"), load("allegations"), load("updates", FEED))
+             load("seasons"), load("funding"), load("allegations"), load("moved"),
+             load("archives"), load("updates", FEED))
     print("data ok")
 
 
