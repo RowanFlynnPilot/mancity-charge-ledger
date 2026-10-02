@@ -1,6 +1,6 @@
 """Build data/seasons.json from the Premier League's own final tables.
 
-Reads the League's standings for each season the charges cover and records
+Reads the League's standings for each season the accounts charges cover and records
 where City finished, the champion and the runner-up. Each row cites that
 season's table page on premierleague.com.
 
@@ -23,7 +23,7 @@ STANDINGS = ("https://sdp-prem-prod.premier-league-prod.pulselive.com"
              "/api/v5/competitions/8/seasons/{year}/standings?live=false")
 TABLE_PAGE = "https://www.premierleague.com/en/tables/premier-league/{id}/all-matchweeks"
 
-# 2009/10 to 2017/18, the seasons the Premier League's charges cover.
+# 2009/10 to 2017/18, the seasons covered by the charges about the club's accounts and spending.
 FIRST_YEAR, LAST_YEAR = 2009, 2017
 CLUB = "Manchester City"
 CLUBS = 20

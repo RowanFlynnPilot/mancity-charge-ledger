@@ -1,4 +1,5 @@
 // The record, typed. pipeline/validate.py is what guarantees these casts hold.
+import allegationsJson from "../data/allegations.json";
 import casesJson from "../data/cases.json";
 import chargesJson from "../data/charges.json";
 import eventsJson from "../data/events.json";
@@ -7,7 +8,9 @@ import pendingJson from "../data/pending.json";
 import seasonsJson from "../data/seasons.json";
 import updatesJson from "../data/updates.json";
 import type { ViewId } from "./route";
-import type { Case, CaseEvent, CaseId, Charge, Funding, PendingItem, Season, Update } from "./types";
+import type {
+  Allegations, Case, CaseEvent, CaseId, Charge, Funding, PendingItem, Season, Update,
+} from "./types";
 
 export const cases = casesJson as Case[];
 export const events = eventsJson as CaseEvent[];
@@ -15,6 +18,7 @@ export const charges = chargesJson as Charge[];
 export const pending = pendingJson as PendingItem[];
 export const seasons = seasonsJson as Season[];
 export const funding = fundingJson as Funding;
+export const allegations = allegationsJson as Allegations;
 export const updates = updatesJson as Update[];
 
 export const caseById = Object.fromEntries(cases.map((c) => [c.id, c])) as Record<CaseId, Case>;
@@ -26,6 +30,8 @@ export const viewOfRecord: Record<string, ViewId> = Object.fromEntries([
   ...charges.map((c) => [c.id, "ledger"] as const),
   ...pending.map((p) => [p.id, "next"] as const),
   ...seasons.map((s) => [s.id, "seasons"] as const),
+  // The League's statement, rule by season: the ledger's second way of counting.
+  ["allegations", "ledger"] as const,
 ]);
 
 // events.json is sorted ascending, so the last entry is where the record ends.

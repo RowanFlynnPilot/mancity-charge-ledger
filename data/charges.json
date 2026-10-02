@@ -118,7 +118,7 @@
     "caseId": "pl-2023",
     "ref": "Charge 4(A)",
     "subject": "Duty to cooperate with the League's investigation",
-    "period": null,
+    "period": "December 2018 to February 2023",
     "finding": "proven-in-part",
     "appeal": "none",
     "summary": "The Commission found breaches of the duty to cooperate in the majority of the respects alleged.",
@@ -128,6 +128,12 @@
         "publisher": "Premier League",
         "url": "https://resources.premierleague.pulselive.com/premierleague/document/2026/09/29/9bb3f063-6312-4d15-a1f1-77280d356a49/Premier-League-Manchester-City-independent-Commission-Redacted-Core-Decision.pdf",
         "kind": "primary"
+      },
+      {
+        "title": "Premier League statement (6 Feb 2023)",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/news/3045970",
+        "kind": "primary"
       }
     ]
   },
@@ -136,7 +142,7 @@
     "caseId": "pl-2023",
     "ref": "Charge 4(B)",
     "subject": "Duty to cooperate with the League's investigation",
-    "period": null,
+    "period": "December 2018 to February 2023",
     "finding": "not-proven",
     "appeal": "none",
     "summary": "The Commission found no breach in the respects alleged. This is the only charge not proven.",
@@ -146,6 +152,12 @@
         "publisher": "Premier League",
         "url": "https://resources.premierleague.pulselive.com/premierleague/document/2026/09/29/9bb3f063-6312-4d15-a1f1-77280d356a49/Premier-League-Manchester-City-independent-Commission-Redacted-Core-Decision.pdf",
         "kind": "primary"
+      },
+      {
+        "title": "Premier League statement (6 Feb 2023)",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/news/3045970",
+        "kind": "primary"
       }
     ]
   },
@@ -154,7 +166,7 @@
     "caseId": "pl-2023",
     "ref": "Charge 4(C)",
     "subject": "Duty to cooperate with the League's investigation",
-    "period": null,
+    "period": "December 2018 to February 2023",
     "finding": "proven",
     "appeal": "none",
     "summary": "The Commission found breaches of the duty to cooperate in each of the respects alleged.",
@@ -164,6 +176,12 @@
         "publisher": "Premier League",
         "url": "https://resources.premierleague.pulselive.com/premierleague/document/2026/09/29/9bb3f063-6312-4d15-a1f1-77280d356a49/Premier-League-Manchester-City-independent-Commission-Redacted-Core-Decision.pdf",
         "kind": "primary"
+      },
+      {
+        "title": "Premier League statement (6 Feb 2023)",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/news/3045970",
+        "kind": "primary"
       }
     ]
   },
@@ -172,7 +190,7 @@
     "caseId": "pl-2023",
     "ref": "Charge 4(D)",
     "subject": "Duty to cooperate with the League's investigation",
-    "period": null,
+    "period": "December 2018 to February 2023",
     "finding": "proven",
     "appeal": "none",
     "summary": "The Commission found a breach of the duty to cooperate in the respect alleged.",
@@ -181,6 +199,12 @@
         "title": "Independent Commission: Redacted Core Decision",
         "publisher": "Premier League",
         "url": "https://resources.premierleague.pulselive.com/premierleague/document/2026/09/29/9bb3f063-6312-4d15-a1f1-77280d356a49/Premier-League-Manchester-City-independent-Commission-Redacted-Core-Decision.pdf",
+        "kind": "primary"
+      },
+      {
+        "title": "Premier League statement (6 Feb 2023)",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/news/3045970",
         "kind": "primary"
       }
     ]

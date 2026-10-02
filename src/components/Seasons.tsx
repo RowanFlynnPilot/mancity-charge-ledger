@@ -15,10 +15,12 @@ export function Seasons({ target }: { target: string | null }) {
     <section id="seasons" className="view" aria-labelledby="seasons-title">
       <h2 id="seasons-title">Seasons</h2>
       <p className="view-intro">
-        <a href={`#${charged.id}`}>The Premier League&rsquo;s charges</a> cover the {seasons.length}{" "}
-        seasons from {first.label} to {last.label}. For each one, this shows where City finished
-        and which clubs finished first and second, taken from the League&rsquo;s own final table.
-        Results are given as those tables record them.
+        <a href={`#${charged.id}`}>The charges about the club&rsquo;s accounts and spending</a>{" "}
+        cover the {seasons.length} seasons from {first.label} to {last.label}. For each one, this
+        shows where City finished and which clubs finished first and second, taken from the
+        League&rsquo;s own final table. Results are given as those tables record them. The charges
+        about cooperating with the League&rsquo;s investigation concern a later period and are not
+        shown here.
       </p>
 
       <table className="seasons">

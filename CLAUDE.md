@@ -28,7 +28,7 @@ These are not style preferences. They are what makes the tool publishable.
 4. **Primary over press.** `charges.json` cites primary documents only. Events may cite press, but add the primary document when one exists.
 5. **Redactions stay redacted.** The published Core Decision redacts names of people and sponsors. `charges.json` does not fill them in from press reports.
 6. **The APT case is a different kind of case.** City brought it (`cityRole: "claimant"`). It is not an allegation against the club and must not be styled as one.
-7. **No "115".** The Commission's own structure is Charges 1(A)–(D), 2, 3 and 4(A)–(D), covering "well over 100" individual breaches. The ledger is keyed to that structure. Press tallies (115, 114, 130) appear only in event summaries, attributed.
+7. **Ten charges, and the count shown both ways.** The Commission's own structure is Charges 1(A)–(D), 2, 3 and 4(A)–(D), covering "well over 100" individual breaches. The ledger is keyed to that structure. Its second view counts the League's charge statement rule by season, states the method, and names the press figure of 115 beside the result, attributed to a press source held in `allegations.json`. A press tally is never presented as the record's own count, appears nowhere else except attributed event summaries, and never enters `charges.json`. (Relaxed on 2 Oct 2026 from a flat ban on naming 115: readers arrive expecting that number and need to see how it relates to the ten.)
 8. **Summaries are our own words.** No pasted paragraphs from sources.
 
 ## Stack
@@ -46,6 +46,7 @@ data/cases.json           the four cases                      hand-edited
 data/events.json          timeline, sorted ascending          hand-edited
 data/charges.json         Commission charge ledger            hand-edited
 data/pending.json         due but not yet happened            hand-edited
+data/allegations.json     the League's statement, rule by season   hand-edited, from the charge statement
 data/funding.json         sponsorship money by season         hand-edited, from the Core Decision
 data/seasons.json         final tables, 2009/10 to 2017/18    written by build_seasons.py only
 data/updates.json         news feed, newest first             written by the pipeline only
@@ -58,6 +59,7 @@ src/route.ts              URL fragment → view and entry
 src/dates.ts              date formatting, "today" in London, due notes
 src/rail.ts               geometry of the timeline's lane rail
 src/board.ts              charge groups for the findings board, and money totals
+src/allegations.ts        counting the League's statement rule by season
 src/components/           one file per view, plus shared pieces
 src/styles.css            all styles and the design tokens
 .github/workflows/        deploy.yml (check, build, Pages), updates.yml (cron fetch)
@@ -83,13 +85,14 @@ The pipeline uses the Python standard library only. There is no `requirements.tx
 - Dates are `YYYY-MM-DD`, or `YYYY-MM` when only the month is established. Never guess a day.
 - `events.json` stays sorted by date ascending. The validator fails otherwise.
 - An event can belong to more than one case (`caseIds`). The Der Spiegel leak sits in two lanes.
-- `Charge.period` is `null` until the period is read from the published decision. `null` renders as nothing, not as a placeholder.
+- `Charge.period` is `null` until the period is read from the published decision or another primary document. `null` renders as nothing, not as a placeholder.
 - When a pending item happens, add it to `events.json` and delete it from `pending.json` in the same commit.
 - `updates.json` is never hand-edited. A feed item becomes part of the record only when a person writes an event for it.
 - `seasons.json` is never hand-edited. `build_seasons.py` reads the Premier League's own standings for each season and raises unless it gets a complete final table (20 clubs, 38 matches each). Each row cites that season's table page on premierleague.com as a primary source. The validator checks that `cityPosition` agrees with `champion` and `runnerUp`. The file records the tables as the League publishes them: if a decision ever alters a final table, re-run the script.
 - Charge ids are the Commission's number and letter (`1A`, `2`, `4B`). The validator enforces this, and the findings board groups charges by the number.
 - `funding.json` holds the season-by-season sponsorship figures behind one finding (`chargeId`), entered by hand from the decision. Each season's two parts must add up to the recorded figure; the validator fails otherwise. Amounts are £ million. `locator` says where in the source the figures are. It is a single object, not a list.
-- Record ids are URL fragments. They use letters, digits and single hyphens, and are unique across cases, events, charges, pending items and seasons. `timeline`, `ledger`, `seasons`, `next`, `latest`, `method` and `funding` are reserved for the app.
+- `allegations.json` transcribes the League's charge statement of 6 Feb 2023: the rule numbers it cites, season by season, in the statement's own groups. `chargeIds` on each group is this record's own match to the Commission's charges, made from the rule numbers the two documents share; the UI says so. `pressTally` holds the press figure and its source. The count is not stored. It is computed: each rule once per season, a range such as `E.52 to E.60` as nine. It comes to 130, and `src/allegations.test.ts` pins that number so a data edit cannot change the published count unnoticed. For 2009/10 the statement cites four rules before 10 September 2009 and five after; the data holds the five and a `note` says so.
+- Record ids are URL fragments. They use letters, digits and single hyphens, and are unique across cases, events, charges, pending items and seasons. `timeline`, `ledger`, `seasons`, `next`, `latest`, `method`, `funding` and `allegations` are reserved for the app.
 - `Case.cityPositionEventId` points at the `statement` event that records City's position. It is required for any case that has charges; the validator fails otherwise. This is how editorial rule 3 is enforced: the ledger and the timeline read City's position from that event. When City's position changes, add a new statement event and repoint the field.
 - One URL is always cited with the same title, publisher and kind. The validator fails on a mismatch.
 - `Update.publishedAt` is UTC, `YYYY-MM-DDTHH:MM:SSZ`, so string order is time order. `Update.id` must equal the sha1 of `Update.url`.
@@ -123,7 +126,7 @@ Four views in v1, one page, tabbed:
 3. **What's next.** `pending.json`, dated items first.
 4. **Latest.** `updates.json`, labelled as press coverage, not as part of the record.
 
-Then v1.1, built: **Season view.** For 2009/10 to 2017/18, City's finishing position, the champion and the runner-up, each row sourced to the League's final table. It states results as the tables record them and says nothing about what a sanction might change; that would be status in copy. It does not show findings, so it does not set charges against seasons. Doing that would need `Charge.period` to become structured data, and the seasons for 1(B), 1(C) and 4 are not public.
+Then v1.1, built: **Season view.** For 2009/10 to 2017/18, City's finishing position, the champion and the runner-up, each row sourced to the League's final table. It covers the seasons of the charges about the club's accounts and spending, and says the cooperation charges concern a later period; the table is not extended to those seasons, because setting league positions beside them would suggest a link the charges do not make. It states results as the tables record them and says nothing about what a sanction might change; that would be status in copy. It does not show findings, so it does not set charges against seasons. Doing that would need `Charge.period` to become structured data, and the seasons for 1(B), 1(C) and 4 are not public.
 
 This is a personal project. No organisation logo or branding appears in the UI.
 
@@ -138,6 +141,14 @@ The opening, above the views (built 2 Oct 2026 to give the page a focal point):
 - The title is set at display size. Under it, each open case gets an exhibit: its name, a status tag, its `outcome` line, and, if it has charges, the findings board.
 - The findings board draws one block per charge, filled by its `finding`, in the Commission's groups (1(A) to 1(D), 2, 3, 4(A) to 4(D)). Each block links to its charge in the ledger. City's position and the appeal state sit directly under it, because editorial rule 3 applies here as much as in the ledger.
 - The sponsorship money exhibit is a table with a bar in each row, built from `funding.json`. Every figure is in the table, so nothing depends on reading the bars or on hovering. It shows the charge's finding and appeal badges, City's position, and the source. Its text attributes the figures to the Commission.
+
+The charge ledger counts the case two ways, behind a switch:
+
+- "The Commission's 10 charges" is the ledger table.
+- "The League's 130 alleged breaches" is a grid built from `allegations.json`: the statement's groups down the side, the fourteen seasons from 2009/10 to 2022/23 across the top, and in each cell how many rules the statement cites. Each row carries the Commission charges that decided it, as chips showing their findings. Below it are the counting notes, the caveat that the match to charges is this record's own, the full list of rules, and the sources. `#allegations` opens this view.
+- The grid's cells are neutral, not plum, because they show allegations. Plum appears only on the charge chips, which show findings.
+- The findings board in the opening says what the ten charges add up to and links to the grid.
+- What cannot be shown: which individual breaches fall under which finding. The Statement of Charges and the appendices that would show it are not published.
 
 How the views are built:
 
@@ -170,7 +181,11 @@ Periods:
 - 3: 2015/16 to 2017/18 rests on para 81(a)(ii) in the same way.
 - 1(B): four, six and one seasons for its three limbs (paras 118, 125, 132). The seasons themselves are redacted (para 101(b)–(d)). Stays `null`.
 - 1(C): the seasons are redacted (para 101(e)). Footnote 12 names 2014/15 and 2017/18 only in connection with sums not paid. Stays `null`.
-- 4(A)–(D): no period is stated. The detail is in Appendices 33 and 34, which are not published. Stays `null`.
+- 4(A)–(D): the decision states no period; the detail is in Appendices 33 and 34, which are not published. The period recorded, December 2018 to February 2023, comes from the League's charge statement of 6 Feb 2023, which gives it for the cooperation charges as a whole, not for each sub-charge.
+
+The League's charge statement of 6 Feb 2023 (`https://www.premierleague.com/en/news/3045970`) is the primary document for the charges themselves. It lists the alleged breaches by season: financial information 2009/10 to 2017/18; manager remuneration 2009/10 to 2012/13; player remuneration 2010/11 to 2015/16; UEFA rules 2013/14 to 2017/18; Profitability and Sustainability 2015/16 to 2017/18; cooperation from December 2018 to the date of the statement. Its numbering (1 to 5) is not the Commission's (1(A)–(D), 2, 3, 4(A)–(D)); the ledger stays keyed to the Commission's.
+
+Its manager and player remuneration rows line up with two of Charge 1(B)'s three arrangements (four and six seasons, the same rule numbers as paras 120 and 127). 1(B)'s period still stays `null`: the decision redacts those seasons, and editorial rule 5 holds even where another primary document would let them be worked out.
 
 Dates. The decision confirms dates already in `events.json`: proceedings began February 2023 (para 1); the hearing sat on 42 days from 16 Sep to 6 Dec 2024 (page 1, para 16); 27 factual witnesses (para 27); the UEFA settlement was May 2014 (para 102); the Der Spiegel articles were November 2018 (para 103). The decision itself carries no visible date: the signature block on page 40 is redacted. It gives two further dates, neither of which is a step in a case, so neither is an event: ADUG bought 90% of the club in September 2008 (para 49), and an episode on 25 May 2013 that the Commission uses as an example (paras 88–89).
 

@@ -1,0 +1,101 @@
+{
+  "sources": [
+    {
+      "title": "Premier League statement (6 Feb 2023)",
+      "publisher": "Premier League",
+      "url": "https://www.premierleague.com/en/news/3045970",
+      "kind": "primary"
+    }
+  ],
+  "pressTally": {
+    "count": 115,
+    "sources": [
+      {
+        "title": "Timeline: How Man City's Financial Case Went From Leaked Emails To Verdict",
+        "publisher": "Associated Press via Fox Sports",
+        "url": "https://www.foxsports.com/stories/soccer/timeline-of-the-premier-league-vs-manchester-city",
+        "kind": "press"
+      }
+    ]
+  },
+  "groups": [
+    {
+      "id": "financial-information",
+      "subject": "Accurate financial information",
+      "chargeIds": ["1A", "1B", "1C", "1D"],
+      "seasons": [
+        {
+          "season": "2009/10",
+          "rules": ["B.13", "C.71", "C.72", "C.79", "C.80"],
+          "note": "The statement cites these five rules from 10 September 2009, and four before that date: B.13, C.71, C.72 and C.75. The count uses the five."
+        },
+        { "season": "2010/11", "rules": ["B.13", "C.78", "C.79", "C.86", "C.87"], "note": null },
+        { "season": "2011/12", "rules": ["B.13", "C.78", "C.79", "C.86", "C.87"], "note": null },
+        { "season": "2012/13", "rules": ["B.16", "E.3", "E.4", "E.11", "E.12"], "note": null },
+        { "season": "2013/14", "rules": ["B.15", "E.3", "E.4", "E.11", "E.12", "E.49"], "note": null },
+        { "season": "2014/15", "rules": ["B.16", "E.3", "E.4", "E.11", "E.12", "E.50"], "note": null },
+        { "season": "2015/16", "rules": ["B.16", "E.3", "E.4", "E.11", "E.12", "E.50"], "note": null },
+        { "season": "2016/17", "rules": ["B.16", "E.3", "E.4", "E.11", "E.12", "E.51"], "note": null },
+        { "season": "2017/18", "rules": ["B.16", "E.3", "E.4", "E.11", "E.12", "E.51"], "note": null }
+      ]
+    },
+    {
+      "id": "manager-remuneration",
+      "subject": "Manager remuneration set out in contracts",
+      "chargeIds": ["1B"],
+      "seasons": [
+        { "season": "2009/10", "rules": ["Q.7", "Q.8"], "note": null },
+        { "season": "2010/11", "rules": ["Q.7", "Q.8"], "note": null },
+        { "season": "2011/12", "rules": ["Q.7", "Q.8"], "note": null },
+        { "season": "2012/13", "rules": ["P.7", "P.8"], "note": null }
+      ]
+    },
+    {
+      "id": "player-remuneration",
+      "subject": "Player remuneration set out in contracts",
+      "chargeIds": ["1B"],
+      "seasons": [
+        { "season": "2010/11", "rules": ["K.12", "K.20"], "note": null },
+        { "season": "2011/12", "rules": ["K.12", "K.20"], "note": null },
+        { "season": "2012/13", "rules": ["T.12", "T.20"], "note": null },
+        { "season": "2013/14", "rules": ["T.12", "T.19"], "note": null },
+        { "season": "2014/15", "rules": ["T.12", "T.19"], "note": null },
+        { "season": "2015/16", "rules": ["T.13", "T.20"], "note": null }
+      ]
+    },
+    {
+      "id": "uefa-regulations",
+      "subject": "Compliance with UEFA's regulations",
+      "chargeIds": ["2"],
+      "seasons": [
+        { "season": "2013/14", "rules": ["B.14.6"], "note": null },
+        { "season": "2014/15", "rules": ["B.15.6"], "note": null },
+        { "season": "2015/16", "rules": ["B.15.6"], "note": null },
+        { "season": "2016/17", "rules": ["B.15.6"], "note": null },
+        { "season": "2017/18", "rules": ["B.15.6"], "note": null }
+      ]
+    },
+    {
+      "id": "profitability-and-sustainability",
+      "subject": "Profitability and Sustainability",
+      "chargeIds": ["3"],
+      "seasons": [
+        { "season": "2015/16", "rules": ["E.52 to E.60"], "note": null },
+        { "season": "2016/17", "rules": ["E.53 to E.60"], "note": null },
+        { "season": "2017/18", "rules": ["E.53 to E.60"], "note": null }
+      ]
+    },
+    {
+      "id": "cooperation",
+      "subject": "Cooperating with the League's investigation",
+      "chargeIds": ["4A", "4B", "4C", "4D"],
+      "seasons": [
+        { "season": "2018/19", "rules": ["B.16", "B.19", "W.1", "W.2", "W.12", "W.13"], "note": null },
+        { "season": "2019/20", "rules": ["B.16", "B.19", "W.1", "W.2", "W.12", "W.13"], "note": null },
+        { "season": "2020/21", "rules": ["B.16", "B.19", "W.1", "W.2", "W.12", "W.13"], "note": null },
+        { "season": "2021/22", "rules": ["B.15", "B.18", "W.1", "W.2", "W.12", "W.13"], "note": null },
+        { "season": "2022/23", "rules": ["B.15", "B.18", "W.1", "W.2", "W.15", "W.16"], "note": null }
+      ]
+    }
+  ]
+}

@@ -1412,6 +1412,176 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
   padding-right: 0;
 }
 
+/* ---------- The League's statement, rule by season ---------- */
+
+.count-switch {
+  margin-top: var(--s7);
+}
+
+.allegations > p {
+  max-width: var(--measure);
+  margin-top: var(--s3);
+}
+
+.allegations > .case-title + p {
+  margin-top: var(--s2);
+}
+
+.grid {
+  width: 100%;
+  margin-top: var(--s6);
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-family: var(--sans);
+  font-stretch: var(--condensed);
+  font-size: var(--u);
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.grid caption {
+  padding-bottom: var(--s3);
+  color: var(--ink-soft);
+  text-align: left;
+}
+
+.grid :is(th, td) {
+  padding: var(--s2) 1px;
+  font-weight: 400;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.grid thead th {
+  border-bottom: 1px solid var(--ink);
+  font-size: var(--u-small);
+  font-weight: 600;
+  color: var(--ink-soft);
+  vertical-align: bottom;
+}
+
+.grid abbr {
+  text-decoration: none;
+}
+
+.grid .grid-subject {
+  width: 17rem;
+  padding-left: 0;
+  padding-right: var(--s4);
+  text-align: left;
+}
+
+.grid tbody tr + tr > * {
+  border-top: 1px solid var(--rule);
+}
+
+.grid-name {
+  display: block;
+  font-size: var(--u-large);
+  font-weight: 650;
+}
+
+.grid-charges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1);
+  margin-top: var(--s1);
+}
+
+.chip {
+  text-decoration: none;
+  outline: 2px solid transparent;
+  outline-offset: 1px;
+  transition: outline-color var(--ease);
+}
+
+.chip:hover {
+  outline-color: var(--ink);
+}
+
+.chip.finding-proven:active {
+  color: var(--on-finding);
+}
+
+.chip:not(.finding-proven):active {
+  color: var(--finding);
+}
+
+/* A season in which the statement cites rules: a neutral tile holding how many.
+   Neutral because these are allegations; plum is kept for findings. */
+.grid-tile {
+  display: block;
+  padding-block: var(--s1);
+  border-radius: 2px;
+  background: var(--mark);
+  font-weight: 600;
+  print-color-adjust: exact;
+}
+
+.grid .grid-total {
+  width: 3.5rem;
+  padding-right: 0;
+  font-weight: 650;
+  text-align: right;
+}
+
+.grid tfoot :is(th, td) {
+  padding-top: var(--s3);
+  border-top: 3px double var(--ink);
+  font-weight: 650;
+}
+
+.allegations > .grid-note {
+  max-width: 44rem;
+  margin-top: var(--s3);
+  font-family: var(--sans);
+  font-stretch: var(--condensed);
+  font-size: var(--u);
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.grid-rules {
+  margin-top: var(--s5);
+  font-family: var(--sans);
+  font-stretch: var(--condensed);
+  font-size: var(--u);
+  line-height: 1.5;
+}
+
+.grid-rules summary {
+  width: fit-content;
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  text-decoration-color: var(--rule-strong);
+}
+
+.grid-rules summary:hover {
+  text-decoration-color: currentColor;
+}
+
+.grid-rules dl {
+  margin-top: var(--s4);
+}
+
+.grid-rules-group {
+  font-weight: 650;
+}
+
+.grid-rules-season {
+  display: inline-block;
+  min-width: 4.5rem;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.allegations > .sources {
+  margin-top: var(--s5);
+}
+
 /* ---------- Seasons ---------- */
 
 .seasons :is(th, td) {
@@ -1568,6 +1738,72 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .grid,
+  .grid :is(caption, thead, tbody, tfoot) {
+    display: block;
+  }
+
+  .grid tr {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr)) 2.5rem;
+    column-gap: 2px;
+    align-items: center;
+  }
+
+  .grid :is(th, td) {
+    padding: var(--s1) 0;
+  }
+
+  .grid .grid-subject {
+    grid-column: 1 / -1;
+    width: auto;
+    padding-right: 0;
+  }
+
+  /* The column heading for the subjects has nothing to sit above here. */
+  .grid thead .grid-subject {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .grid .grid-total {
+    width: auto;
+  }
+
+  /* One rule under the season headings, not one per column. */
+  .grid thead tr {
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .grid thead th {
+    border-bottom: 0;
+  }
+
+  .grid tbody tr {
+    padding-block: var(--s3);
+  }
+
+  .grid tbody tr + tr {
+    border-top: 1px solid var(--rule);
+  }
+
+  .grid tbody tr + tr > * {
+    border-top: 0;
+  }
+
+  .grid tfoot tr {
+    padding-top: var(--s2);
+    border-top: 3px double var(--ink);
+  }
+
+  .grid tfoot :is(th, td) {
+    padding-top: var(--s1);
+    border-top: 0;
+  }
+
   /* Each table becomes one block per row. */
   :is(.ledger, .seasons) thead {
     position: absolute;
@@ -1671,6 +1907,14 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
   .block {
     min-height: 5.5rem;
     padding: var(--s2);
+  }
+
+  .grid-season-end {
+    display: none;
+  }
+
+  .grid {
+    font-size: var(--u-small);
   }
 
   /* Each season: its figures on one line, its bar beneath. */

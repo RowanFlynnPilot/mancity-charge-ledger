@@ -164,8 +164,14 @@
     "date": "2023-02-06",
     "type": "charge",
     "headline": "Premier League charges City and refers the case to an independent Commission",
-    "summary": "The League alleged more than 100 breaches of its rules across 2009/10 to 2017/18, plus failures to cooperate with its investigation. City denied every charge and said the evidence supported its position.",
+    "summary": "The League alleged more than 100 breaches of its rules: over the club's accounts and spending across 2009/10 to 2017/18, and over cooperation with its investigation from December 2018 up to the charges. City denied every charge and said the evidence supported its position.",
     "sources": [
+      {
+        "title": "Premier League statement (6 Feb 2023)",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/news/3045970",
+        "kind": "primary"
+      },
       {
         "title": "Independent Commission: Redacted Core Decision",
         "publisher": "Premier League",

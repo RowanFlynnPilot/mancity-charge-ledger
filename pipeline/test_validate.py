@@ -42,6 +42,18 @@ VALID = {
             {"season": "2010/11", "recorded": 41.25, "paidBySponsors": 12.75, "paidByOwner": 28.5},
         ],
     },
+    "allegations": {
+        "sources": [SOURCE],
+        "pressTally": {"count": 115, "sources": [PRESS]},
+        "groups": [{
+            "id": "financial-information", "subject": "Accurate financial information",
+            "chargeIds": ["1A"],
+            "seasons": [
+                {"season": "2009/10", "rules": ["B.13", "C.71"], "note": "Two rule sets."},
+                {"season": "2015/16", "rules": ["E.52 to E.60", "B.14.6"], "note": None},
+            ],
+        }],
+    },
     "updates": [{"id": hashlib.sha1(URL.encode()).hexdigest(), "title": "Story", "url": URL,
                  "publisher": "Paper", "publishedAt": "2026-10-01T21:41:00Z"}],
 }
@@ -162,6 +174,34 @@ class Validate(unittest.TestCase):
     def test_seasons_out_of_order(self):
         self.data["seasons"].reverse()
         self.assert_rejected("seasons: not sorted")
+
+    def test_allegation_must_map_to_a_charge(self):
+        self.data["allegations"]["groups"][0]["chargeIds"] = ["9Z"]
+        self.assert_rejected("bad chargeIds")
+
+    def test_allegation_rule_must_look_like_a_rule(self):
+        self.data["allegations"]["groups"][0]["seasons"][0]["rules"] = ["Rule B13"]
+        self.assert_rejected("is not a rule number")
+
+    def test_allegation_range_must_run_upwards(self):
+        self.data["allegations"]["groups"][0]["seasons"][1]["rules"] = ["E.60 to E.52"]
+        self.assert_rejected("is not a rule number")
+
+    def test_allegation_rule_listed_twice(self):
+        self.data["allegations"]["groups"][0]["seasons"][0]["rules"] = ["B.13", "B.13"]
+        self.assert_rejected("listed twice")
+
+    def test_allegation_statement_must_be_primary(self):
+        self.data["allegations"]["sources"] = [PRESS]
+        self.assert_rejected("primary sources only")
+
+    def test_press_tally_needs_a_source(self):
+        self.data["allegations"]["pressTally"]["sources"] = []
+        self.assert_rejected("no sources")
+
+    def test_press_tally_must_be_a_count(self):
+        self.data["allegations"]["pressTally"]["count"] = "115"
+        self.assert_rejected("bad count")
 
     def test_update_id_must_be_sha1_of_url(self):
         self.data["updates"][0]["id"] = "abc"

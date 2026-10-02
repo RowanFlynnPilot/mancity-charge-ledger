@@ -16,8 +16,13 @@ ISO_UTC = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 # Ids become URL fragments (#pl-core-decision, #1A).
 ID = re.compile(r"^[A-Za-z0-9]+(-[A-Za-z0-9]+)*$")
 # Fragments the app uses for its own views. No record may take one.
-RESERVED_IDS = {"timeline", "ledger", "seasons", "next", "latest", "method", "funding"}
+RESERVED_IDS = {"timeline", "ledger", "seasons", "next", "latest", "method", "funding",
+                "allegations"}
 SEASON = re.compile(r"^(\d{4})/(\d{2})$")
+# A Premier League rule as the charge statement cites it: "B.13", "B.14.6", or a
+# range, "E.52 to E.60".
+RULE = re.compile(r"^[A-Z]\.\d+(\.\d+)?$")
+RULE_RANGE = re.compile(r"^([A-Z])\.(\d+) to \1\.(\d+)$")
 # The Commission's own numbering: Charge 2, Charge 1(A).
 CHARGE_ID = re.compile(r"^\d+[A-Z]?$")
 CLUB = "Manchester City"
@@ -224,6 +229,47 @@ def validate_funding(funding: dict, charges: list[dict]) -> None:
     require(labels == sorted(set(labels)), f"{where}: seasons not sorted ascending, or repeated")
 
 
+def check_rule(rule: object, where: str) -> None:
+    require(isinstance(rule, str), f"{where}: a rule must be text")
+    span = RULE_RANGE.match(rule)
+    require(RULE.match(rule) is not None or (span is not None and int(span[3]) > int(span[2])),
+            f"{where}: {rule!r} is not a rule number or a range of them")
+
+
+def validate_allegations(allegations: dict, charges: list[dict]) -> None:
+    where = "allegations"
+    check_keys(allegations, {"sources", "pressTally", "groups"}, where)
+    check_sources(allegations["sources"], where, primary_only=True)
+
+    tally = allegations["pressTally"]
+    check_keys(tally, {"count", "sources"}, f"{where}/pressTally")
+    require(type(tally["count"]) is int and tally["count"] > 0, f"{where}/pressTally: bad count")
+    check_sources(tally["sources"], f"{where}/pressTally")
+
+    charge_ids = {c["id"] for c in charges}
+    check_ids(allegations["groups"], where)
+    for g in allegations["groups"]:
+        group = f"{where}/{g['id']}"
+        check_keys(g, {"id", "subject", "chargeIds", "seasons"}, group)
+        check_text(g, ("subject",), group)
+        require(ID.match(g["id"]) is not None, f"{group}: bad id")
+        require(len(g["chargeIds"]) > 0 and set(g["chargeIds"]) <= charge_ids
+                and len(g["chargeIds"]) == len(set(g["chargeIds"])), f"{group}: bad chargeIds")
+        require(len(g["seasons"]) > 0, f"{group}: no seasons")
+        for s in g["seasons"]:
+            check_keys(s, {"season", "rules", "note"}, group)
+            check_season(s["season"], group)
+            season = f"{group}/{s['season']}"
+            require(isinstance(s["rules"], list) and len(s["rules"]) > 0, f"{season}: no rules")
+            for rule in s["rules"]:
+                check_rule(rule, season)
+            require(len(s["rules"]) == len(set(s["rules"])), f"{season}: a rule is listed twice")
+            if s["note"] is not None:
+                check_text(s, ("note",), season)
+        labels = [s["season"] for s in g["seasons"]]
+        require(labels == sorted(set(labels)), f"{group}: seasons not sorted ascending, or repeated")
+
+
 def validate_updates(updates: list[dict]) -> None:
     check_ids(updates, "updates")
     require(len(updates) <= MAX_UPDATES, f"updates: more than {MAX_UPDATES} items")
@@ -241,7 +287,7 @@ def validate_updates(updates: list[dict]) -> None:
 
 
 def validate(cases: list[dict], events: list[dict], charges: list[dict], pending: list[dict],
-             seasons: list[dict], funding: dict, updates: list[dict]) -> None:
+             seasons: list[dict], funding: dict, allegations: dict, updates: list[dict]) -> None:
     case_ids = validate_cases(cases)
     validate_events(events, case_ids)
     validate_charges(charges, case_ids)
@@ -249,14 +295,19 @@ def validate(cases: list[dict], events: list[dict], charges: list[dict], pending
     validate_city_position(cases, events, charges)
     validate_seasons(seasons)
     validate_funding(funding, charges)
+    validate_allegations(allegations, charges)
     check_fragments(cases, events, charges, pending, seasons)
-    check_source_consistency(events, charges, pending, seasons, [funding | {"id": "funding"}])
+    check_source_consistency(events, charges, pending, seasons, [
+        funding | {"id": "funding"},
+        allegations | {"id": "allegations"},
+        allegations["pressTally"] | {"id": "allegations/pressTally"},
+    ])
     validate_updates(updates)
 
 
 def main() -> None:
     validate(load("cases"), load("events"), load("charges"), load("pending"),
-             load("seasons"), load("funding"), load("updates"))
+             load("seasons"), load("funding"), load("allegations"), load("updates"))
     print("data ok")
 
 

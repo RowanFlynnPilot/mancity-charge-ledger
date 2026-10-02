@@ -1,8 +1,9 @@
 // The top of the page: the name, then where each open case stands.
 import type { CSSProperties } from "react";
+import { groupCount } from "../allegations";
 import { groupByNumber, shortRef } from "../board";
 import { cx } from "../cx";
-import { cases, charges, recordRunsTo } from "../data";
+import { allegations, cases, charges, recordRunsTo } from "../data";
 import { formatDate } from "../dates";
 import { STATUS_LABEL } from "../labels";
 import type { Case, Charge } from "../types";
@@ -14,10 +15,21 @@ import { FundingChart } from "./FundingChart";
 // The charges as a board: one block each, filled by its finding, in the
 // Commission's own groups. Each block opens its charge in the ledger.
 function Board({ caseCharges, body }: { caseCharges: Charge[]; body: string }) {
+  // The groups of the League's statement that these charges decided.
+  const statement = allegations.groups.filter((group) =>
+    group.chargeIds.some((id) => caseCharges.some((c) => c.id === id)));
+
   return (
     <figure className="board-figure">
       <figcaption>
         Findings of the {body} on the {caseCharges.length} charges. Select a charge to read it.
+        {statement.length > 0 && (
+          <>
+            {" "}The charges cover {statement.reduce((sum, group) => sum + groupCount(group), 0)}{" "}
+            alleged breaches, counted rule by season.{" "}
+            <a href="#allegations">See how the two counts relate</a>
+          </>
+        )}
       </figcaption>
       <ol className="board">
         {groupByNumber(caseCharges).map((group) => (

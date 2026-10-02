@@ -87,6 +87,28 @@ export interface Funding {
   seasons: FundingSeason[]; // sorted ascending
 }
 
+// data/allegations.json: the breaches the League alleged, as its charge statement
+// lists them: rule numbers, season by season, in groups. Entered by hand.
+export interface AllegationSeason {
+  season: string; // "2009/10"
+  rules: string[]; // as cited: "B.13", or a range, "E.52 to E.60"
+  note: string | null; // anything a reader needs to know about how this season is counted
+}
+
+export interface AllegationGroup {
+  id: string;
+  subject: string; // what the rules require, in our words
+  chargeIds: string[]; // the Commission's charges that decided these, matched by rule number
+  seasons: AllegationSeason[]; // sorted ascending
+}
+
+export interface Allegations {
+  sources: Source[]; // primary only: the statement
+  // A total used in press coverage. Shown beside the record's own count, attributed.
+  pressTally: { count: number; sources: Source[] };
+  groups: AllegationGroup[];
+}
+
 // data/pending.json: things that are due but have not happened.
 // When one happens it becomes a CaseEvent and leaves this file.
 export interface PendingItem {

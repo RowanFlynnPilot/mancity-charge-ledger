@@ -1,25 +1,24 @@
+import { useState } from "react";
+import { groupCount } from "../allegations";
 import { cx } from "../cx";
-import { caseById, charges } from "../data";
-import type { Case } from "../types";
+import { allegations, caseById, charges } from "../data";
+import type { Case, Charge } from "../types";
+import { AllegationsGrid } from "./AllegationsGrid";
 import { AppealBadge, FindingBadge } from "./Badges";
 import { CityPosition, FindingsTally } from "./CityPosition";
 import { CopyLink } from "./CopyLink";
 import { SourceList } from "./SourceList";
 
-function CaseLedger({ ledgerCase, target }: { ledgerCase: Case; target: string | null }) {
-  const caseCharges = charges.filter((c) => c.caseId === ledgerCase.id);
+// The same case counted two ways: the Commission's charges, or the rules the
+// League's statement cites season by season.
+type Count = "charges" | "rules";
 
+const ALLEGATIONS = "allegations";
+const allegedTotal = allegations.groups.reduce((sum, group) => sum + groupCount(group), 0);
+
+function ChargeTable({ caseCharges, target }: { caseCharges: Charge[]; target: string | null }) {
   return (
     <>
-      <h3 className="case-title"><i>{ledgerCase.name}</i></h3>
-      <p className="view-intro">
-        The findings below are those of the {ledgerCase.body}, set out charge by charge as its
-        published decision numbers them. This record reports them and links to the document.
-        It makes no findings of its own.
-      </p>
-
-      <CityPosition ledgerCase={ledgerCase} caseCharges={caseCharges} />
-
       <FindingsTally caseCharges={caseCharges} />
 
       <table className="ledger">
@@ -50,6 +49,54 @@ function CaseLedger({ ledgerCase, target }: { ledgerCase: Case; target: string |
           ))}
         </tbody>
       </table>
+    </>
+  );
+}
+
+function CaseLedger({ ledgerCase, target }: { ledgerCase: Case; target: string | null }) {
+  const caseCharges = charges.filter((c) => c.caseId === ledgerCase.id);
+  // The League's statement belongs to the case whose charges it is matched to.
+  const hasStatement = allegations.groups.some((group) =>
+    group.chargeIds.some((id) => caseCharges.some((c) => c.id === id)));
+
+  const [count, setCount] = useState<Count>("charges");
+
+  // A link to a charge, or to the statement, must land on the count that shows it.
+  const [seenTarget, setSeenTarget] = useState<string | null>(null);
+  if (target !== seenTarget) {
+    setSeenTarget(target);
+    if (target === ALLEGATIONS && hasStatement) setCount("rules");
+    else if (caseCharges.some((c) => c.id === target)) setCount("charges");
+  }
+
+  return (
+    <>
+      <h3 className="case-title"><i>{ledgerCase.name}</i></h3>
+      <p className="view-intro">
+        The findings below are those of the {ledgerCase.body}, set out charge by charge as its
+        published decision numbers them. This record reports them and links to the document.
+        It makes no findings of its own.
+      </p>
+
+      <CityPosition ledgerCase={ledgerCase} caseCharges={caseCharges} />
+
+      {hasStatement && (
+        <div className="toolbar count-switch">
+          <p className="toolbar-status">The same case, counted two ways.</p>
+          <div className="segmented" role="group" aria-label="Count by">
+            <button type="button" aria-pressed={count === "charges"} onClick={() => setCount("charges")}>
+              The Commission&rsquo;s {caseCharges.length} charges
+            </button>
+            <button type="button" aria-pressed={count === "rules"} onClick={() => setCount("rules")}>
+              The League&rsquo;s {allegedTotal} alleged breaches
+            </button>
+          </div>
+        </div>
+      )}
+
+      {count === "charges"
+        ? <ChargeTable caseCharges={caseCharges} target={target} />
+        : <AllegationsGrid caseCharges={caseCharges} body={ledgerCase.body} />}
     </>
   );
 }
