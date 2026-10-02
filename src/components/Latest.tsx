@@ -1,5 +1,6 @@
 import { updates } from "../data";
 import { formatDate, londonDate, londonTime } from "../dates";
+import { isOpinion, MARKS_ITS_COLUMNS } from "../opinion";
 import type { Update } from "../types";
 
 // updates.json is newest first, so days come out in that order too.
@@ -30,7 +31,8 @@ export function Latest() {
       ) : (
         <>
           <p className="view-intro">
-            {updates.length} headlines from {publisherList}. Times are UK time.
+            {updates.length} headlines from {publisherList}. Times are UK time. Columns from{" "}
+            {MARKS_ITS_COLUMNS} are tagged as opinion; the other feeds do not mark theirs.
           </p>
           {byLondonDay(updates).map(([day, items]) => (
             <section key={day} className="day" aria-labelledby={`day-${day}`}>
@@ -46,6 +48,7 @@ export function Latest() {
                     </div>
                     <div className="row-body">
                       <a href={item.url} rel="noopener">{item.title}</a>
+                      {isOpinion(item) && <> <span className="tag">Opinion</span></>}
                     </div>
                   </li>
                 ))}
