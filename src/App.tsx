@@ -9,7 +9,7 @@ import { Timeline } from "./components/Timeline";
 import { WhatsNext } from "./components/WhatsNext";
 import { viewOfRecord } from "./data";
 import { HOME, resolve, VIEWS, type Route } from "./route";
-import { EDIT_HISTORY, REPO, SITE } from "./site";
+import { EDIT_HISTORY, LICENCE, REPO, SITE } from "./site";
 
 function useRoute(): Route {
   const [route, setRoute] = useState(() => resolve(window.location.hash, HOME, viewOfRecord));
@@ -88,6 +88,7 @@ export function App() {
             <li><a href="#method">How this record is kept</a></li>
             <li><a href={EDIT_HISTORY} rel="noopener">Edit history</a></li>
             <li><a href={REPO} rel="noopener">Source code</a></li>
+            <li><a href={LICENCE} rel="noopener">Licence</a></li>
           </ul>
         </div>
       </footer>

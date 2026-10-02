@@ -41,6 +41,10 @@ No database. No server. No auth.
 
 ```
 CLAUDE.md
+README.md                 the repo's front page, for a visitor
+LICENSE                   MIT, for the code
+LICENSE-DATA.md           CC BY 4.0, for data/, and what it does not cover
+design/social-card.html   draws public/og.png, the image a shared link shows
 src/types.ts              data contract (source of truth for shapes)
 data/cases.json           the four cases                      hand-edited
 data/events.json          timeline, sorted ascending          hand-edited
@@ -221,7 +225,18 @@ Its own, neutral. Reference-book plain: the documents are the content.
   - With one case selected in the timeline, rows do not repeat the case name.
   - Browser surfaces are themed: text selection, scrollbar, the browser's own chrome (`theme-color`), and print. The print stylesheet forces the light palette, drops the controls and prints each source's address after its title.
   - `public/404.html` is served on its own by GitHub Pages, so it carries its own copy of the paper and ink tokens and uses Georgia. Keep it in step by hand if the palette changes.
-  - The footer says the project is independent and not affiliated with any club, league or governing body.
+  - The footer says the project is independent and not affiliated with any club, league or governing body. It links to `LICENSE-DATA.md` for the terms of reuse.
+- Social card, added 2 Oct 2026. `public/og.png` (1200 by 630) is what a shared link shows; `index.html` names it by its full address because link previews need one.
+  - It is a still image, so it carries no findings and no status. Nothing on it may go out of date when the record changes. That is editorial rule 2 applied to an image.
+  - It uses paper, ink and rules only. No plum or bronze, which mean findings and appeals.
+  - Its lane rail is a motif, not data.
+  - `design/social-card.html` draws it on a canvas with the site's fonts and carries its own copy of the paper and ink tokens. To redraw it, open that page through the dev server and save the image as `public/og.png`. Keep the tokens in step by hand if the palette changes.
+
+## README and licence
+
+- `README.md` is for a visitor to the repo. It describes what the record covers and how it is kept. It does not state where a case stands: that would be status in copy, and it would go stale. Counts that change (events, pending items) stay out of it.
+- The code is MIT. The record in `data/` is CC BY 4.0, by notice in `LICENSE-DATA.md`. The headlines in `feed/updates.json` are the publishers' words and are not licensed by this project; neither are the documents the record cites.
+- The README sends corrections to GitHub issues. The corrections email for the site's methodology note is still an open decision.
 
 ## Open decisions
 
