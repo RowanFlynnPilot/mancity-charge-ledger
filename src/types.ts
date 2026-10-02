@@ -126,6 +126,11 @@ export interface PendingItem {
 // link someone shared to the old one must still arrive.
 export type Moved = Record<string, string>;
 
+// data/archives.json: for a cited address, the same page as the Wayback Machine
+// held it at one moment. Entered only after reading the copy: it must show what
+// the record cites the page for.
+export type Archives = Record<string, string>;
+
 // data/seasons.json: written by pipeline/build_seasons.py from the Premier
 // League's final tables, sorted ascending. One row per season the charges cover.
 export interface Season {

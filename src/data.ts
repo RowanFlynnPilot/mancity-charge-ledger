@@ -1,5 +1,6 @@
 // The record, typed. pipeline/validate.py is what guarantees these casts hold.
 import allegationsJson from "../data/allegations.json";
+import archivesJson from "../data/archives.json";
 import casesJson from "../data/cases.json";
 import chargesJson from "../data/charges.json";
 import eventsJson from "../data/events.json";
@@ -10,7 +11,7 @@ import seasonsJson from "../data/seasons.json";
 import updatesJson from "../feed/updates.json";
 import type { ViewId } from "./route";
 import type {
-  Allegations, Case, CaseEvent, CaseId, Charge, Funding, Moved, PendingItem, Season, Update,
+  Allegations, Archives, Case, CaseEvent, CaseId, Charge, Funding, Moved, PendingItem, Season, Update,
 } from "./types";
 
 export const cases = casesJson as Case[];
@@ -37,6 +38,9 @@ export const viewOfRecord = new Map<string, ViewId>([
 
 // Ids that are no longer in the record, and the record each one became.
 export const moved = new Map(Object.entries(movedJson as Moved));
+
+// The archived copy of a cited address, where one has been read and recorded.
+export const archiveOf = new Map(Object.entries(archivesJson as Archives));
 
 // events.json is sorted ascending, so the last entry is where the record ends.
 export const recordRunsTo = events[events.length - 1]!.date;

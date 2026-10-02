@@ -26,6 +26,8 @@ SEASON = re.compile(r"^(\d{4})/(\d{2})$")
 # range, "E.52 to E.60".
 RULE = re.compile(r"^[A-Z]\.\d+(\.\d+)?$")
 RULE_RANGE = re.compile(r"^([A-Z])\.(\d+) to \1\.(\d+)$")
+# A page as the Wayback Machine held it at one moment: the stamp is YYYYMMDDHHMMSS.
+WAYBACK = re.compile(r"^https://web\.archive\.org/web/\d{14}/https://")
 # The Commission's own numbering: Charge 2, Charge 1(A).
 CHARGE_ID = re.compile(r"^\d+[A-Z]?$")
 CLUB = "Manchester City"
@@ -118,14 +120,16 @@ def check_sources(sources: list[dict], where: str, primary_only: bool = False) -
     require(len(urls) == len(set(urls)), f"{where}: the same source is listed twice")
 
 
-def check_source_consistency(*groups: list[dict]) -> None:
-    """One URL is always cited with the same title, publisher and kind."""
+def check_source_consistency(*groups: list[dict]) -> set[str]:
+    """One URL is always cited with the same title, publisher and kind.
+    Returns every address the record cites."""
     cited: dict[str, dict] = {}
     for group in groups:
         for record in group:
             for s in record["sources"]:
                 require(cited.setdefault(s["url"], s) == s,
                         f"{record['id']}: {s['url']} is cited differently elsewhere")
+    return set(cited)
 
 
 def validate_cases(cases: list[dict]) -> set[str]:
@@ -204,6 +208,17 @@ def validate_city_position(cases: list[dict], events: list[dict], charges: list[
         require(event is not None, f"{where}: cityPositionEventId {position!r} is not an event")
         require(c["id"] in event["caseIds"], f"{where}: {position!r} belongs to another case")
         require(event["type"] == "statement", f"{where}: {position!r} is not a statement event")
+
+
+def validate_archives(archives: dict, cited: set[str]) -> None:
+    """An archived copy belongs to an address the record cites, and is that
+    address as the Wayback Machine holds it at one moment."""
+    require(isinstance(archives, dict), "archives: must be an object of cited address to archived copy")
+    for url, copy in archives.items():
+        where = f"archives/{url}"
+        require(url in cited, f"{where}: the record does not cite this address")
+        require(isinstance(copy, str) and WAYBACK.match(copy) is not None and copy.endswith(f"/{url}"),
+                f"{where}: must be https://web.archive.org/web/<14 digits>/ followed by the address")
 
 
 def validate_seasons(seasons: list[dict]) -> None:
@@ -304,7 +319,7 @@ def validate_updates(updates: list[dict]) -> None:
 
 def validate(cases: list[dict], events: list[dict], charges: list[dict], pending: list[dict],
              seasons: list[dict], funding: dict, allegations: dict, moved: dict,
-             updates: list[dict]) -> None:
+             archives: dict, updates: list[dict]) -> None:
     case_ids = validate_cases(cases)
     validate_events(events, case_ids)
     validate_charges(charges, case_ids)
@@ -316,18 +331,19 @@ def validate(cases: list[dict], events: list[dict], charges: list[dict], pending
     in_use = check_fragments(cases, events, charges, pending, seasons)
     # Cases have ids but no place on the page, so nothing can move to one.
     validate_moved(moved, in_use, in_use - case_ids)
-    check_source_consistency(events, charges, pending, seasons, [
+    cited = check_source_consistency(events, charges, pending, seasons, [
         funding | {"id": "funding"},
         allegations | {"id": "allegations"},
         allegations["pressTally"] | {"id": "allegations/pressTally"},
     ])
+    validate_archives(archives, cited)
     validate_updates(updates)
 
 
 def main() -> None:
     validate(load("cases"), load("events"), load("charges"), load("pending"),
              load("seasons"), load("funding"), load("allegations"), load("moved"),
-             load("updates", FEED))
+             load("archives"), load("updates", FEED))
     print("data ok")
 
 

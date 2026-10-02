@@ -55,6 +55,7 @@ VALID = {
         }],
     },
     "moved": {"sanction-deadline": "decision"},
+    "archives": {SOURCE["url"]: f"https://web.archive.org/web/20261001120000/{SOURCE['url']}"},
     "updates": [{"id": hashlib.sha1(URL.encode()).hexdigest(), "title": "Story", "url": URL,
                  "publisher": "Paper", "publishedAt": "2026-10-01T21:41:00Z"}],
 }
@@ -223,6 +224,19 @@ class Validate(unittest.TestCase):
     def test_moved_id_must_be_a_url_fragment(self):
         self.data["moved"] = {"sanction deadline": "decision"}
         self.assert_rejected("not a valid URL fragment")
+
+    def test_archived_copy_must_belong_to_a_cited_address(self):
+        url = "https://example.com/never-cited"
+        self.data["archives"] = {url: f"https://web.archive.org/web/20261001120000/{url}"}
+        self.assert_rejected("does not cite this address")
+
+    def test_archived_copy_must_be_a_dated_wayback_address(self):
+        self.data["archives"] = {SOURCE["url"]: f"https://web.archive.org/web/2026/{SOURCE['url']}"}
+        self.assert_rejected("must be https://web.archive.org/web/")
+
+    def test_archived_copy_must_be_of_the_address_it_is_filed_under(self):
+        self.data["archives"] = {SOURCE["url"]: f"https://web.archive.org/web/20261001120000/{PRESS['url']}"}
+        self.assert_rejected("must be https://web.archive.org/web/")
 
     def test_update_id_must_be_sha1_of_url(self):
         self.data["updates"][0]["id"] = "abc"

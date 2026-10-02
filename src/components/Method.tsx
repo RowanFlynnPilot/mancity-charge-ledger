@@ -23,7 +23,8 @@ export function Method() {
               Every entry links to where it comes from. A primary document is a decision, award,
               rule or statement published by a regulator, a tribunal, a court or the club. A press
               report is journalism about one. Each source is labelled as one or the other, and the
-              charge ledger cites primary documents only.
+              charge ledger cites primary documents only. Where the Internet Archive holds a copy
+              that shows what is cited, the source links to that archived copy as well.
             </p>
           </dd>
         </div>
