@@ -114,7 +114,8 @@ The pipeline uses the Python standard library only. There is no `requirements.tx
 - `Case.cityPositionEventId` points at the `statement` event that records City's position. It is required for any case that has charges; the validator fails otherwise. This is how editorial rule 3 is enforced: the ledger and the timeline read City's position from that event. When City's position changes, add a new statement event and repoint the field.
 - One URL is always cited with the same title, publisher and kind. The validator fails on a mismatch.
 - `archives.json` maps a cited address to the same page as the Wayback Machine held it at one moment. The source list shows it as "Archived copy". The validator checks that the address is one the record cites and that the copy is `https://web.archive.org/web/<14 digits>/` followed by that address. An address with no entry shows no link.
-- Read an archived copy before adding it. It must show what the record cites the page for. Three kinds of copy were left out on 2 Oct 2026 for failing that: the League's table pages, whose copies are empty shells because the table is loaded by script; a BBC report whose only copy was taken before the report was rewritten to cover the appeal; and pages the Archive holds no copy of, which is most of them (7 of 37 addresses have a copy). Nothing has been submitted to the Archive; only copies it already held are linked.
+- Read an archived copy before adding it. It must show what the record cites the page for. On 2 Oct 2026 the Archive was asked to save every cited page it had no usable copy of, and each result was read. 22 of the 37 cited addresses now have a copy. The 15 that do not, and why: the four `mancity.com` statements, because the club's site refuses the Archive as it refuses any script; the Farrer & Co page, whose capture fails; the PressReader page and the League's nine table pages, whose copies are empty shells because the content is loaded by script. An earlier copy of the BBC report predated its rewrite to cover the appeal; the copy linked is the one taken after.
+- To add a copy: ask the Archive to save the page (`https://web.archive.org/save/<address>`), then read the copy it reports. Its lookup of what it already holds (`archive.org/wayback/available`) misses captures; the index at `web.archive.org/cdx/search/cdx?url=<address>` does not. Read copies back slowly: the Archive refuses connections after a burst of requests. A redirecting address is saved under the address it leads to, so cite that one.
 - `check_links.py` does not request the archived copies.
 - `Update.publishedAt` is UTC, `YYYY-MM-DDTHH:MM:SSZ`, so string order is time order. `Update.id` must equal the sha1 of `Update.url`.
 
@@ -258,7 +259,7 @@ Things to know when checking these links:
 
 - `tas-cas.org` answers 200 with an HTML page for a file that does not exist. A link check must look at the content type, not the status.
 - `mancity.com` refuses scripted requests with 403, and `uefa.com` times them out. Both load in a browser.
-- UEFA's old `newsid=` addresses redirect. Cite the address the page redirects to.
+- Cite the address a page redirects to, not the one that redirects. UEFA's old `newsid=` addresses redirect; so did two addresses in the record until 2 Oct 2026 (a `premierleague.com/news/` address without `www` or `/en/`, and a Lawyer Monthly `?p=` short link).
 
 ## Visual identity
 
@@ -341,7 +342,7 @@ The social card and the README say nothing about where a case stands, so neither
 
 - The corrections email address for the methodology note. Not yet supplied. Leave the contact line out until it is.
 - Whether Premier League and club statements, which have no RSS, are worth an HTML scrape. Until decided they enter by hand as events.
-- Whether to ask the Wayback Machine to save the 30 cited pages it holds no usable copy of. Rowan chose on 2 Oct 2026 to link only copies it already held. Saving the rest would mean sending each address to archive.org.
+- How to preserve the 15 sources the Wayback Machine cannot hold a usable copy of, the club's own statements among them. Another archive (archive.today, or the League's standings feed for the tables) might take them. The validator accepts only Wayback addresses for now.
 - `athletic-verdict-report` cites the AP timeline, not The Athletic's own article. Add the article's address when it is to hand.
 - There is no error boundary. If a render throws in the browser the page goes blank. The render test and the build both render every address first, which is the guard. A boundary was left out because it would be a fallback path.
 
