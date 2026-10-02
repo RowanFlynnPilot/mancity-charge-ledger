@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Social card | The Charge Ledger</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 24px;
+        background: #dfe6da;
+        color: #1a1d1b;
+        font: 15px/1.5 system-ui, sans-serif;
+      }
+      canvas {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        margin-top: 16px;
+        border: 1px solid #79827a;
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      Draws public/og.png, the image a shared link shows. Open this page through
+      the dev server (npm run dev, then /mancity-charge-ledger/design/social-card.html),
+      right-click the image and save it as public/og.png.
+
+      The card is a still image, so it carries no findings and no status: nothing
+      on it can go out of date when the record changes. For the same reason it
+      uses no plum or bronze, which mean findings and appeals. The rail on the
+      left is the timeline's device, drawn as a motif, not as data.
+    -->
+    <p>The image a shared link shows. Right-click it and save it as <code>public/og.png</code>.</p>
+    <canvas id="card" width="1200" height="630"></canvas>
+
+    <script type="module">
+      // The site's paper and ink, from the top of src/styles.css. Keep in step by hand.
+      const PAPER = "#f2f4ef";
+      const INK = "#1a1d1b";
+      const INK_SOFT = "#505752";
+      const RULE = "#ccd3ca";
+      const RULE_STRONG = "#79827a";
+
+      const TITLE = "The Charge Ledger";
+      const STANDFIRST =
+        "A sourced record of the financial-rules cases involving Manchester City: " +
+        "what was alleged, what was decided and by whom, and what happens next.";
+      const PROMISE = "Every entry links to its source";
+      const KEEPER = "An independent record kept by Rowan Flynn";
+
+      const WIDTH = 1200;
+      const HEIGHT = 630;
+      const EDGE = 72; // margin on every side
+      const BODY_X = 268; // where the text column starts, right of the rail
+      const BODY_W = WIDTH - EDGE - BODY_X;
+
+      const FILES = "../node_modules/@fontsource-variable";
+      const faces = [
+        new FontFace("Literata", `url(${FILES}/literata/files/literata-latin-opsz-normal.woff2)`, { weight: "200 900" }),
+        new FontFace("Archivo", `url(${FILES}/archivo/files/archivo-latin-wdth-normal.woff2)`, { weight: "100 900", stretch: "62% 125%" }),
+      ];
+      for (const face of faces) document.fonts.add(await face.load());
+
+      const ctx = document.getElementById("card").getContext("2d");
+      ctx.textBaseline = "alphabetic";
+
+      function line(x1, y1, x2, y2, colour, width, dash = []) {
+        ctx.save();
+        ctx.strokeStyle = colour;
+        ctx.lineWidth = width;
+        ctx.setLineDash(dash);
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // A filled dot for a case against City, an open one for a case City brought.
+      function dot(x, y, open) {
+        ctx.beginPath();
+        ctx.arc(x, y, 8, 0, Math.PI * 2);
+        ctx.fillStyle = open ? PAPER : INK;
+        ctx.fill();
+        if (open) {
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = INK;
+          ctx.stroke();
+        }
+      }
+
+      function wrap(text, width) {
+        const lines = [];
+        let current = "";
+        for (const word of text.split(" ")) {
+          const next = current ? `${current} ${word}` : word;
+          if (current && ctx.measureText(next).width > width) {
+            lines.push(current);
+            current = word;
+          } else {
+            current = next;
+          }
+        }
+        return [...lines, current];
+      }
+
+      ctx.fillStyle = PAPER;
+      ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+      // The lane rail: one line per case, newest at the top, as the timeline draws it.
+      const lanes = [EDGE + 12, EDGE + 46, EDGE + 80, EDGE + 114];
+      const FOOT = 500; // the rule above the foot of the card; the rail ends level with it
+      const tie = 430; // one event sits in two lanes
+      line(lanes[1], 214, lanes[1], tie, RULE_STRONG, 2);
+      line(lanes[2], 0, lanes[2], 96, RULE_STRONG, 2, [3, 7]); // still open
+      line(lanes[2], 96, lanes[2], tie, RULE_STRONG, 2);
+      line(lanes[3], 146, lanes[3], 326, RULE_STRONG, 2);
+      line(lanes[1], tie, lanes[2], tie, INK, 3);
+      dot(lanes[0], FOOT, false);
+      for (const y of [214, 286, 358, tie]) dot(lanes[1], y, false);
+      for (const y of [96, 172, 272, tie]) dot(lanes[2], y, false);
+      for (const y of [146, 236, 326]) dot(lanes[3], y, true);
+
+      // The title, set as large as the column allows.
+      let size = 118;
+      const titleFont = () => `500 ${size}px Literata`;
+      ctx.letterSpacing = "-2px";
+      ctx.font = titleFont();
+      while (ctx.measureText(TITLE).width > BODY_W) {
+        size -= 1;
+        ctx.font = titleFont();
+      }
+      ctx.fillStyle = INK;
+      ctx.fillText(TITLE, BODY_X - 4, 204);
+      ctx.letterSpacing = "0px";
+
+      // A ledger's double rule.
+      line(BODY_X, 248, WIDTH - EDGE, 248, INK, 2);
+      line(BODY_X, 255, WIDTH - EDGE, 255, INK, 2);
+
+      ctx.font = "400 35px Literata";
+      wrap(STANDFIRST, BODY_W).forEach((text, i) => ctx.fillText(text, BODY_X, 322 + i * 50));
+
+      line(BODY_X, FOOT, WIDTH - EDGE, FOOT, RULE, 2);
+
+      // The site's mark: a ledger page with its ruled margin.
+      ctx.save();
+      ctx.translate(BODY_X, 528);
+      ctx.scale(36 / 24, 36 / 24);
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(2.75, 2.75, 18.5, 18.5, 2);
+      ctx.stroke();
+      ctx.lineWidth = 1;
+      ctx.stroke(new Path2D("M7.75 3v18M10 3v18"));
+      ctx.lineWidth = 1.5;
+      ctx.lineCap = "round";
+      ctx.stroke(new Path2D("M13 8.5h5M13 12h5M13 15.5h5"));
+      ctx.restore();
+
+      ctx.font = "600 23px Archivo";
+      ctx.fontStretch = "semi-condensed";
+      ctx.fillStyle = INK;
+      ctx.fillText(PROMISE, BODY_X + 50, 555);
+      ctx.font = "400 23px Archivo";
+      ctx.fillStyle = INK_SOFT;
+      ctx.textAlign = "right";
+      ctx.fillText(KEEPER, WIDTH - EDGE, 555);
+
+      document.body.dataset.drawn = "true";
+    </script>
+  </body>
+</html>
