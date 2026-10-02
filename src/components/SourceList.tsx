@@ -21,7 +21,8 @@ export function SourceList({ sources }: { sources: Source[] }) {
               <a href={source.url} rel="noopener">{source.title}</a>
               <span className="source-publisher">
                 {isPdf(source.url) && " (PDF)"}, {source.publisher}
-                {archive && <>. <a href={archive} rel="noopener">Archived copy</a></>}
+                {/* A non-breaking space, so the two words are never split across lines. */}
+                {archive && <>. <a href={archive} rel="noopener">Archived&nbsp;copy</a></>}
               </span>
             </span>
           </li>
