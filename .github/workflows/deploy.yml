@@ -1,0 +1,59 @@
+name: Check and deploy
+
+# Validates the data, tests the pipeline and the app, and builds the site.
+# Off pull requests it then publishes the build to GitHub Pages.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The head of the branch, so a run called by the updates workflow
+          # builds the commit that workflow has just pushed.
+          ref: ${{ github.event_name == 'pull_request' && github.sha || github.ref }}
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+      - run: python pipeline/validate.py
+      - run: python -m unittest discover pipeline
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+      - if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

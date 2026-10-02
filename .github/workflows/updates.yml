@@ -1,0 +1,48 @@
+name: Fetch updates
+
+# Reads the news feeds every three hours and commits data/updates.json if it
+# changed. A failed run is the alert that a feed is down or has changed shape.
+on:
+  schedule:
+    - cron: "17 */3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: updates
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+      - run: python pipeline/fetch_updates.py
+      - run: python pipeline/validate.py
+      - id: commit
+        run: |
+          if git diff --quiet -- data/updates.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update press coverage feed" -- data/updates.json
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+  # A push made with the workflow's own token does not start other workflows,
+  # so the site is rebuilt from here.
+  deploy:
+    needs: fetch
+    if: needs.fetch.outputs.changed == 'true'
+    uses: ./.github/workflows/deploy.yml

@@ -1,0 +1,1110 @@
+/* The Charge Ledger.
+   Ledger paper and ink. The only hues are the finding and appeal badges. */
+
+:root {
+  --paper: #f2f4ef;
+  --sheet: #fbfcfa;
+  --ink: #1a1d1b;
+  --ink-soft: #505752;
+  --rule: #ccd3ca;
+  --rule-strong: #79827a;
+  --mark: #e3e9df;
+
+  --finding: #53306f;
+  --finding-tint: #eadff2;
+  --on-finding: #ffffff;
+  --appeal: #6b4700;
+  --appeal-tint: #f3e6c6;
+  --on-appeal: #ffffff;
+
+  --serif: "Literata Variable", Georgia, serif;
+  --sans: "Archivo Variable", system-ui, sans-serif;
+
+  --margin-col: 8.5rem;
+  --lane-w: 1.25rem;
+  --row-pad: 1.15rem;
+  --dot-y: calc(var(--row-pad) + 0.62rem);
+  --nav-h: 3rem;
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #141714;
+    --sheet: #1b1f1c;
+    --ink: #e7ebe5;
+    --ink-soft: #a6afa8;
+    --rule: #333a35;
+    --rule-strong: #646e67;
+    --mark: #252c26;
+
+    --finding: #cdb9e4;
+    --finding-tint: #33263f;
+    --on-finding: #1c1126;
+    --appeal: #e2c26e;
+    --appeal-tint: #3d3112;
+    --on-appeal: #241a00;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  font-optical-sizing: auto;
+  font-variant-numeric: lining-nums;
+}
+
+h1, h2, h3, p, ul, ol, dl, dd, table {
+  margin: 0;
+  padding: 0;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  text-decoration-color: var(--rule-strong);
+}
+
+a:hover {
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 2px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* Entries and sections are focused when linked to; the highlight shows that. */
+[tabindex="-1"]:focus {
+  outline: none;
+}
+
+[id] {
+  scroll-margin-top: calc(var(--nav-h) + 0.75rem);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.page {
+  width: 100%;
+  max-width: 68rem;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 2.5rem);
+}
+
+.skip {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 10;
+  padding: 0.5rem 0.8rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--sans);
+}
+
+.skip:focus {
+  top: 0.75rem;
+}
+
+/* ---------- Masthead ---------- */
+
+.masthead {
+  padding-top: clamp(2rem, 6vw, 4.5rem);
+}
+
+.masthead h1 {
+  font-size: clamp(2.6rem, 8vw, 4.75rem);
+  font-weight: 480;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+}
+
+.standfirst {
+  max-width: 34em;
+  margin-top: 1.1rem;
+  font-size: 1.2rem;
+  line-height: 1.5;
+}
+
+.masthead .standing {
+  margin-top: clamp(1.75rem, 4vw, 2.75rem);
+  /* A ledger's double rule. */
+  border-top: 3px double var(--ink);
+}
+
+/* ---------- Margin-and-entry blocks (masthead, position, method) ---------- */
+
+.standing > div {
+  display: grid;
+  grid-template-columns: var(--margin-col) minmax(0, 1fr);
+  padding-block: 0.9rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.standing dt {
+  padding-right: 1rem;
+  font-family: var(--sans);
+  font-stretch: 90%;
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.9;
+}
+
+.standing dd {
+  max-width: 44rem;
+}
+
+.standing dd > * + * {
+  margin-top: 0.35rem;
+}
+
+.standing-lead {
+  font-size: 1.15rem;
+  font-weight: 560;
+  line-height: 1.35;
+}
+
+.standing-meta {
+  font-family: var(--sans);
+  font-stretch: 92%;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.standing-meta a {
+  color: var(--ink);
+}
+
+.due-flag {
+  display: inline-block;
+  margin-left: 0.6em;
+  padding: 0.05em 0.5em;
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+  color: var(--ink);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.due-flag.due-passed {
+  display: block;
+  margin: 0.3rem 0 0;
+  padding: 0;
+  border: 0;
+  font-weight: 400;
+}
+
+/* ---------- View navigation ---------- */
+
+.views {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  margin-top: 2rem;
+  background: var(--paper);
+  border-bottom: 1px solid var(--ink);
+}
+
+.views ul {
+  display: flex;
+  gap: clamp(1rem, 3vw, 2rem);
+  height: var(--nav-h);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.views a {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  border-bottom: 3px solid transparent;
+  font-family: var(--sans);
+  font-stretch: 90%;
+  font-size: 0.98rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.views a:hover {
+  color: var(--ink);
+}
+
+.views a[aria-current="page"] {
+  border-bottom-color: var(--ink);
+  color: var(--ink);
+  font-weight: 650;
+}
+
+.views a:focus-visible {
+  outline-offset: -3px;
+}
+
+/* ---------- Views ---------- */
+
+.view {
+  padding-top: 2.25rem;
+}
+
+.view > h2,
+.method > h2 {
+  font-size: 1.9rem;
+  font-weight: 520;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.view-intro {
+  max-width: 42rem;
+  margin-top: 0.6rem;
+  color: var(--ink-soft);
+}
+
+.case-title {
+  margin-top: 1.25rem;
+  font-size: 1.3rem;
+  font-weight: 560;
+}
+
+.view .standing {
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--ink);
+}
+
+.notice {
+  max-width: 44rem;
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--ink);
+  background: var(--sheet);
+}
+
+.empty {
+  margin-top: 1.5rem;
+  color: var(--ink-soft);
+}
+
+/* ---------- Case register (timeline filter) ---------- */
+
+.cases {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+}
+
+.case {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.9rem 0.9rem 1rem;
+  border: 0;
+  border-left: 1px solid var(--rule);
+  background: none;
+  text-align: left;
+}
+
+.case:first-child {
+  border-left: 0;
+  padding-left: 0;
+}
+
+.case:hover .case-name {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+.case[aria-pressed="true"] {
+  padding-left: 0.9rem;
+  background: var(--sheet);
+  box-shadow: inset 0 3px 0 var(--ink);
+}
+
+.case-name {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.case-meta,
+.case-outcome {
+  font-family: var(--sans);
+  font-stretch: 90%;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+
+.case-outcome {
+  margin-top: 0.25rem;
+  color: var(--ink);
+}
+
+.lane-key {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  height: 0.9rem;
+  margin-bottom: 0.15rem;
+}
+
+.lane-key-tick {
+  width: 0.62rem;
+  height: 1.5px;
+  background: var(--rule-strong);
+}
+
+.lane-key-on {
+  height: 0.62rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.lane-key-on.dot-claimant {
+  background: transparent;
+}
+
+/* ---------- Toolbar ---------- */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  margin-top: 1rem;
+  font-family: var(--sans);
+  font-stretch: 92%;
+  font-size: 0.9rem;
+}
+
+.toolbar-status {
+  color: var(--ink-soft);
+}
+
+.text-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+.segmented {
+  display: flex;
+}
+
+.segmented button {
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--ink);
+  background: none;
+  font-weight: 500;
+}
+
+.segmented button + button {
+  border-left: 0;
+}
+
+.segmented button[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* ---------- Rows: a margin column and an entry ---------- */
+
+.rows {
+  margin-top: 1.25rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: var(--margin-col) minmax(0, 1fr);
+}
+
+.rows-rail .row {
+  grid-template-columns: auto var(--margin-col) minmax(0, 1fr);
+}
+
+.row-margin,
+.row-body {
+  padding-block: var(--row-pad);
+  border-top: 1px solid var(--rule);
+}
+
+.row-margin {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding-right: 1rem;
+  font-family: var(--sans);
+  font-stretch: 90%;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.row-margin time {
+  font-weight: 650;
+}
+
+.row-kind {
+  color: var(--ink-soft);
+}
+
+.row-kind.due-passed {
+  color: var(--ink);
+}
+
+.row-body > * {
+  max-width: 43rem;
+}
+
+.row-body h3 {
+  font-size: 1.22rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+}
+
+.row-body h3 + p {
+  margin-top: 0.4rem;
+}
+
+.position-line {
+  margin-top: 0.6rem;
+  padding-left: 0.8rem;
+  border-left: 3px solid var(--ink);
+}
+
+.row-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1.5rem;
+  margin-top: 0.75rem;
+  font-family: var(--sans);
+  font-stretch: 92%;
+  font-size: 0.84rem;
+  color: var(--ink-soft);
+}
+
+.copy-link {
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  text-decoration-color: var(--rule-strong);
+}
+
+.copy-link:hover {
+  color: var(--ink);
+  text-decoration-color: currentColor;
+}
+
+.is-target > .row-margin,
+.is-target > .row-body,
+tr.is-target > * {
+  background: var(--mark);
+}
+
+.is-target > .row-margin {
+  box-shadow: inset 4px 0 0 var(--ink);
+  padding-left: 0.75rem;
+}
+
+.is-target > .row-body {
+  padding-right: 0.75rem;
+}
+
+/* Year headings and the open end of the timeline */
+
+.row-year .row-margin {
+  grid-column: 2 / -1;
+  padding-block: 1.6rem 0.5rem;
+  border-top: 1px solid var(--ink);
+  font-family: var(--serif);
+  font-stretch: normal;
+  font-size: 1.5rem;
+  font-weight: 480;
+  line-height: 1;
+}
+
+.row-year + .row > .row-margin,
+.row-year + .row > .row-body {
+  border-top: 0;
+}
+
+.row-ongoing .row-margin,
+.row-ongoing .row-body {
+  border-top: 0;
+  padding-bottom: 1.4rem;
+}
+
+.row-ongoing .row-margin {
+  font-weight: 650;
+}
+
+/* ---------- Lane rail ---------- */
+
+.rail {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--lanes), var(--lane-w));
+  margin-right: 1rem;
+}
+
+.lane {
+  position: relative;
+}
+
+.lane-above::before,
+.lane-below::after {
+  content: "";
+  position: absolute;
+  left: calc(50% - 0.75px);
+  border-left: 1.5px solid var(--ink);
+}
+
+.lane-above::before {
+  top: 0;
+  height: var(--dot-y);
+}
+
+.lane-below::after {
+  top: var(--dot-y);
+  bottom: 0;
+}
+
+.lane-ongoing::before,
+.lane-ongoing::after {
+  border-left-style: dashed;
+}
+
+.lane-ongoing.lane-below::after {
+  top: 0.5rem;
+}
+
+.lane-ongoing.lane-above::before {
+  height: calc(100% - 0.5rem);
+}
+
+.dot {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: var(--dot-y);
+  width: 0.68rem;
+  height: 0.68rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  background: var(--ink);
+  transform: translate(-50%, -50%);
+}
+
+/* A case City brought is drawn open, not filled. */
+.dot-claimant {
+  background: var(--paper);
+}
+
+.tie {
+  position: absolute;
+  top: calc(var(--dot-y) - 0.75px);
+  left: calc((var(--from) + 0.5) * var(--lane-w));
+  width: calc((var(--to) - var(--from)) * var(--lane-w));
+  border-top: 1.5px solid var(--ink);
+}
+
+/* ---------- Sources ---------- */
+
+.sources {
+  display: grid;
+  gap: 0.3rem;
+  margin-top: 0.8rem;
+  font-family: var(--sans);
+  font-stretch: 92%;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.sources li {
+  display: grid;
+  grid-template-columns: 8.4rem minmax(0, 1fr);
+  align-items: baseline;
+}
+
+.source-kind {
+  color: var(--ink-soft);
+}
+
+.source-kind-primary {
+  justify-self: start;
+  padding: 0 0.4em;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.source-publisher {
+  color: var(--ink-soft);
+}
+
+/* ---------- Badges: the only colour on the page ---------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.18em 0.6em;
+  border: 1px solid;
+  border-radius: 2px;
+  font-family: var(--sans);
+  font-stretch: 90%;
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.finding {
+  border-color: var(--finding);
+  color: var(--finding);
+}
+
+.finding-proven {
+  background: var(--finding);
+  color: var(--on-finding);
+}
+
+.finding-proven-in-part {
+  background: var(--finding-tint);
+}
+
+.finding.is-overturned {
+  text-decoration: line-through;
+}
+
+.finding-glyph {
+  width: 0.62em;
+  height: 0.62em;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+}
+
+.finding-proven .finding-glyph {
+  background: currentColor;
+}
+
+.finding-proven-in-part .finding-glyph {
+  background: linear-gradient(90deg, currentColor 50%, transparent 50%);
+}
+
+.appeal {
+  border-color: var(--appeal);
+  color: var(--appeal);
+}
+
+.appeal-none {
+  border-color: var(--rule-strong);
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+.appeal-pending {
+  background: var(--appeal-tint);
+}
+
+.appeal-upheld {
+  background: var(--appeal);
+  color: var(--on-appeal);
+}
+
+.appeal-overturned {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.tally {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  font-family: var(--sans);
+  font-stretch: 92%;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.tally-findings {
+  margin-top: 1.75rem;
+}
+
+.tally li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ---------- Charge ledger table ---------- */
+
+.ledger {
+  width: 100%;
+  margin-top: 0.9rem;
+  border-collapse: collapse;
+  border-bottom: 1px solid var(--rule);
+}
+
+.ledger th,
+.ledger td {
+  padding: var(--row-pad) 1rem var(--row-pad) 0;
+  border-top: 1px solid var(--rule);
+  text-align: left;
+  vertical-align: top;
+}
+
+.ledger thead th {
+  padding-block: 0.5rem;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  font-family: var(--sans);
+  font-stretch: 90%;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.ledger tbody tr:first-child > * {
+  border-top: 0;
+}
+
+.ledger-ref {
+  width: var(--margin-col);
+  font-family: var(--sans);
+  font-stretch: 90%;
+  font-size: 0.95rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+/* The ruled margin of a ledger page: a double line after the reference column. */
+.ledger-body {
+  padding-left: 1rem;
+  border-left: 3px double var(--rule-strong);
+}
+
+.ledger thead th:nth-child(2) {
+  padding-left: 1rem;
+}
+
+.ledger-subject {
+  font-size: 1.12rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.ledger-body > * {
+  max-width: 43rem;
+}
+
+.ledger-period {
+  margin-top: 0.15rem;
+  font-family: var(--sans);
+  font-stretch: 90%;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.ledger-period + p,
+.ledger-subject + p:not(.ledger-period) {
+  margin-top: 0.35rem;
+}
+
+.ledger-finding,
+.ledger-appeal {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.ledger .ledger-appeal {
+  padding-right: 0;
+}
+
+tr.is-target > .ledger-ref {
+  box-shadow: inset 4px 0 0 var(--ink);
+  padding-left: 0.75rem;
+}
+
+/* ---------- Latest coverage ---------- */
+
+.day {
+  margin-top: 2rem;
+}
+
+.day-title {
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--ink);
+  font-size: 1.25rem;
+  font-weight: 520;
+}
+
+.day .rows {
+  margin-top: 0;
+}
+
+.day .row:first-child > * {
+  border-top: 0;
+}
+
+.row-update .row-margin,
+.row-update .row-body {
+  padding-block: 0.7rem;
+}
+
+.row-update .row-body a {
+  font-weight: 500;
+}
+
+/* ---------- Method and colophon ---------- */
+
+.method {
+  margin-top: 5rem;
+  padding-top: 2rem;
+  border-top: 3px double var(--ink);
+}
+
+.method .standing {
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--rule);
+}
+
+.colophon {
+  padding-block: 2rem 3rem;
+  font-family: var(--sans);
+  font-stretch: 92%;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+}
+
+/* ---------- Narrow screens ---------- */
+
+@media (max-width: 62rem) {
+  .cases {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .case:nth-child(odd) {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .case:nth-child(n + 3) {
+    border-top: 1px solid var(--rule);
+  }
+
+  .case[aria-pressed="true"] {
+    padding-left: 0.9rem;
+  }
+
+  /* The ledger table becomes one block per charge. */
+  .ledger thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .ledger,
+  .ledger tbody {
+    display: block;
+  }
+
+  .ledger tr {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "ref ref"
+      "finding appeal"
+      "body body";
+    gap: 0.6rem 0.75rem;
+    align-items: center;
+    padding-block: var(--row-pad);
+    border-top: 1px solid var(--rule);
+  }
+
+  .ledger tbody tr:first-child {
+    border-top: 1px solid var(--ink);
+  }
+
+  .ledger th,
+  .ledger td {
+    width: auto;
+    padding: 0;
+    border: 0;
+  }
+
+  .ledger-ref { grid-area: ref; }
+  .ledger-finding { grid-area: finding; }
+  .ledger-appeal { grid-area: appeal; }
+
+  .ledger-body {
+    grid-area: body;
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  tr.is-target {
+    background: var(--mark);
+    box-shadow: inset 4px 0 0 var(--ink);
+    padding-inline: 0.75rem;
+  }
+
+  tr.is-target > .ledger-ref {
+    box-shadow: none;
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 44rem) {
+  body {
+    font-size: 1rem;
+  }
+
+  :root {
+    --lane-w: 0.9rem;
+    --row-pad: 1rem;
+  }
+
+  .cases {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .case,
+  .case:first-child {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .case + .case {
+    border-top: 1px solid var(--rule);
+  }
+
+  .case[aria-pressed="true"] {
+    padding-left: 0.9rem;
+  }
+
+  /* The margin column moves above its entry. */
+  .standing > div,
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rows-rail .row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .rail {
+    grid-row: 1 / span 2;
+    margin-right: 0.75rem;
+  }
+
+  .row-margin {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0 0.6rem;
+    padding-bottom: 0;
+  }
+
+  .row-body {
+    padding-top: 0.3rem;
+    border-top: 0;
+  }
+
+  .row-year .row-margin {
+    grid-column: 2;
+    padding-bottom: 0.5rem;
+  }
+
+  .row-ongoing .row-margin {
+    padding-bottom: 0;
+  }
+
+  .row-ongoing .row-body {
+    padding-top: 0.2rem;
+  }
+
+  .row-year + .row > .row-margin {
+    border-top: 0;
+  }
+
+  .row-update .row-margin {
+    padding-bottom: 0;
+  }
+
+  .row-update .row-body {
+    padding-top: 0.15rem;
+  }
+
+  .is-target > .row-margin,
+  .is-target > .row-body {
+    padding-inline: 0.75rem;
+  }
+
+  .sources li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.1rem;
+  }
+
+  .sources li + li {
+    margin-top: 0.35rem;
+  }
+}
+
+@media print {
+  .views,
+  .skip,
+  .toolbar,
+  .copy-link {
+    display: none;
+  }
+}

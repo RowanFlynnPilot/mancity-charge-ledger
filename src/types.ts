@@ -24,6 +24,9 @@ export interface Case {
   cityRole: "respondent" | "claimant";
   status: "open" | "closed";
   outcome: string; // one line, current state
+  // The "statement" event recording City's position on the findings.
+  // Required when the case has charges, so findings never appear without it.
+  cityPositionEventId: string | null;
 }
 
 export type EventType =
@@ -37,6 +40,9 @@ export type EventType =
   | "statement"
   | "rule-change"
   | "filing";
+
+// Record ids double as URL fragments (#pl-core-decision, #1A): letters, digits
+// and single hyphens, unique across cases, events, charges and pending items.
 
 // data/events.json: hand-curated, sorted by date ascending.
 export interface CaseEvent {
@@ -82,5 +88,5 @@ export interface Update {
   title: string;
   url: string;
   publisher: string;
-  publishedAt: string; // ISO 8601
+  publishedAt: string; // UTC, "YYYY-MM-DDTHH:MM:SSZ"
 }

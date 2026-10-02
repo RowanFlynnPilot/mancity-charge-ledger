@@ -12,8 +12,8 @@ A personal project by Rowan Flynn, hosted under the `RowanFlynnPilot` GitHub acc
 
 As of 1 Oct 2026:
 
-- Done: data contract (`src/types.ts`), validator (`pipeline/validate.py`), seed data (4 cases, 19 events, 10 charges, 3 pending items). `python pipeline/validate.py` passes.
-- Not started: Vite app, feed fetcher, GitHub Actions, Pages deploy.
+- Done: data contract (`src/types.ts`), validator (`pipeline/validate.py`), seed data (4 cases, 19 events, 10 charges, 3 pending items), feed fetcher (`pipeline/fetch_updates.py`), the Vite app with all four views, the methodology note and linkable entries, and both workflows.
+- Not done: the first push and Pages enablement (Settings → Pages → Source: GitHub Actions). Build step 2 (reading the Core Decision PDF to fill the `null` periods). Step 6 (`seasons.json` and the season view).
 - The story is live. The Commission's Core Decision was published 29 Sep 2026. The appeal deadline is 2 Oct 2026. Sanction is undecided.
 
 ## Editorial rules
@@ -46,8 +46,29 @@ data/charges.json         Commission charge ledger            hand-edited
 data/pending.json         due but not yet happened            hand-edited
 data/updates.json         news feed, newest first             written by the pipeline only
 pipeline/validate.py      raises on first contract violation
-pipeline/fetch_updates.py (to build) RSS → updates.json
+pipeline/fetch_updates.py RSS → updates.json
+pipeline/test_*.py        unittest, stdlib only
+src/data.ts               the JSON, typed, plus lookups
+src/route.ts              URL fragment → view and entry
+src/dates.ts              date formatting, "today" in London, due notes
+src/rail.ts               geometry of the timeline's lane rail
+src/components/           one file per view, plus shared pieces
+src/styles.css            all styles and the design tokens
+.github/workflows/        deploy.yml (check, build, Pages), updates.yml (cron fetch)
 ```
+
+## Commands
+
+```
+python pipeline/validate.py              validate data/
+python -m unittest discover pipeline     pipeline tests
+python pipeline/fetch_updates.py         refresh data/updates.json from the feeds
+npm run dev                              dev server (base path /mancity-charge-ledger/)
+npm test                                 app tests (vitest)
+npm run build                            typecheck, then build to dist/
+```
+
+The pipeline uses the Python standard library only. There is no `requirements.txt`.
 
 ## Data rules
 
@@ -58,19 +79,30 @@ pipeline/fetch_updates.py (to build) RSS → updates.json
 - `Charge.period` is `null` until the period is read from the published decision. `null` renders as nothing, not as a placeholder.
 - When a pending item happens, add it to `events.json` and delete it from `pending.json` in the same commit.
 - `updates.json` is never hand-edited. A feed item becomes part of the record only when a person writes an event for it.
+- Record ids are URL fragments. They use letters, digits and single hyphens, and are unique across cases, events, charges and pending items. `timeline`, `ledger`, `next`, `latest` and `method` are reserved for the app.
+- `Case.cityPositionEventId` points at the `statement` event that records City's position. It is required for any case that has charges; the validator fails otherwise. This is how editorial rule 3 is enforced: the ledger and the timeline read City's position from that event. When City's position changes, add a new statement event and repoint the field.
+- One URL is always cited with the same title, publisher and kind. The validator fails on a mismatch.
+- `Update.publishedAt` is UTC, `YYYY-MM-DDTHH:MM:SSZ`, so string order is time order. `Update.id` must equal the sha1 of `Update.url`.
 
 ## Pipeline: `fetch_updates.py`
 
 One job: read RSS feeds, keep the items about these cases, write `data/updates.json`.
 
-- Feeds are a fixed list at the top of the file.
-  - `https://www.skysports.com/rss/12040` (Sky Sports news, all sports). Confirmed reachable 1 Oct 2026, standard RSS with `title`, `description`, `link`, `pubDate`.
-  - `https://feeds.bbci.co.uk/sport/football/rss.xml` and `https://www.theguardian.com/football/manchestercity/rss` are candidates that could not be reached from the sandbox where this scaffold was built. Request each once in session 1. Keep the ones that return valid RSS and remove the rest from this file.
-- Keep an item when title + description mention the club (`Man City` or `Manchester City`) and at least one case term: `charges`, `commission`, `appeal`, `sanction`, `verdict`, `breach`, `tribunal`, `APT`, `points deduction`, `expulsion`, `financial rules`.
-- `id` is the sha1 of the URL. Merge with the existing file, sort newest first, keep the latest 200.
+- Feeds are a fixed list at the top of the file. All three were requested on 1 Oct 2026 and returned valid RSS.
+  - `https://www.skysports.com/rss/12040` (Sky Sports news, all sports). 20 items, spanning about 5.5 hours when checked, so a 3-hour cron does not miss items.
+  - `https://feeds.bbci.co.uk/sport/football/rss.xml` (BBC Sport football).
+  - `https://www.theguardian.com/football/manchestercity/rss` (The Guardian, Manchester City).
+- Keep an item when title + description mention the club (`Man City` or `Manchester City`) and at least one case term: `charges`, `commission`, `appeal`, `sanction`, `verdict`, `breach`, `tribunal`, `APT`, `points deduction`, `expulsion`, `financial rules`, `guilty`, `ruling`, `findings`, `hearing`. Terms match at the start of a word (`appeal` catches `appeals`). `APT` is case-sensitive and whole-word, so it does not hit `captain` or `apt`. Markup is stripped before matching.
+- The filter is loose by design. It lets through the odd unrelated item that mentions the club and a term in passing. The Latest view is labelled as unchecked press coverage for that reason.
+- `title`, `link` and `pubDate` are required and a missing one raises. `description` may be empty; publishers do send that.
+- Sky stamps dates with `BST`, which is not an RFC 822 zone. The fetcher maps it to `+0100` and raises on any other zone name it cannot resolve.
+- The URL is stored without its query string (BBC appends tracking parameters). `id` is the sha1 of that URL. Merge with the existing file, sort newest first, keep the latest 200.
 - Any HTTP error or unparseable feed raises. A red workflow run is the alert. Do not catch and continue.
 
-Workflow: cron every 3 hours → `fetch_updates.py` → `validate.py` → commit `data/updates.json` if it changed. A push to `main` builds and deploys Pages.
+Workflows:
+
+- `updates.yml`: cron every 3 hours → `fetch_updates.py` → `validate.py` → commit `data/updates.json` if it changed → call `deploy.yml`. The call is needed because a push made with the workflow's own token does not trigger other workflows.
+- `deploy.yml`: on push to `main`, pull request, manual run, or a call from `updates.yml`. Runs `validate.py`, the pipeline tests, the app tests and the build. Off pull requests it then deploys to Pages.
 
 ## UI
 
@@ -88,15 +120,24 @@ This is a personal project. No organisation logo or branding appears in the UI.
 Two things a public reference needs that the four views don't cover:
 
 - **Methodology note.** A short section on the page: what counts as a primary source, what counts as press, that findings are attributed and City's position is shown, who maintains it (Rowan Flynn), and how to report a correction.
-- **Linkable items.** Every event and charge gets a URL fragment from its `id` (`#pl-core-decision`, `#1A`), so one item can be cited or shared on its own.
+- **Linkable items.** Every event, charge and pending item gets a URL fragment from its `id` (`#pl-core-decision`, `#1A`), so one item can be cited or shared on its own. The fragment opens the right view, scrolls to the entry and marks it. Views are fragments too (`#ledger`).
+
+How the views are built:
+
+- The views are links, not ARIA tabs, so the back button and shared URLs work. `src/route.ts` resolves the fragment.
+- The timeline's lane rail is the page's one distinctive device: a vertical line per case, a dot per event, a tie where an event sits in two lanes, a dashed end for a case that is still open. Cases City brought (`cityRole: "claimant"`) are drawn with open dots, which is how editorial rule 6 shows in the UI.
+- The ledger shows City's position (from `cityPositionEventId`), the appeal state counted from the charges' `appeal` fields, and the next pending item, above the table. A ruling or sanction in the timeline carries a "City's position" line for the same reason.
+- An `appeal` of `overturned` strikes through the finding badge.
+- Due dates are compared with today's date in London. A pending item whose date has passed says so and says no outcome is recorded yet.
+- The methodology note sits below every view and links to the public edit history of `data/` on GitHub.
 
 ## Build order
 
-1. `npm create vite@latest` (React + TS) in the repo root, keeping `src/types.ts`. Add `validate.py` to CI.
+1. Done. Vite (React + TS) in the repo root, keeping `src/types.ts`. `validate.py` runs in CI.
 2. Read the full Core Decision PDF. Fill the `null` periods in `charges.json` where the published text states them. Add any dated events it establishes.
-3. Confirm the feed list, build `fetch_updates.py`, add the cron workflow.
-4. Build the four views against the JSON.
-5. Pages deploy.
+3. Done. Feed list confirmed, `fetch_updates.py` built, cron workflow added.
+4. Done. The four views, the methodology note and linkable entries.
+5. Workflow written. Still needs the first push and Pages switched on with GitHub Actions as the source.
 6. `seasons.json` and the season view.
 
 ## Visual identity
@@ -106,7 +147,13 @@ Its own, neutral. Reference-book plain: the documents are the content.
 - No club colours. No sky blue, and no rival club's red either. Either one reads as taking a side.
 - Do not reuse another project's design tokens.
 - Colour carries meaning in exactly one place: the `finding` and `appeal` badges. Each badge also has a text label, so colour is never the only signal.
-- Palette and type are chosen in the UI session and recorded here once chosen.
+- Chosen 1 Oct 2026. The tokens live at the top of `src/styles.css`, with a dark set under `prefers-color-scheme: dark`.
+  - Surfaces: paper `#f2f4ef` (the pale green-grey of ledger paper), sheet `#fbfcfa`, ink `#1a1d1b`, soft ink `#505752`, rules `#ccd3ca` and `#79827a`. There is no accent colour. Links are underlined ink.
+  - Finding badges are plum `#53306f`: solid for proven, tinted for proven in part, outlined for not proven, each with a full, half or empty disc.
+  - Appeal badges are bronze `#6b4700`: grey outline for none, tinted for pending, solid for upheld, solid ink for overturned.
+  - Every text and badge pairing is at least 6:1 contrast in both themes.
+  - Type: Literata (variable, optical size) for reading and headings, italic for case names as law reports set them. Archivo (variable, slightly condensed) for dates, references, labels and controls. Both are self-hosted through `@fontsource-variable`, so the site makes no third-party requests.
+  - Layout: a left margin column carries the key (date, charge reference, label) and the body carries the entry, on every view. Rows are ruled. A double rule marks the masthead, the ledger's reference column and the methodology note.
 
 ## Open decisions
 

@@ -5,7 +5,8 @@
     "body": "UEFA Club Financial Control Body",
     "cityRole": "respondent",
     "status": "closed",
-    "outcome": "Settled in May 2014 with no findings made."
+    "outcome": "Settled in May 2014 with no findings made.",
+    "cityPositionEventId": null
   },
   {
     "id": "uefa-2020",
@@ -13,7 +14,8 @@
     "body": "UEFA Club Financial Control Body; Court of Arbitration for Sport",
     "cityRole": "respondent",
     "status": "closed",
-    "outcome": "Two-season ban overturned by CAS in July 2020; fine cut to €10 million for failing to cooperate."
+    "outcome": "Two-season ban overturned by CAS in July 2020; fine cut to €10 million for failing to cooperate.",
+    "cityPositionEventId": null
   },
   {
     "id": "pl-2023",
@@ -21,7 +23,8 @@
     "body": "Premier League independent Commission (Section W)",
     "cityRole": "respondent",
     "status": "open",
-    "outcome": "Charges found proven in September 2026, bar Charge 4(B). Sanction not yet decided. City denies wrongdoing and has said it will appeal."
+    "outcome": "Charges found proven in September 2026, bar Charge 4(B). Sanction not yet decided. City denies wrongdoing and has said it will appeal.",
+    "cityPositionEventId": "city-response-to-decision"
   },
   {
     "id": "apt",
@@ -29,6 +32,7 @@
     "body": "Premier League arbitration tribunal",
     "cityRole": "claimant",
     "status": "closed",
-    "outcome": "Previous rules ruled unenforceable; settled in September 2025 with City accepting the current rules as valid."
+    "outcome": "Previous rules ruled unenforceable; settled in September 2025 with City accepting the current rules as valid.",
+    "cityPositionEventId": null
   }
 ]

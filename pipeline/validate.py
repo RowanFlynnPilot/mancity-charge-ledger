@@ -3,18 +3,29 @@
 Raises on the first violation. Run before every commit and in CI:
     python pipeline/validate.py
 """
+import hashlib
 import json
 import re
+from datetime import datetime
 from pathlib import Path
 
 DATA = Path(__file__).resolve().parent.parent / "data"
 
 DATE = re.compile(r"^\d{4}-(0[1-9]|1[0-2])(-(0[1-9]|[12]\d|3[01]))?$")
+ISO_UTC = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+# Ids become URL fragments (#pl-core-decision, #1A).
+ID = re.compile(r"^[A-Za-z0-9]+(-[A-Za-z0-9]+)*$")
+# Fragments the app uses for its own views. No record may take one.
+RESERVED_IDS = {"timeline", "ledger", "next", "latest", "method"}
+# Press tallies of the charges. The ledger is keyed to the Commission's structure.
+PRESS_TALLY = re.compile(r"\b(114|115|130)\s+(charges|breaches)\b", re.IGNORECASE)
+
 EVENT_TYPES = {"report", "investigation", "charge", "hearing", "ruling", "sanction",
                "settlement", "statement", "rule-change", "filing"}
 FINDINGS = {"proven", "proven-in-part", "not-proven"}
 APPEAL_STATES = {"none", "pending", "upheld", "overturned"}
 SOURCE_KINDS = {"primary", "press"}
+MAX_UPDATES = 200
 
 
 def load(name: str) -> list[dict]:
@@ -30,37 +41,82 @@ def check_keys(record: dict, keys: set[str], where: str) -> None:
     require(set(record) == keys, f"{where}: keys {sorted(record)} != {sorted(keys)}")
 
 
-def check_unique_ids(records: list[dict], where: str) -> None:
+def check_text(record: dict, fields: tuple[str, ...], where: str) -> None:
+    for name in fields:
+        value = record[name]
+        require(isinstance(value, str) and value != "" and value == value.strip(),
+                f"{where}: {name} must be non-empty text with no surrounding whitespace")
+
+
+def check_date(value: object, where: str) -> None:
+    require(isinstance(value, str) and DATE.match(value) is not None, f"{where}: bad date {value!r}")
+    try:
+        datetime.strptime(value if len(value) == 10 else f"{value}-01", "%Y-%m-%d")
+    except ValueError:
+        raise ValueError(f"{where}: {value!r} is not a calendar date") from None
+
+
+def check_ids(records: list[dict], where: str) -> None:
+    for r in records:
+        require(isinstance(r.get("id"), str), f"{where}: record without a text id")
     ids = [r["id"] for r in records]
     require(len(ids) == len(set(ids)), f"{where}: duplicate id")
 
 
+def check_fragments(*groups: list[dict]) -> None:
+    """Every record id is a usable, unambiguous URL fragment across all files."""
+    seen = set(RESERVED_IDS)
+    for group in groups:
+        for record in group:
+            fragment = record["id"]
+            require(ID.match(fragment) is not None, f"id {fragment!r}: not a valid URL fragment")
+            require(fragment not in seen, f"id {fragment!r}: reserved or used by another record")
+            seen.add(fragment)
+
+
 def check_sources(sources: list[dict], where: str, primary_only: bool = False) -> None:
-    require(len(sources) > 0, f"{where}: no sources")
+    require(isinstance(sources, list) and len(sources) > 0, f"{where}: no sources")
     for s in sources:
         check_keys(s, {"title", "publisher", "url", "kind"}, where)
+        check_text(s, ("title", "publisher", "url"), where)
         require(s["url"].startswith("https://"), f"{where}: source url must be https")
         require(s["kind"] in SOURCE_KINDS, f"{where}: bad source kind {s['kind']!r}")
         require(not primary_only or s["kind"] == "primary", f"{where}: primary sources only")
+    urls = [s["url"] for s in sources]
+    require(len(urls) == len(set(urls)), f"{where}: the same source is listed twice")
+
+
+def check_source_consistency(*groups: list[dict]) -> None:
+    """One URL is always cited with the same title, publisher and kind."""
+    cited: dict[str, dict] = {}
+    for group in groups:
+        for record in group:
+            for s in record["sources"]:
+                require(cited.setdefault(s["url"], s) == s,
+                        f"{record['id']}: {s['url']} is cited differently elsewhere")
 
 
 def validate_cases(cases: list[dict]) -> set[str]:
-    check_unique_ids(cases, "cases")
+    check_ids(cases, "cases")
     for c in cases:
         where = f"cases/{c['id']}"
-        check_keys(c, {"id", "name", "body", "cityRole", "status", "outcome"}, where)
+        check_keys(c, {"id", "name", "body", "cityRole", "status", "outcome",
+                       "cityPositionEventId"}, where)
+        check_text(c, ("name", "body", "outcome"), where)
         require(c["cityRole"] in {"respondent", "claimant"}, f"{where}: bad cityRole")
         require(c["status"] in {"open", "closed"}, f"{where}: bad status")
     return {c["id"] for c in cases}
 
 
 def validate_events(events: list[dict], case_ids: set[str]) -> None:
-    check_unique_ids(events, "events")
+    check_ids(events, "events")
     for e in events:
         where = f"events/{e['id']}"
         check_keys(e, {"id", "caseIds", "date", "type", "headline", "summary", "sources"}, where)
+        check_text(e, ("headline", "summary"), where)
         require(len(e["caseIds"]) > 0 and set(e["caseIds"]) <= case_ids, f"{where}: bad caseIds")
-        require(DATE.match(e["date"]) is not None, f"{where}: bad date {e['date']!r}")
+        require(len(e["caseIds"]) == len(set(e["caseIds"])), f"{where}: repeated caseId")
+        check_date(e["date"], where)
         require(e["type"] in EVENT_TYPES, f"{where}: bad type {e['type']!r}")
         check_sources(e["sources"], where)
     dates = [e["date"] for e in events]
@@ -68,44 +124,84 @@ def validate_events(events: list[dict], case_ids: set[str]) -> None:
 
 
 def validate_charges(charges: list[dict], case_ids: set[str]) -> None:
-    check_unique_ids(charges, "charges")
+    check_ids(charges, "charges")
     for c in charges:
         where = f"charges/{c['id']}"
         check_keys(c, {"id", "caseId", "ref", "subject", "period", "finding", "appeal",
                        "summary", "sources"}, where)
+        check_text(c, ("ref", "subject", "summary"), where)
         require(c["caseId"] in case_ids, f"{where}: bad caseId")
-        require(c["period"] is None or isinstance(c["period"], str), f"{where}: bad period")
+        if c["period"] is not None:
+            check_text(c, ("period",), where)
         require(c["finding"] in FINDINGS, f"{where}: bad finding {c['finding']!r}")
         require(c["appeal"] in APPEAL_STATES, f"{where}: bad appeal {c['appeal']!r}")
+        require(PRESS_TALLY.search(f"{c['subject']} {c['summary']}") is None,
+                f"{where}: press tally of charges in the ledger")
         check_sources(c["sources"], where, primary_only=True)
+    refs = [c["ref"] for c in charges]
+    require(len(refs) == len(set(refs)), "charges: duplicate ref")
 
 
 def validate_pending(pending: list[dict], case_ids: set[str]) -> None:
-    check_unique_ids(pending, "pending")
+    check_ids(pending, "pending")
     for p in pending:
         where = f"pending/{p['id']}"
         check_keys(p, {"id", "caseId", "label", "due", "detail", "sources"}, where)
+        check_text(p, ("label", "detail"), where)
         require(p["caseId"] in case_ids, f"{where}: bad caseId")
-        require(p["due"] is None or DATE.match(p["due"]) is not None, f"{where}: bad due")
+        if p["due"] is not None:
+            check_date(p["due"], where)
         check_sources(p["sources"], where)
 
 
+def validate_city_position(cases: list[dict], events: list[dict], charges: list[dict]) -> None:
+    """Findings never appear without City's position: the case must point at the
+    statement event that records it."""
+    events_by_id = {e["id"]: e for e in events}
+    cases_with_findings = {c["caseId"] for c in charges}
+    for c in cases:
+        where = f"cases/{c['id']}"
+        position = c["cityPositionEventId"]
+        if position is None:
+            require(c["id"] not in cases_with_findings,
+                    f"{where}: has charges, so cityPositionEventId is required")
+            continue
+        event = events_by_id.get(position)
+        require(event is not None, f"{where}: cityPositionEventId {position!r} is not an event")
+        require(c["id"] in event["caseIds"], f"{where}: {position!r} belongs to another case")
+        require(event["type"] == "statement", f"{where}: {position!r} is not a statement event")
+
+
 def validate_updates(updates: list[dict]) -> None:
-    check_unique_ids(updates, "updates")
+    check_ids(updates, "updates")
+    require(len(updates) <= MAX_UPDATES, f"updates: more than {MAX_UPDATES} items")
     for u in updates:
         where = f"updates/{u['id']}"
         check_keys(u, {"id", "title", "url", "publisher", "publishedAt"}, where)
+        check_text(u, ("title", "url", "publisher", "publishedAt"), where)
         require(u["url"].startswith("https://"), f"{where}: url must be https")
+        require(u["id"] == hashlib.sha1(u["url"].encode("utf-8")).hexdigest(),
+                f"{where}: id is not the sha1 of the url")
+        require(ISO_UTC.match(u["publishedAt"]) is not None,
+                f"{where}: publishedAt must be UTC, YYYY-MM-DDTHH:MM:SSZ")
     stamps = [u["publishedAt"] for u in updates]
     require(stamps == sorted(stamps, reverse=True), "updates: not sorted newest first")
 
 
+def validate(cases: list[dict], events: list[dict], charges: list[dict],
+             pending: list[dict], updates: list[dict]) -> None:
+    case_ids = validate_cases(cases)
+    validate_events(events, case_ids)
+    validate_charges(charges, case_ids)
+    validate_pending(pending, case_ids)
+    validate_city_position(cases, events, charges)
+    check_fragments(cases, events, charges, pending)
+    check_source_consistency(events, charges, pending)
+    validate_updates(updates)
+
+
 def main() -> None:
-    case_ids = validate_cases(load("cases"))
-    validate_events(load("events"), case_ids)
-    validate_charges(load("charges"), case_ids)
-    validate_pending(load("pending"), case_ids)
-    validate_updates(load("updates"))
+    validate(load("cases"), load("events"), load("charges"), load("pending"), load("updates"))
     print("data ok")
 
 
