@@ -401,9 +401,45 @@
     "summary": "City said it is innocent, called the decision legally and factually wrong, and said it will pursue the appeal routes open to it.",
     "sources": [
       {
+        "title": "Club Statement (29 Sep 2026)",
+        "publisher": "Manchester City",
+        "url": "https://www.mancity.com/news/club/manchester-city-club-statement-premier-league-63926128",
+        "kind": "primary"
+      },
+      {
         "title": "Man City to appeal guilty verdict in Premier League breaches case",
         "publisher": "ESPN",
         "url": "https://www.espn.com/soccer/story/_/id/50065250/man-city-appeal-guilty-verdict-premier-league-breaches-case",
+        "kind": "press"
+      }
+    ]
+  },
+  {
+    "id": "city-appeal-lodged",
+    "caseIds": [
+      "pl-2023"
+    ],
+    "date": "2026-10-01",
+    "type": "filing",
+    "headline": "City lodges its appeal against the Commission's decision",
+    "summary": "City said it lodged its appeal on the evening of 1 October. The League confirmed the next day that an appeal had been lodged with the Chair of the Judicial Panel. City called the appeal comprehensive and said the decision contains errors of law, principle and fact; neither statement lists the findings it covers. A three-member Appeal Board hears the appeal in private, and the League said the outcome will be published when its rules permit.",
+    "sources": [
+      {
+        "title": "Manchester City lodge appeal (2 Oct 2026)",
+        "publisher": "Manchester City",
+        "url": "https://www.mancity.com/news/club/manchester-city-lodge-appeal-63926534",
+        "kind": "primary"
+      },
+      {
+        "title": "Premier League statement: Manchester City FC appeal decision of independent Commission (2 Oct 2026)",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/news/4729207/premier-league-statement-manchester-city-fc-appeal-decision-of-independent-commission-02-october-2026",
+        "kind": "primary"
+      },
+      {
+        "title": "Man City confirm appeal against guilty verdict",
+        "publisher": "BBC Sport",
+        "url": "https://www.bbc.co.uk/sport/football/articles/cqn7470513n0o",
         "kind": "press"
       }
     ]

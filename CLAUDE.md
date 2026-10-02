@@ -16,7 +16,7 @@ As of 1 Oct 2026:
 - Live since 2 Oct 2026 at the Pages URL. Pages is set to deploy from GitHub Actions.
 - The Core Decision was read in full on 2 Oct 2026 (build step 2). No `null` period could be filled. See "What the Core Decision does and does not establish" below.
 - The season view (v1.1) is built: `data/seasons.json` from the Premier League's final tables, and a Seasons view between the charge ledger and What's next.
-- The story is live. The Commission's Core Decision was published 29 Sep 2026. The appeal deadline is 2 Oct 2026. Sanction is undecided.
+- The story is live. The Commission's Core Decision was published 29 Sep 2026. City lodged its appeal on 1 Oct 2026, and the League confirmed it on 2 Oct. Neither statement lists the findings appealed; the nine charges found against City are recorded as `appeal: "pending"` because City calls the appeal comprehensive, and Charge 4(B), which City won, stays `none`. Sanction is undecided.
 
 ## Editorial rules
 
@@ -33,7 +33,7 @@ These are not style preferences. They are what makes the tool publishable.
 
 ## Stack
 
-Python pipeline → static JSON in `data/` → GitHub Actions → React + Vite + TypeScript → GitHub Pages. It is a standalone site, not an embed.
+Python pipeline → static JSON in `data/` and `feed/` → GitHub Actions → React + Vite + TypeScript → GitHub Pages. It is a standalone site, not an embed.
 
 No database. No server. No auth.
 
@@ -49,9 +49,9 @@ data/pending.json         due but not yet happened            hand-edited
 data/allegations.json     the League's statement, rule by season   hand-edited, from the charge statement
 data/funding.json         sponsorship money by season         hand-edited, from the Core Decision
 data/seasons.json         final tables, 2009/10 to 2017/18    written by build_seasons.py only
-data/updates.json         news feed, newest first             written by the pipeline only
+feed/updates.json         news feed, newest first             written by the pipeline only
 pipeline/validate.py      raises on first contract violation
-pipeline/fetch_updates.py RSS → updates.json
+pipeline/fetch_updates.py RSS → feed/updates.json
 pipeline/build_seasons.py Premier League final tables → seasons.json, run by hand
 pipeline/test_*.py        unittest, stdlib only
 src/data.ts               the JSON, typed, plus lookups
@@ -70,7 +70,7 @@ src/styles.css            all styles and the design tokens
 ```
 python pipeline/validate.py              validate data/
 python -m unittest discover pipeline     pipeline tests
-python pipeline/fetch_updates.py         refresh data/updates.json from the feeds
+python pipeline/fetch_updates.py         refresh feed/updates.json from the feeds
 python pipeline/build_seasons.py         rebuild data/seasons.json from the League's tables
 npm run dev                              dev server (base path /mancity-charge-ledger/)
 npm test                                 app tests (vitest)
@@ -88,6 +88,7 @@ The pipeline uses the Python standard library only. There is no `requirements.tx
 - `Charge.period` is `null` until the period is read from the published decision or another primary document. `null` renders as nothing, not as a placeholder.
 - When a pending item happens, add it to `events.json` and delete it from `pending.json` in the same commit.
 - `updates.json` is never hand-edited. A feed item becomes part of the record only when a person writes an event for it.
+- `updates.json` lives in `feed/`, not `data/`. A workflow commits it every few hours, and the methodology note links to the commit history of `data/` as the record's edit history. Keeping the feed out of `data/` keeps that history to edits a person made.
 - `seasons.json` is never hand-edited. `build_seasons.py` reads the Premier League's own standings for each season and raises unless it gets a complete final table (20 clubs, 38 matches each). Each row cites that season's table page on premierleague.com as a primary source. The validator checks that `cityPosition` agrees with `champion` and `runnerUp`. The file records the tables as the League publishes them: if a decision ever alters a final table, re-run the script.
 - Charge ids are the Commission's number and letter (`1A`, `2`, `4B`). The validator enforces this, and the findings board groups charges by the number.
 - `funding.json` holds the season-by-season sponsorship figures behind one finding (`chargeId`), entered by hand from the decision. Each season's two parts must add up to the recorded figure; the validator fails otherwise. Amounts are £ million. `locator` says where in the source the figures are. It is a single object, not a list.
@@ -99,7 +100,7 @@ The pipeline uses the Python standard library only. There is no `requirements.tx
 
 ## Pipeline: `fetch_updates.py`
 
-One job: read RSS feeds, keep the items about these cases, write `data/updates.json`.
+One job: read RSS feeds, keep the items about these cases, write `feed/updates.json`.
 
 - Feeds are a fixed list at the top of the file. All three were requested on 1 Oct 2026 and returned valid RSS.
   - `https://www.skysports.com/rss/12040` (Sky Sports news, all sports). 20 items, spanning about 5.5 hours when checked, so a 3-hour cron does not miss items.
@@ -114,7 +115,7 @@ One job: read RSS feeds, keep the items about these cases, write `data/updates.j
 
 Workflows:
 
-- `updates.yml`: cron every 3 hours → `fetch_updates.py` → `validate.py` → commit `data/updates.json` if it changed → call `deploy.yml`. The call is needed because a push made with the workflow's own token does not trigger other workflows.
+- `updates.yml`: cron every 3 hours → `fetch_updates.py` → `validate.py` → commit `feed/updates.json` if it changed → call `deploy.yml`. The call is needed because a push made with the workflow's own token does not trigger other workflows.
 - `deploy.yml`: on push to `main`, pull request, manual run, or a call from `updates.yml`. Runs `validate.py`, the pipeline tests, the app tests and the build. Off pull requests it then deploys to Pages.
 
 ## UI
@@ -152,7 +153,7 @@ The charge ledger counts the case two ways, behind a switch:
 
 How the views are built:
 
-- The views are links, not ARIA tabs, so the back button and shared URLs work. `src/route.ts` resolves the fragment.
+- The views are links, not ARIA tabs, so the back button and shared URLs work. `src/route.ts` resolves the fragment. It compares the fragment as written, without decoding it, and looks records up in a `Map`: a reader can type anything after the `#`, and a malformed escape or a name such as `toString` must not stop the page rendering.
 - The timeline's lane rail is the page's one distinctive device: a vertical line per case, a dot per event, a tie where an event sits in two lanes, a dashed end for a case that is still open. Cases City brought (`cityRole: "claimant"`) are drawn with open dots, which is how editorial rule 6 shows in the UI.
 - The ledger shows City's position (from `cityPositionEventId`), the appeal state counted from the charges' `appeal` fields, and the next pending item, above the table. A ruling or sanction in the timeline carries a "City's position" line for the same reason.
 - An `appeal` of `overturned` strikes through the finding badge.

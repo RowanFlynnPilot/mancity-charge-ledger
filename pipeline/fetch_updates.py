@@ -1,4 +1,4 @@
-"""Read RSS feeds, keep the items about these cases, write data/updates.json.
+"""Read RSS feeds, keep the items about these cases, write feed/updates.json.
 
 Run by the scheduled workflow:
     python pipeline/fetch_updates.py
@@ -16,7 +16,7 @@ from email.utils import parsedate_to_datetime
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
-UPDATES = Path(__file__).resolve().parent.parent / "data" / "updates.json"
+UPDATES = Path(__file__).resolve().parent.parent / "feed" / "updates.json"
 
 # (publisher, feed url). All three confirmed as valid RSS on 1 Oct 2026.
 FEEDS = [

@@ -1,5 +1,5 @@
 // Data contract for The Charge Ledger.
-// pipeline/validate.py enforces the same rules on the JSON in data/.
+// pipeline/validate.py enforces the same rules on the JSON in data/ and feed/.
 
 export type CaseId = "uefa-2014" | "uefa-2020" | "pl-2023" | "apt";
 
@@ -131,7 +131,8 @@ export interface Season {
   sources: Source[]; // primary only: the League's final table
 }
 
-// data/updates.json: written only by pipeline/fetch_updates.py, newest first.
+// feed/updates.json: written only by pipeline/fetch_updates.py, newest first.
+// It sits outside data/ because it is press coverage, not part of the record.
 export interface Update {
   id: string; // sha1 of url
   title: string;
