@@ -24,7 +24,7 @@
   --serif: "Literata Variable", Georgia, serif;
   --sans: "Archivo Variable", system-ui, sans-serif;
   --condensed: 92%;
-  --t-display: clamp(2.5rem, 6vw, 4rem);
+  --t-display: clamp(3rem, 11.5vw, 6rem);
   --t-title: 1.875rem;
   --t-year: 1.5rem;
   --t-lead: 1.25rem;
@@ -60,7 +60,8 @@
   --z-skip: 20;
 
   /* State changes ease out fast and settle. */
-  --ease: 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  --out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease: 160ms var(--out);
 
   color-scheme: light dark;
 }
@@ -198,80 +199,350 @@ button {
   flex: none;
 }
 
-/* ---------- Masthead: the name on the left, the open case on the right ---------- */
+/* ---------- Opening: the name, then where each open case stands ---------- */
 
-.masthead {
-  display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-  gap: var(--s8) var(--s9);
-  align-items: start;
-  padding-block: clamp(var(--s7), 6vw, var(--s9)) var(--s8);
+.opening {
+  padding-block: clamp(var(--s7), 5vw, var(--s9)) var(--s8);
 }
 
-.masthead h1 {
+.opening h1 {
   font-size: var(--t-display);
   font-weight: 480;
-  line-height: 1;
-  letter-spacing: -0.02em;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+.opening-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--s4) var(--s8);
+  align-items: end;
+  margin-top: var(--s6);
 }
 
 .standfirst {
-  max-width: 26em;
-  margin-top: var(--s5);
+  max-width: 30em;
   font-size: var(--t-lead);
   line-height: 1.45;
 }
 
-.masthead-meta {
-  margin-top: var(--s5);
+.opening-meta {
+  font-family: var(--sans);
+  font-stretch: var(--condensed);
+  font-size: var(--u);
+  line-height: 1.5;
+  color: var(--ink-soft);
+  text-align: right;
+}
+
+.opening-meta a {
+  color: var(--ink);
+}
+
+/* An exhibit: something the record shows up front, under a ledger's double rule. */
+.exhibit {
+  margin-top: var(--s8);
+  padding-top: var(--s6);
+  border-top: 3px double var(--ink);
+}
+
+.exhibit-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s2) var(--s4);
+}
+
+.exhibit h2 {
+  font-size: var(--t-title);
+  font-weight: 520;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.exhibit-lead {
+  max-width: 40rem;
+  margin-top: var(--s2);
+  font-size: var(--t-lead);
+  line-height: 1.45;
+}
+
+.exhibit .standing {
+  margin-top: var(--s6);
+  border-top: 1px solid var(--rule);
+}
+
+/* The findings board: one block per charge, filled by its finding. */
+
+.board-figure {
+  margin: var(--s7) 0 0;
+}
+
+.board-figure figcaption {
   font-family: var(--sans);
   font-stretch: var(--condensed);
   font-size: var(--u);
   color: var(--ink-soft);
 }
 
-.masthead-meta a {
-  color: var(--ink);
-}
-
-.masthead-status {
-  display: grid;
-  gap: var(--s4);
-}
-
-/* Panels: a sheet on the paper, edged with a hairline. */
-.status,
-.notice {
-  background: var(--sheet);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-}
-
-.status {
-  padding: var(--s6);
-}
-
-.status-head {
+.board {
   display: flex;
-  align-items: baseline;
+  gap: var(--s4);
+  margin-top: var(--s3);
+}
+
+/* Groups are the Commission's: 1(A) to 1(D), 2, 3, 4(A) to 4(D). */
+.board-group {
+  flex: var(--span) var(--span) 0;
+  min-width: 0;
+}
+
+.board-group > ol {
+  display: grid;
+  grid-template-columns: repeat(var(--span), minmax(0, 1fr));
+  gap: var(--s1);
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
   justify-content: space-between;
   gap: var(--s4);
+  min-height: 7rem;
+  padding: var(--s3);
+  border: 1px solid var(--finding);
+  border-radius: var(--radius);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  color: var(--finding);
+  text-decoration: none;
+  print-color-adjust: exact;
+  transition: outline-color var(--ease);
+  /* The page's one authored moment: the board fills in, charge by charge. */
+  animation: block-in 520ms var(--out) both;
+  animation-delay: calc(var(--i) * 45ms);
 }
 
-.status-case {
-  font-size: var(--t-lead);
-  font-weight: 560;
-  line-height: 1.3;
+.block-proven,
+.block-proven:active {
+  background: var(--finding);
+  color: var(--on-finding);
 }
 
-.status-head + p {
-  margin-top: var(--s2);
+.block-proven-in-part {
+  background: var(--finding-tint);
 }
 
-.status .standing-meta {
+.block:hover {
+  outline-color: var(--ink);
+}
+
+.block:active {
+  outline-color: var(--ink-soft);
+}
+
+.block:not(.block-proven):active {
+  color: var(--finding);
+}
+
+.block-ref {
+  font-family: var(--sans);
+  font-stretch: var(--condensed);
+  font-size: var(--t-year);
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.block-finding {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  font-family: var(--sans);
+  font-stretch: var(--condensed);
+  font-size: var(--u-small);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.block.is-overturned .block-finding {
+  text-decoration: line-through;
+}
+
+.block .finding-glyph {
+  flex: none;
+}
+
+.block-proven .finding-glyph {
+  background: currentColor;
+}
+
+.block-proven-in-part .finding-glyph {
+  box-shadow: inset calc(0.3125rem - 1.5px) 0 0 currentColor;
+}
+
+.board-figure .tally-findings {
   margin-top: var(--s4);
-  padding-top: var(--s4);
+}
+
+@keyframes block-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+
+/* The sponsorship money: a table with a bar in each row. */
+
+.funding {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: var(--s7) var(--s9);
+  align-items: start;
+}
+
+.funding-text > :is(.funding-charge, .position-line, .sources, .funding-locator) {
+  margin-top: var(--s4);
+}
+
+.funding-charge {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2) var(--s3);
+  font-family: var(--sans);
+  font-stretch: var(--condensed);
+  font-size: var(--u-large);
+  font-weight: 650;
+}
+
+.funding-locator {
+  font-family: var(--sans);
+  font-stretch: var(--condensed);
+  font-size: var(--u);
+  color: var(--ink-soft);
+}
+
+.funding-table {
+  width: 100%;
+  /* Fixed columns: the season and the three figures take what they need, the bars take the rest. */
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-family: var(--sans);
+  font-stretch: var(--condensed);
+  font-size: var(--u);
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.funding-table caption {
+  padding-bottom: var(--s3);
+  color: var(--ink-soft);
+  text-align: left;
+}
+
+.funding-table :is(th, td) {
+  padding: var(--s2) 0 var(--s2) var(--s4);
+  font-weight: 400;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.funding-table :is(th, td):first-child {
+  padding-left: 0;
+}
+
+.funding-table thead th {
+  border-bottom: 1px solid var(--ink);
+  font-size: var(--u-small);
+  font-weight: 600;
+  color: var(--ink-soft);
+  vertical-align: bottom;
+}
+
+.funding-table tbody th {
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.funding-table tbody tr + tr > * {
   border-top: 1px solid var(--rule);
+}
+
+.funding-table tbody tr:hover > * {
+  background: var(--sheet);
+}
+
+.funding-table thead th:first-child {
+  width: 4.75rem;
+}
+
+.funding-table .num {
+  width: 5.75rem;
+  text-align: right;
+}
+
+/* A total in a ledger sits under a double rule. */
+.funding-table tfoot :is(th, td) {
+  padding-top: var(--s3);
+  border-top: 3px double var(--ink);
+  font-weight: 650;
+}
+
+.bar {
+  display: flex;
+  gap: 2px;
+  width: calc(var(--share) * 100%);
+  height: 0.875rem;
+  transform-origin: left center;
+  animation: bar-in 900ms var(--out) both;
+  animation-delay: calc(var(--i) * 40ms + 200ms);
+}
+
+.seg {
+  flex: 0 0 0;
+  min-width: 0;
+  print-color-adjust: exact;
+  forced-color-adjust: none;
+}
+
+.seg-sponsors,
+.key-sponsors {
+  background: var(--rule-strong);
+}
+
+.seg-owner,
+.key-owner {
+  background: var(--finding);
+}
+
+.seg-owner {
+  border-radius: 0 4px 4px 0;
+}
+
+.key {
+  display: inline-block;
+  width: 0.625rem;
+  height: 0.625rem;
+  margin-right: 0.4em;
+  border-radius: 2px;
+  print-color-adjust: exact;
+  forced-color-adjust: none;
+}
+
+@keyframes bar-in {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 /* ---------- Margin-and-entry blocks (City's position, method) ---------- */
@@ -352,7 +623,6 @@ button {
   top: 0;
   z-index: var(--z-bar);
   background: var(--paper);
-  border-top: 1px solid var(--rule);
   border-bottom: 1px solid var(--ink);
 }
 
@@ -464,7 +734,11 @@ button {
   border-top: 1px solid var(--ink);
 }
 
+/* A panel: a sheet on the paper, edged with a hairline. */
 .notice {
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
   max-width: calc(var(--measure) + 2 * var(--s5));
   margin-top: var(--s5);
   padding: var(--s4) var(--s5);
@@ -962,6 +1236,7 @@ tr.is-target > * {
   font-weight: 600;
   line-height: 1.5;
   white-space: nowrap;
+  print-color-adjust: exact;
 }
 
 .finding {
@@ -1256,9 +1531,24 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
 /* ---------- Narrow screens ---------- */
 
 @media (max-width: 62rem) {
-  .masthead {
+  .opening-intro,
+  .funding {
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--s7);
+  }
+
+  .opening-meta {
+    text-align: left;
+  }
+
+  /* The board becomes four across: 1(A) to 1(D), then 2 and 3, then 4(A) to 4(D). */
+  .board {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--s1);
+  }
+
+  .board-group {
+    grid-column: span var(--span);
   }
 
   .cases {
@@ -1378,8 +1668,41 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
     --row-pad: var(--s4);
   }
 
-  .status {
-    padding: var(--s5);
+  .block {
+    min-height: 5.5rem;
+    padding: var(--s2);
+  }
+
+  /* Each season: its figures on one line, its bar beneath. */
+  .funding-table,
+  .funding-table :is(caption, thead, tbody, tfoot) {
+    display: block;
+  }
+
+  .funding-table tr {
+    display: grid;
+    grid-template-columns: 3.75rem repeat(3, minmax(0, 1fr));
+    align-items: end;
+  }
+
+  .funding-table :is(th, td) {
+    padding-left: var(--s2);
+  }
+
+  .funding-table .num {
+    width: auto;
+  }
+
+  .funding-table .funding-bar {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: auto;
+    padding: 0 0 var(--s2);
+    border-top: 0;
+  }
+
+  .funding-table :is(thead, tfoot) .funding-bar {
+    display: none;
   }
 
   /* The view links scroll sideways here. Fade the edge they run off. */
@@ -1503,12 +1826,13 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
     display: none;
   }
 
-  .masthead {
+  .opening {
     padding-top: 0;
   }
 
   .row,
-  .status,
+  .board,
+  .funding-table,
   :is(.ledger, .seasons) tr,
   .standing > div {
     break-inside: avoid;

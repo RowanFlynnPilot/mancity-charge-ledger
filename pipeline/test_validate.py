@@ -35,6 +35,13 @@ VALID = {
         {"id": "2015-16", "label": "2015/16", "cityPosition": 4, "champion": "Leicester City",
          "runnerUp": "Arsenal", "sources": [TABLE_2015]},
     ],
+    "funding": {
+        "chargeId": "1A", "locator": "paragraph 72", "sources": [SOURCE],
+        "seasons": [
+            {"season": "2009/10", "recorded": 27.0, "paidBySponsors": 4.5, "paidByOwner": 22.5},
+            {"season": "2010/11", "recorded": 41.25, "paidBySponsors": 12.75, "paidByOwner": 28.5},
+        ],
+    },
     "updates": [{"id": hashlib.sha1(URL.encode()).hexdigest(), "title": "Story", "url": URL,
                  "publisher": "Paper", "publishedAt": "2026-10-01T21:41:00Z"}],
 }
@@ -81,8 +88,12 @@ class Validate(unittest.TestCase):
         self.assert_rejected("reserved or used by another record")
 
     def test_id_not_a_url_fragment(self):
-        self.data["charges"][0]["id"] = "1 A"
+        self.data["pending"][0]["id"] = "appeal deadline"
         self.assert_rejected("not a valid URL fragment")
+
+    def test_charge_id_follows_the_numbering_in_the_decision(self):
+        self.data["charges"][0]["id"] = "charge-1a"
+        self.assert_rejected("id must be the charge number and letter")
 
     def test_source_cited_inconsistently(self):
         self.data["pending"][0]["sources"] = [SOURCE | {"title": "The Decision"}]
@@ -100,13 +111,37 @@ class Validate(unittest.TestCase):
         self.data["cases"][0]["cityPositionEventId"] = "missing"
         self.assert_rejected("is not an event")
 
-    def test_season_id_must_be_consecutive_years(self):
+    def test_season_must_be_consecutive_years(self):
         self.data["seasons"][0] |= {"id": "2011-13", "label": "2011/13"}
-        self.assert_rejected("id must be a season")
+        self.assert_rejected("is not a season")
 
-    def test_season_label_must_match_id(self):
+    def test_season_id_must_match_label(self):
         self.data["seasons"][0]["label"] = "2012/13"
-        self.assert_rejected("label does not match id")
+        self.assert_rejected("id does not match label")
+
+    def test_funding_must_belong_to_a_charge(self):
+        self.data["funding"]["chargeId"] = "9Z"
+        self.assert_rejected("chargeId is not a charge")
+
+    def test_funding_parts_must_add_up(self):
+        self.data["funding"]["seasons"][0]["paidByOwner"] = 22.4
+        self.assert_rejected("do not add up to recorded")
+
+    def test_funding_amounts_must_be_numbers(self):
+        self.data["funding"]["seasons"][0]["recorded"] = "27.0"
+        self.assert_rejected("bad recorded")
+
+    def test_funding_needs_a_primary_source(self):
+        self.data["funding"]["sources"] = [PRESS]
+        self.assert_rejected("primary sources only")
+
+    def test_funding_seasons_in_order(self):
+        self.data["funding"]["seasons"].reverse()
+        self.assert_rejected("seasons not sorted")
+
+    def test_funding_source_must_be_cited_consistently(self):
+        self.data["funding"]["sources"] = [SOURCE | {"publisher": "The League"}]
+        self.assert_rejected("cited differently elsewhere")
 
     def test_season_position_must_be_a_league_place(self):
         self.data["seasons"][1]["cityPosition"] = 21

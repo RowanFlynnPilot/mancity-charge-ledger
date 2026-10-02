@@ -5,6 +5,7 @@ import { formatDate } from "../dates";
 import { STATUS_LABEL } from "../labels";
 import { buildRows, railCells, type Cell } from "../rail";
 import type { Case, CaseEvent, CaseId, EventType } from "../types";
+import { PositionLine } from "./CityPosition";
 import { CopyLink } from "./CopyLink";
 import { SourceList } from "./SourceList";
 
@@ -27,12 +28,11 @@ const ROLE_LABEL: Record<Case["cityRole"], string> = {
 };
 
 // Where a ruling or sanction is shown, City's recorded position goes with it.
-function cityPositions(event: CaseEvent): CaseEvent[] {
+function cityPositionIds(event: CaseEvent): string[] {
   if (event.type !== "ruling" && event.type !== "sanction") return [];
   return event.caseIds
     .map((id) => caseById[id].cityPositionEventId)
-    .filter((id): id is string => id !== null && id !== event.id)
-    .map((id) => eventById.get(id)!);
+    .filter((id): id is string => id !== null && id !== event.id);
 }
 
 function Rail({ cells, lanes }: { cells: Cell[]; lanes: Case[] }) {
@@ -85,12 +85,7 @@ function EventRow({ event, cells, lanes, isTarget }: {
         <div className="row-main">
           <h3>{event.headline}</h3>
           <p>{event.summary}</p>
-          {cityPositions(event).map((position) => (
-            <p key={position.id} className="position-line">
-              <span className="position-label">City&rsquo;s position</span>{" "}
-              <a href={`#${position.id}`}>{position.headline}</a>
-            </p>
-          ))}
+          {cityPositionIds(event).map((id) => <PositionLine key={id} eventId={id} />)}
         </div>
         <div className="row-aside">
           <SourceList sources={event.sources} />

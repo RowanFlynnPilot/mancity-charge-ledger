@@ -46,6 +46,7 @@ data/cases.json           the four cases                      hand-edited
 data/events.json          timeline, sorted ascending          hand-edited
 data/charges.json         Commission charge ledger            hand-edited
 data/pending.json         due but not yet happened            hand-edited
+data/funding.json         sponsorship money by season         hand-edited, from the Core Decision
 data/seasons.json         final tables, 2009/10 to 2017/18    written by build_seasons.py only
 data/updates.json         news feed, newest first             written by the pipeline only
 pipeline/validate.py      raises on first contract violation
@@ -56,6 +57,7 @@ src/data.ts               the JSON, typed, plus lookups
 src/route.ts              URL fragment → view and entry
 src/dates.ts              date formatting, "today" in London, due notes
 src/rail.ts               geometry of the timeline's lane rail
+src/board.ts              charge groups for the findings board, and money totals
 src/components/           one file per view, plus shared pieces
 src/styles.css            all styles and the design tokens
 .github/workflows/        deploy.yml (check, build, Pages), updates.yml (cron fetch)
@@ -85,7 +87,9 @@ The pipeline uses the Python standard library only. There is no `requirements.tx
 - When a pending item happens, add it to `events.json` and delete it from `pending.json` in the same commit.
 - `updates.json` is never hand-edited. A feed item becomes part of the record only when a person writes an event for it.
 - `seasons.json` is never hand-edited. `build_seasons.py` reads the Premier League's own standings for each season and raises unless it gets a complete final table (20 clubs, 38 matches each). Each row cites that season's table page on premierleague.com as a primary source. The validator checks that `cityPosition` agrees with `champion` and `runnerUp`. The file records the tables as the League publishes them: if a decision ever alters a final table, re-run the script.
-- Record ids are URL fragments. They use letters, digits and single hyphens, and are unique across cases, events, charges, pending items and seasons. `timeline`, `ledger`, `seasons`, `next`, `latest` and `method` are reserved for the app.
+- Charge ids are the Commission's number and letter (`1A`, `2`, `4B`). The validator enforces this, and the findings board groups charges by the number.
+- `funding.json` holds the season-by-season sponsorship figures behind one finding (`chargeId`), entered by hand from the decision. Each season's two parts must add up to the recorded figure; the validator fails otherwise. Amounts are £ million. `locator` says where in the source the figures are. It is a single object, not a list.
+- Record ids are URL fragments. They use letters, digits and single hyphens, and are unique across cases, events, charges, pending items and seasons. `timeline`, `ledger`, `seasons`, `next`, `latest`, `method` and `funding` are reserved for the app.
 - `Case.cityPositionEventId` points at the `statement` event that records City's position. It is required for any case that has charges; the validator fails otherwise. This is how editorial rule 3 is enforced: the ledger and the timeline read City's position from that event. When City's position changes, add a new statement event and repoint the field.
 - One URL is always cited with the same title, publisher and kind. The validator fails on a mismatch.
 - `Update.publishedAt` is UTC, `YYYY-MM-DDTHH:MM:SSZ`, so string order is time order. `Update.id` must equal the sha1 of `Update.url`.
@@ -128,6 +132,13 @@ Two things a public reference needs that the four views don't cover:
 - **Methodology note.** A short section on the page: what counts as a primary source, what counts as press, that findings are attributed and City's position is shown, who maintains it (Rowan Flynn), and how to report a correction.
 - **Linkable items.** Every event, charge and pending item gets a URL fragment from its `id` (`#pl-core-decision`, `#1A`), so one item can be cited or shared on its own. The fragment opens the right view, scrolls to the entry and marks it. Views are fragments too (`#ledger`).
 
+The opening, above the views (built 2 Oct 2026 to give the page a focal point):
+
+- The view bar is at the very top and sticks there.
+- The title is set at display size. Under it, each open case gets an exhibit: its name, a status tag, its `outcome` line, and, if it has charges, the findings board.
+- The findings board draws one block per charge, filled by its `finding`, in the Commission's groups (1(A) to 1(D), 2, 3, 4(A) to 4(D)). Each block links to its charge in the ledger. City's position and the appeal state sit directly under it, because editorial rule 3 applies here as much as in the ledger.
+- The sponsorship money exhibit is a table with a bar in each row, built from `funding.json`. Every figure is in the table, so nothing depends on reading the bars or on hovering. It shows the charge's finding and appeal badges, City's position, and the source. Its text attributes the figures to the Commission.
+
 How the views are built:
 
 - The views are links, not ARIA tabs, so the back button and shared URLs work. `src/route.ts` resolves the fragment.
@@ -163,7 +174,7 @@ Periods:
 
 Dates. The decision confirms dates already in `events.json`: proceedings began February 2023 (para 1); the hearing sat on 42 days from 16 Sep to 6 Dec 2024 (page 1, para 16); 27 factual witnesses (para 27); the UEFA settlement was May 2014 (para 102); the Der Spiegel articles were November 2018 (para 103). The decision itself carries no visible date: the signature block on page 40 is redacted. It gives two further dates, neither of which is a step in a case, so neither is an event: ADUG bought 90% of the club in September 2008 (para 49), and an episode on 25 May 2013 that the Commission uses as an example (paras 88–89).
 
-Figures the decision states exactly: £949.94 million recorded as sponsorship income from Abu Dhabi sponsors across 2009/10 to 2017/18, of which £119.25 million was paid by the sponsors and £830.69 million by ADUG (para 72, with a season-by-season table in footnote 8).
+Figures the decision states exactly (now held in `data/funding.json`, season by season): £949.94 million recorded as sponsorship income from Abu Dhabi sponsors across 2009/10 to 2017/18, of which £119.25 million was paid by the sponsors and £830.69 million by ADUG (para 72, with a season-by-season table in footnote 8).
 
 ## Visual identity
 
@@ -174,6 +185,7 @@ Its own, neutral. Reference-book plain: the documents are the content.
 - Colour carries meaning in exactly one place: the `finding` and `appeal` badges. Each badge also has a text label, so colour is never the only signal.
 - Chosen 1 Oct 2026. The tokens live at the top of `src/styles.css`, with a dark set under `prefers-color-scheme: dark`.
   - Surfaces: paper `#f2f4ef` (the pale green-grey of ledger paper), sheet `#fbfcfa`, ink `#1a1d1b`, soft ink `#505752`, rules `#ccd3ca` and `#79827a`. There is no accent colour. Links are underlined ink.
+  - The two hues mean findings and appeals wherever they appear. Plum fills the findings board and the owner-paid part of the money chart because both show findings; nothing else may use it. The chart's other part is neutral grey.
   - Finding badges are plum `#53306f`: solid for proven, tinted for proven in part, outlined for not proven, each with a full, half or empty disc.
   - Appeal badges are bronze `#6b4700`: grey outline for none, tinted for pending, solid for upheld, solid ink for overturned.
   - Every text and badge pairing is at least 6:1 contrast in both themes.
@@ -184,7 +196,8 @@ Its own, neutral. Reference-book plain: the documents are the content.
   - Reading text is held to `--measure` (36rem, about 70 characters). On wide screens an entry's sources sit in a side column so the text stays at that width.
   - The masthead puts the title on the left and the open case on the right, in a panel. Panels (the open case, the press-coverage notice) are a lighter sheet with a hairline edge. There are no shadows; structure comes from rules.
   - The site has its own mark, a ledger page (`src/components/Mark.tsx`, also the favicon). It sits in the view bar and links back to the top.
-  - Every control has hover, pressed and keyboard-focus states. Motion is limited to those 140ms state changes and a brief highlight when arriving at a linked entry, and is switched off under `prefers-reduced-motion`.
+  - Every control has hover, pressed and keyboard-focus states. Motion is limited to those quick state changes, a brief highlight when arriving at a linked entry, and one moment on load: the findings board fills in block by block and the chart's bars draw. All of it is switched off under `prefers-reduced-motion`.
+  - Chart marks follow fixed rules: bars 14px thick, square at the baseline and rounded at the data end, a 2px gap between the two parts, no outlines. Badges, blocks and bars keep their fill when printed.
   - No gradients, no pure black or white on screen, and the only `z-index` values are `--z-bar` and `--z-skip`.
   - No label sitting above a heading. A state such as "Open" or "Today" is a `.tag` beside the text it describes.
   - No thick stripe down the side of an entry or callout. A linked entry is marked by its background alone; City's position is a labelled line under a hairline.

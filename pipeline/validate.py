@@ -16,8 +16,10 @@ ISO_UTC = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 # Ids become URL fragments (#pl-core-decision, #1A).
 ID = re.compile(r"^[A-Za-z0-9]+(-[A-Za-z0-9]+)*$")
 # Fragments the app uses for its own views. No record may take one.
-RESERVED_IDS = {"timeline", "ledger", "seasons", "next", "latest", "method"}
-SEASON_ID = re.compile(r"^(\d{4})-(\d{2})$")
+RESERVED_IDS = {"timeline", "ledger", "seasons", "next", "latest", "method", "funding"}
+SEASON = re.compile(r"^(\d{4})/(\d{2})$")
+# The Commission's own numbering: Charge 2, Charge 1(A).
+CHARGE_ID = re.compile(r"^\d+[A-Z]?$")
 CLUB = "Manchester City"
 CLUBS_IN_LEAGUE = 20
 # Press tallies of the charges. The ledger is keyed to the Commission's structure.
@@ -31,7 +33,7 @@ SOURCE_KINDS = {"primary", "press"}
 MAX_UPDATES = 200
 
 
-def load(name: str) -> list[dict]:
+def load(name: str) -> list[dict] | dict:
     return json.loads((DATA / f"{name}.json").read_text(encoding="utf-8"))
 
 
@@ -57,6 +59,12 @@ def check_date(value: object, where: str) -> None:
         datetime.strptime(value if len(value) == 10 else f"{value}-01", "%Y-%m-%d")
     except ValueError:
         raise ValueError(f"{where}: {value!r} is not a calendar date") from None
+
+
+def check_season(label: object, where: str) -> None:
+    years = SEASON.match(label) if isinstance(label, str) else None
+    require(years is not None and int(years[2]) == (int(years[1]) + 1) % 100,
+            f"{where}: {label!r} is not a season such as 2009/10")
 
 
 def check_ids(records: list[dict], where: str) -> None:
@@ -133,6 +141,8 @@ def validate_charges(charges: list[dict], case_ids: set[str]) -> None:
         check_keys(c, {"id", "caseId", "ref", "subject", "period", "finding", "appeal",
                        "summary", "sources"}, where)
         check_text(c, ("ref", "subject", "summary"), where)
+        require(CHARGE_ID.match(c["id"]) is not None,
+                f"{where}: id must be the charge number and letter, such as 1A or 2")
         require(c["caseId"] in case_ids, f"{where}: bad caseId")
         if c["period"] is not None:
             check_text(c, ("period",), where)
@@ -181,10 +191,8 @@ def validate_seasons(seasons: list[dict]) -> None:
         where = f"seasons/{s['id']}"
         check_keys(s, {"id", "label", "cityPosition", "champion", "runnerUp", "sources"}, where)
         check_text(s, ("label", "champion", "runnerUp"), where)
-        years = SEASON_ID.match(s["id"])
-        require(years is not None and int(years[2]) == (int(years[1]) + 1) % 100,
-                f"{where}: id must be a season such as 2009-10")
-        require(s["label"] == s["id"].replace("-", "/"), f"{where}: label does not match id")
+        check_season(s["label"], where)
+        require(s["id"] == s["label"].replace("/", "-"), f"{where}: id does not match label")
         position = s["cityPosition"]
         require(type(position) is int and 1 <= position <= CLUBS_IN_LEAGUE,
                 f"{where}: bad cityPosition {position!r}")
@@ -194,6 +202,26 @@ def validate_seasons(seasons: list[dict]) -> None:
         check_sources(s["sources"], where, primary_only=True)
     ids = [s["id"] for s in seasons]
     require(ids == sorted(ids), "seasons: not sorted ascending")
+
+
+def validate_funding(funding: dict, charges: list[dict]) -> None:
+    where = "funding"
+    check_keys(funding, {"chargeId", "locator", "sources", "seasons"}, where)
+    check_text(funding, ("locator",), where)
+    require(funding["chargeId"] in {c["id"] for c in charges}, f"{where}: chargeId is not a charge")
+    check_sources(funding["sources"], where, primary_only=True)
+    require(len(funding["seasons"]) > 0, f"{where}: no seasons")
+    amounts = ("recorded", "paidBySponsors", "paidByOwner")
+    for s in funding["seasons"]:
+        check_keys(s, {"season", *amounts}, where)
+        check_season(s["season"], where)
+        season = f"{where}/{s['season']}"
+        for name in amounts:
+            require(type(s[name]) in (int, float) and s[name] >= 0, f"{season}: bad {name}")
+        require(round(s["paidBySponsors"] + s["paidByOwner"] - s["recorded"], 2) == 0,
+                f"{season}: the two parts do not add up to recorded")
+    labels = [s["season"] for s in funding["seasons"]]
+    require(labels == sorted(set(labels)), f"{where}: seasons not sorted ascending, or repeated")
 
 
 def validate_updates(updates: list[dict]) -> None:
@@ -212,22 +240,23 @@ def validate_updates(updates: list[dict]) -> None:
     require(stamps == sorted(stamps, reverse=True), "updates: not sorted newest first")
 
 
-def validate(cases: list[dict], events: list[dict], charges: list[dict],
-             pending: list[dict], seasons: list[dict], updates: list[dict]) -> None:
+def validate(cases: list[dict], events: list[dict], charges: list[dict], pending: list[dict],
+             seasons: list[dict], funding: dict, updates: list[dict]) -> None:
     case_ids = validate_cases(cases)
     validate_events(events, case_ids)
     validate_charges(charges, case_ids)
     validate_pending(pending, case_ids)
     validate_city_position(cases, events, charges)
     validate_seasons(seasons)
+    validate_funding(funding, charges)
     check_fragments(cases, events, charges, pending, seasons)
-    check_source_consistency(events, charges, pending, seasons)
+    check_source_consistency(events, charges, pending, seasons, [funding | {"id": "funding"}])
     validate_updates(updates)
 
 
 def main() -> None:
     validate(load("cases"), load("events"), load("charges"), load("pending"),
-             load("seasons"), load("updates"))
+             load("seasons"), load("funding"), load("updates"))
     print("data ok")
 
 

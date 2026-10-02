@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { Latest } from "./components/Latest";
 import { Ledger } from "./components/Ledger";
 import { Mark } from "./components/Mark";
-import { Masthead } from "./components/Masthead";
 import { Method } from "./components/Method";
+import { Opening } from "./components/Opening";
 import { Seasons } from "./components/Seasons";
 import { Timeline } from "./components/Timeline";
 import { WhatsNext } from "./components/WhatsNext";
@@ -50,9 +50,6 @@ export function App() {
   return (
     <>
       <a className="skip" href="#content">Skip to the record</a>
-      <div className="page">
-        <Masthead />
-      </div>
 
       <nav className="views" aria-label="Views">
         <div className="page views-inner">
@@ -66,6 +63,10 @@ export function App() {
           </ul>
         </div>
       </nav>
+
+      <div className="page">
+        <Opening />
+      </div>
 
       <main id="content" tabIndex={-1} className="page">
         {route.view === "timeline" && <Timeline target={route.target} />}

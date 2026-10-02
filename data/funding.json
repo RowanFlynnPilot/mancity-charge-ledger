@@ -1,0 +1,23 @@
+{
+  "chargeId": "1A",
+  "locator": "paragraph 72 and footnote 8",
+  "sources": [
+    {
+      "title": "Independent Commission: Redacted Core Decision",
+      "publisher": "Premier League",
+      "url": "https://resources.premierleague.pulselive.com/premierleague/document/2026/09/29/9bb3f063-6312-4d15-a1f1-77280d356a49/Premier-League-Manchester-City-independent-Commission-Redacted-Core-Decision.pdf",
+      "kind": "primary"
+    }
+  ],
+  "seasons": [
+    { "season": "2009/10", "recorded": 27.0, "paidBySponsors": 4.5, "paidByOwner": 22.5 },
+    { "season": "2010/11", "recorded": 41.25, "paidBySponsors": 12.75, "paidByOwner": 28.5 },
+    { "season": "2011/12", "recorded": 86.75, "paidBySponsors": 16.0, "paidByOwner": 70.75 },
+    { "season": "2012/13", "recorded": 121.75, "paidBySponsors": 16.0, "paidByOwner": 105.75 },
+    { "season": "2013/14", "recorded": 127.5, "paidBySponsors": 16.0, "paidByOwner": 111.5 },
+    { "season": "2014/15", "recorded": 123.2, "paidBySponsors": 16.0, "paidByOwner": 107.2 },
+    { "season": "2015/16", "recorded": 136.17, "paidBySponsors": 16.0, "paidByOwner": 120.17 },
+    { "season": "2016/17", "recorded": 140.59, "paidBySponsors": 11.0, "paidByOwner": 129.59 },
+    { "season": "2017/18", "recorded": 145.73, "paidBySponsors": 11.0, "paidByOwner": 134.73 }
+  ]
+}

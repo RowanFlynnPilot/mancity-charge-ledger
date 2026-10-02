@@ -60,7 +60,7 @@ export type AppealState = "none" | "pending" | "upheld" | "overturned";
 
 // data/charges.json: keyed to the Commission's own charge structure.
 export interface Charge {
-  id: string; // "1A", "4B"
+  id: string; // "1A", "4B", "2": the Commission's number, then its letter if it has one
   caseId: CaseId;
   ref: string; // "Charge 1(A)"
   subject: string;
@@ -69,6 +69,22 @@ export interface Charge {
   appeal: AppealState;
   summary: string;
   sources: Source[]; // primary only
+}
+
+// data/funding.json: the season-by-season figures behind one finding, entered
+// by hand from the published decision. Amounts are in £ million.
+export interface FundingSeason {
+  season: string; // "2009/10"
+  recorded: number; // sponsorship fees recorded in the club's accounts
+  paidBySponsors: number; // the part the Commission found the sponsors paid
+  paidByOwner: number; // the part it found the owner paid; the two add up to recorded
+}
+
+export interface Funding {
+  chargeId: string; // the charge whose finding these figures belong to
+  locator: string; // where in the source the figures are
+  sources: Source[]; // primary only
+  seasons: FundingSeason[]; // sorted ascending
 }
 
 // data/pending.json: things that are due but have not happened.
