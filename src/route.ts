@@ -3,6 +3,7 @@
 export const VIEWS = [
   { id: "timeline", label: "Timeline" },
   { id: "ledger", label: "Charge ledger" },
+  { id: "seasons", label: "Seasons" },
   { id: "next", label: "What’s next" },
   { id: "latest", label: "Latest" },
 ] as const;

@@ -42,7 +42,7 @@ export type EventType =
   | "filing";
 
 // Record ids double as URL fragments (#pl-core-decision, #1A): letters, digits
-// and single hyphens, unique across cases, events, charges and pending items.
+// and single hyphens, unique across cases, events, charges, pending items and seasons.
 
 // data/events.json: hand-curated, sorted by date ascending.
 export interface CaseEvent {
@@ -80,6 +80,17 @@ export interface PendingItem {
   due: LedgerDate | null; // null = no date published
   detail: string;
   sources: Source[];
+}
+
+// data/seasons.json: written by pipeline/build_seasons.py from the Premier
+// League's final tables, sorted ascending. One row per season the charges cover.
+export interface Season {
+  id: string; // "2009-10"
+  label: string; // "2009/10"
+  cityPosition: number; // City's finishing position
+  champion: string;
+  runnerUp: string;
+  sources: Source[]; // primary only: the League's final table
 }
 
 // data/updates.json: written only by pipeline/fetch_updates.py, newest first.

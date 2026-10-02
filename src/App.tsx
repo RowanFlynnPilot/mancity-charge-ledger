@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Latest } from "./components/Latest";
 import { Ledger } from "./components/Ledger";
 import { Masthead } from "./components/Masthead";
 import { Method } from "./components/Method";
+import { Seasons } from "./components/Seasons";
 import { Timeline } from "./components/Timeline";
 import { WhatsNext } from "./components/WhatsNext";
 import { viewOfRecord } from "./data";
@@ -28,6 +29,14 @@ export function App() {
     document.title = `${view.label} | ${SITE}`;
   }, [view]);
 
+  // On a narrow screen the view links scroll sideways. Keep the current one in sight.
+  const links = useRef<HTMLUListElement>(null);
+  useEffect(() => {
+    const list = links.current!;
+    const current = list.querySelector<HTMLElement>('[aria-current="page"]')!;
+    list.scrollLeft = current.offsetLeft - list.offsetLeft - (list.clientWidth - current.offsetWidth) / 2;
+  }, [view]);
+
   // The linked entry is rendered by now, so the browser's own jump to it has
   // already missed. Do it here.
   useEffect(() => {
@@ -46,7 +55,7 @@ export function App() {
       </div>
 
       <nav className="views" aria-label="Views">
-        <ul className="page">
+        <ul className="page" ref={links}>
           {VIEWS.map((v) => (
             <li key={v.id}>
               <a href={`#${v.id}`} aria-current={v.id === route.view ? "page" : undefined}>{v.label}</a>
@@ -58,6 +67,7 @@ export function App() {
       <main id="content" tabIndex={-1} className="page">
         {route.view === "timeline" && <Timeline target={route.target} />}
         {route.view === "ledger" && <Ledger target={route.target} />}
+        {route.view === "seasons" && <Seasons target={route.target} />}
         {route.view === "next" && <WhatsNext target={route.target} />}
         {route.view === "latest" && <Latest />}
         <Method />

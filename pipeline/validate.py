@@ -16,7 +16,10 @@ ISO_UTC = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 # Ids become URL fragments (#pl-core-decision, #1A).
 ID = re.compile(r"^[A-Za-z0-9]+(-[A-Za-z0-9]+)*$")
 # Fragments the app uses for its own views. No record may take one.
-RESERVED_IDS = {"timeline", "ledger", "next", "latest", "method"}
+RESERVED_IDS = {"timeline", "ledger", "seasons", "next", "latest", "method"}
+SEASON_ID = re.compile(r"^(\d{4})-(\d{2})$")
+CLUB = "Manchester City"
+CLUBS_IN_LEAGUE = 20
 # Press tallies of the charges. The ledger is keyed to the Commission's structure.
 PRESS_TALLY = re.compile(r"\b(114|115|130)\s+(charges|breaches)\b", re.IGNORECASE)
 
@@ -172,6 +175,27 @@ def validate_city_position(cases: list[dict], events: list[dict], charges: list[
         require(event["type"] == "statement", f"{where}: {position!r} is not a statement event")
 
 
+def validate_seasons(seasons: list[dict]) -> None:
+    check_ids(seasons, "seasons")
+    for s in seasons:
+        where = f"seasons/{s['id']}"
+        check_keys(s, {"id", "label", "cityPosition", "champion", "runnerUp", "sources"}, where)
+        check_text(s, ("label", "champion", "runnerUp"), where)
+        years = SEASON_ID.match(s["id"])
+        require(years is not None and int(years[2]) == (int(years[1]) + 1) % 100,
+                f"{where}: id must be a season such as 2009-10")
+        require(s["label"] == s["id"].replace("-", "/"), f"{where}: label does not match id")
+        position = s["cityPosition"]
+        require(type(position) is int and 1 <= position <= CLUBS_IN_LEAGUE,
+                f"{where}: bad cityPosition {position!r}")
+        require(s["champion"] != s["runnerUp"], f"{where}: champion and runnerUp are the same club")
+        require((position == 1) == (s["champion"] == CLUB) and (position == 2) == (s["runnerUp"] == CLUB),
+                f"{where}: cityPosition disagrees with champion and runnerUp")
+        check_sources(s["sources"], where, primary_only=True)
+    ids = [s["id"] for s in seasons]
+    require(ids == sorted(ids), "seasons: not sorted ascending")
+
+
 def validate_updates(updates: list[dict]) -> None:
     check_ids(updates, "updates")
     require(len(updates) <= MAX_UPDATES, f"updates: more than {MAX_UPDATES} items")
@@ -189,19 +213,21 @@ def validate_updates(updates: list[dict]) -> None:
 
 
 def validate(cases: list[dict], events: list[dict], charges: list[dict],
-             pending: list[dict], updates: list[dict]) -> None:
+             pending: list[dict], seasons: list[dict], updates: list[dict]) -> None:
     case_ids = validate_cases(cases)
     validate_events(events, case_ids)
     validate_charges(charges, case_ids)
     validate_pending(pending, case_ids)
     validate_city_position(cases, events, charges)
-    check_fragments(cases, events, charges, pending)
-    check_source_consistency(events, charges, pending)
+    validate_seasons(seasons)
+    check_fragments(cases, events, charges, pending, seasons)
+    check_source_consistency(events, charges, pending, seasons)
     validate_updates(updates)
 
 
 def main() -> None:
-    validate(load("cases"), load("events"), load("charges"), load("pending"), load("updates"))
+    validate(load("cases"), load("events"), load("charges"), load("pending"),
+             load("seasons"), load("updates"))
     print("data ok")
 
 

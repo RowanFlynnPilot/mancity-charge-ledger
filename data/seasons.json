@@ -1,0 +1,137 @@
+[
+  {
+    "id": "2009-10",
+    "label": "2009/10",
+    "cityPosition": 5,
+    "champion": "Chelsea",
+    "runnerUp": "Manchester United",
+    "sources": [
+      {
+        "title": "Final table, 2009/10",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/tables/premier-league/2009-10/all-matchweeks",
+        "kind": "primary"
+      }
+    ]
+  },
+  {
+    "id": "2010-11",
+    "label": "2010/11",
+    "cityPosition": 3,
+    "champion": "Manchester United",
+    "runnerUp": "Chelsea",
+    "sources": [
+      {
+        "title": "Final table, 2010/11",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/tables/premier-league/2010-11/all-matchweeks",
+        "kind": "primary"
+      }
+    ]
+  },
+  {
+    "id": "2011-12",
+    "label": "2011/12",
+    "cityPosition": 1,
+    "champion": "Manchester City",
+    "runnerUp": "Manchester United",
+    "sources": [
+      {
+        "title": "Final table, 2011/12",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/tables/premier-league/2011-12/all-matchweeks",
+        "kind": "primary"
+      }
+    ]
+  },
+  {
+    "id": "2012-13",
+    "label": "2012/13",
+    "cityPosition": 2,
+    "champion": "Manchester United",
+    "runnerUp": "Manchester City",
+    "sources": [
+      {
+        "title": "Final table, 2012/13",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/tables/premier-league/2012-13/all-matchweeks",
+        "kind": "primary"
+      }
+    ]
+  },
+  {
+    "id": "2013-14",
+    "label": "2013/14",
+    "cityPosition": 1,
+    "champion": "Manchester City",
+    "runnerUp": "Liverpool",
+    "sources": [
+      {
+        "title": "Final table, 2013/14",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/tables/premier-league/2013-14/all-matchweeks",
+        "kind": "primary"
+      }
+    ]
+  },
+  {
+    "id": "2014-15",
+    "label": "2014/15",
+    "cityPosition": 2,
+    "champion": "Chelsea",
+    "runnerUp": "Manchester City",
+    "sources": [
+      {
+        "title": "Final table, 2014/15",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/tables/premier-league/2014-15/all-matchweeks",
+        "kind": "primary"
+      }
+    ]
+  },
+  {
+    "id": "2015-16",
+    "label": "2015/16",
+    "cityPosition": 4,
+    "champion": "Leicester City",
+    "runnerUp": "Arsenal",
+    "sources": [
+      {
+        "title": "Final table, 2015/16",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/tables/premier-league/2015-16/all-matchweeks",
+        "kind": "primary"
+      }
+    ]
+  },
+  {
+    "id": "2016-17",
+    "label": "2016/17",
+    "cityPosition": 3,
+    "champion": "Chelsea",
+    "runnerUp": "Tottenham Hotspur",
+    "sources": [
+      {
+        "title": "Final table, 2016/17",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/tables/premier-league/2016-17/all-matchweeks",
+        "kind": "primary"
+      }
+    ]
+  },
+  {
+    "id": "2017-18",
+    "label": "2017/18",
+    "cityPosition": 1,
+    "champion": "Manchester City",
+    "runnerUp": "Manchester United",
+    "sources": [
+      {
+        "title": "Final table, 2017/18",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/tables/premier-league/2017-18/all-matchweeks",
+        "kind": "primary"
+      }
+    ]
+  }
+]

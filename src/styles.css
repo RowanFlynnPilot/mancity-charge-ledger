@@ -784,24 +784,23 @@ tr.is-target > * {
   gap: 0.5rem;
 }
 
-/* ---------- Charge ledger table ---------- */
+/* ---------- Ruled tables: the charge ledger and the seasons ---------- */
 
-.ledger {
+:is(.ledger, .seasons) {
   width: 100%;
   margin-top: 0.9rem;
   border-collapse: collapse;
   border-bottom: 1px solid var(--rule);
 }
 
-.ledger th,
-.ledger td {
+:is(.ledger, .seasons) :is(th, td) {
   padding: var(--row-pad) 1rem var(--row-pad) 0;
   border-top: 1px solid var(--rule);
   text-align: left;
   vertical-align: top;
 }
 
-.ledger thead th {
+:is(.ledger, .seasons) thead th {
   padding-block: 0.5rem;
   border-top: 1px solid var(--ink);
   border-bottom: 1px solid var(--ink);
@@ -812,28 +811,33 @@ tr.is-target > * {
   color: var(--ink-soft);
 }
 
-.ledger tbody tr:first-child > * {
+:is(.ledger, .seasons) tbody tr:first-child > * {
   border-top: 0;
 }
 
-.ledger-ref {
+/* The key column: a charge reference or a season. */
+.ledger-ref,
+.seasons-key {
   width: var(--margin-col);
   font-family: var(--sans);
   font-stretch: 90%;
   font-size: 0.95rem;
   font-weight: 650;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
-/* The ruled margin of a ledger page: a double line after the reference column. */
-.ledger-body {
+/* The ruled margin of a ledger page: a double line after the key column. */
+:is(.ledger, .seasons) :is(.ledger-body, .seasons-position) {
   padding-left: 1rem;
   border-left: 3px double var(--rule-strong);
 }
 
-.ledger thead th:nth-child(2) {
+:is(.ledger, .seasons) thead th:nth-child(2) {
   padding-left: 1rem;
 }
+
+/* ---------- Charge ledger ---------- */
 
 .ledger-subject {
   font-size: 1.12rem;
@@ -869,9 +873,35 @@ tr.is-target > * {
   padding-right: 0;
 }
 
-tr.is-target > .ledger-ref {
+tr.is-target > :is(.ledger-ref, .seasons-key) {
   box-shadow: inset 4px 0 0 var(--ink);
   padding-left: 0.75rem;
+}
+
+/* ---------- Seasons ---------- */
+
+.seasons :is(th, td) {
+  padding-block: 0.8rem;
+}
+
+.seasons-position {
+  width: 7.5rem;
+  font-family: var(--sans);
+  font-stretch: 90%;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.seasons-club {
+  white-space: nowrap;
+}
+
+.seasons .sources {
+  margin-top: 0;
+}
+
+.seasons .seasons-source {
+  padding-right: 0;
 }
 
 /* ---------- Latest coverage ---------- */
@@ -945,8 +975,8 @@ tr.is-target > .ledger-ref {
     padding-left: 0.9rem;
   }
 
-  /* The ledger table becomes one block per charge. */
-  .ledger thead {
+  /* Each table becomes one block per row. */
+  :is(.ledger, .seasons) thead {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -954,13 +984,18 @@ tr.is-target > .ledger-ref {
     clip-path: inset(50%);
   }
 
-  .ledger,
-  .ledger tbody {
+  :is(.ledger, .seasons),
+  :is(.ledger, .seasons) tbody {
     display: block;
   }
 
-  .ledger tr {
+  :is(.ledger, .seasons) tr {
     display: grid;
+    padding-block: var(--row-pad);
+    border-top: 1px solid var(--rule);
+  }
+
+  .ledger tr {
     grid-template-columns: auto minmax(0, 1fr);
     grid-template-areas:
       "ref ref"
@@ -968,19 +1003,40 @@ tr.is-target > .ledger-ref {
       "body body";
     gap: 0.6rem 0.75rem;
     align-items: center;
-    padding-block: var(--row-pad);
-    border-top: 1px solid var(--rule);
   }
 
-  .ledger tbody tr:first-child {
+  :is(.ledger, .seasons) tbody tr:first-child {
     border-top: 1px solid var(--ink);
   }
 
-  .ledger th,
-  .ledger td {
+  :is(.ledger, .seasons) :is(th, td) {
     width: auto;
     padding: 0;
     border: 0;
+  }
+
+  /* A season: its label, then each fact with the column heading beside it. */
+  .seasons tr {
+    gap: 0.3rem;
+  }
+
+  .seasons td[data-label] {
+    display: grid;
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    align-items: baseline;
+  }
+
+  .seasons td[data-label]::before {
+    content: attr(data-label);
+    font-family: var(--sans);
+    font-stretch: 90%;
+    font-size: 0.86rem;
+    font-weight: 400;
+    color: var(--ink-soft);
+  }
+
+  .seasons .seasons-source {
+    margin-top: 0.3rem;
   }
 
   .ledger-ref { grid-area: ref; }
@@ -989,6 +1045,9 @@ tr.is-target > .ledger-ref {
 
   .ledger-body {
     grid-area: body;
+  }
+
+  :is(.ledger, .seasons) :is(.ledger-body, .seasons-position) {
     padding-left: 0;
     border-left: 0;
   }
@@ -999,7 +1058,7 @@ tr.is-target > .ledger-ref {
     padding-inline: 0.75rem;
   }
 
-  tr.is-target > .ledger-ref {
+  tr.is-target > :is(.ledger-ref, .seasons-key) {
     box-shadow: none;
     padding-left: 0;
   }

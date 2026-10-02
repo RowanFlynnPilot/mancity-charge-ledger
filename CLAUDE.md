@@ -15,7 +15,7 @@ As of 1 Oct 2026:
 - Done: data contract (`src/types.ts`), validator (`pipeline/validate.py`), seed data (4 cases, 19 events, 10 charges, 3 pending items), feed fetcher (`pipeline/fetch_updates.py`), the Vite app with all four views, the methodology note and linkable entries, and both workflows.
 - Live since 2 Oct 2026 at the Pages URL. Pages is set to deploy from GitHub Actions.
 - The Core Decision was read in full on 2 Oct 2026 (build step 2). No `null` period could be filled. See "What the Core Decision does and does not establish" below.
-- Not done: step 6 (`seasons.json` and the season view).
+- The season view (v1.1) is built: `data/seasons.json` from the Premier League's final tables, and a Seasons view between the charge ledger and What's next.
 - The story is live. The Commission's Core Decision was published 29 Sep 2026. The appeal deadline is 2 Oct 2026. Sanction is undecided.
 
 ## Editorial rules
@@ -46,9 +46,11 @@ data/cases.json           the four cases                      hand-edited
 data/events.json          timeline, sorted ascending          hand-edited
 data/charges.json         Commission charge ledger            hand-edited
 data/pending.json         due but not yet happened            hand-edited
+data/seasons.json         final tables, 2009/10 to 2017/18    written by build_seasons.py only
 data/updates.json         news feed, newest first             written by the pipeline only
 pipeline/validate.py      raises on first contract violation
 pipeline/fetch_updates.py RSS → updates.json
+pipeline/build_seasons.py Premier League final tables → seasons.json, run by hand
 pipeline/test_*.py        unittest, stdlib only
 src/data.ts               the JSON, typed, plus lookups
 src/route.ts              URL fragment → view and entry
@@ -65,6 +67,7 @@ src/styles.css            all styles and the design tokens
 python pipeline/validate.py              validate data/
 python -m unittest discover pipeline     pipeline tests
 python pipeline/fetch_updates.py         refresh data/updates.json from the feeds
+python pipeline/build_seasons.py         rebuild data/seasons.json from the League's tables
 npm run dev                              dev server (base path /mancity-charge-ledger/)
 npm test                                 app tests (vitest)
 npm run build                            typecheck, then build to dist/
@@ -81,7 +84,8 @@ The pipeline uses the Python standard library only. There is no `requirements.tx
 - `Charge.period` is `null` until the period is read from the published decision. `null` renders as nothing, not as a placeholder.
 - When a pending item happens, add it to `events.json` and delete it from `pending.json` in the same commit.
 - `updates.json` is never hand-edited. A feed item becomes part of the record only when a person writes an event for it.
-- Record ids are URL fragments. They use letters, digits and single hyphens, and are unique across cases, events, charges and pending items. `timeline`, `ledger`, `next`, `latest` and `method` are reserved for the app.
+- `seasons.json` is never hand-edited. `build_seasons.py` reads the Premier League's own standings for each season and raises unless it gets a complete final table (20 clubs, 38 matches each). Each row cites that season's table page on premierleague.com as a primary source. The validator checks that `cityPosition` agrees with `champion` and `runnerUp`. The file records the tables as the League publishes them: if a decision ever alters a final table, re-run the script.
+- Record ids are URL fragments. They use letters, digits and single hyphens, and are unique across cases, events, charges, pending items and seasons. `timeline`, `ledger`, `seasons`, `next`, `latest` and `method` are reserved for the app.
 - `Case.cityPositionEventId` points at the `statement` event that records City's position. It is required for any case that has charges; the validator fails otherwise. This is how editorial rule 3 is enforced: the ledger and the timeline read City's position from that event. When City's position changes, add a new statement event and repoint the field.
 - One URL is always cited with the same title, publisher and kind. The validator fails on a mismatch.
 - `Update.publishedAt` is UTC, `YYYY-MM-DDTHH:MM:SSZ`, so string order is time order. `Update.id` must equal the sha1 of `Update.url`.
@@ -115,7 +119,7 @@ Four views in v1, one page, tabbed:
 3. **What's next.** `pending.json`, dated items first.
 4. **Latest.** `updates.json`, labelled as press coverage, not as part of the record.
 
-Then v1.1: **Season view.** For 2009/10 to 2017/18, City's finishing position, the champion and the runner-up, each row sourced. Needs a `data/seasons.json` built from a citable final-table source, not from memory.
+Then v1.1, built: **Season view.** For 2009/10 to 2017/18, City's finishing position, the champion and the runner-up, each row sourced to the League's final table. It states results as the tables record them and says nothing about what a sanction might change; that would be status in copy. It does not show findings, so it does not set charges against seasons. Doing that would need `Charge.period` to become structured data, and the seasons for 1(B), 1(C) and 4 are not public.
 
 This is a personal project. No organisation logo or branding appears in the UI.
 
@@ -140,7 +144,7 @@ How the views are built:
 3. Done. Feed list confirmed, `fetch_updates.py` built, cron workflow added.
 4. Done. The four views, the methodology note and linkable entries.
 5. Done. Deployed by `deploy.yml`.
-6. `seasons.json` and the season view.
+6. Done. `seasons.json` and the season view.
 
 ## What the Core Decision does and does not establish
 
