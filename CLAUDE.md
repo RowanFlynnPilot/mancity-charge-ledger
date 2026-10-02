@@ -142,6 +142,18 @@ Workflows:
 - `links.yml`: Mondays, by hand, or on a pull request that changes the checker. Runs `check_links.py`. It is kept out of `deploy.yml` so that another site being down cannot block a deploy.
 - The feed job is hourly because GitHub drops scheduled runs when it is busy. On the three-hour schedule, on 2 Oct 2026, runs came six and eight hours apart, longer than Sky's feed holds its items. A run that finds nothing new commits nothing and deploys nothing.
 - GitHub switches scheduled workflows off after 60 days without activity in the repo. If the feed and link runs stop, look there first.
+- Even hourly, GitHub's schedule went five hours without a run on 2 Oct 2026. So the feed job is triggered from outside as well; see "The outside trigger" below.
+
+## The outside trigger
+
+A job on cron-job.org, in Rowan's account, starts `updates.yml` at 47 minutes past every hour. It is the main source of feed runs; GitHub's own schedule at 17 minutes past stays as a second one. Chosen by Rowan on 2 Oct 2026 over a scheduled task on Rowan's PC (which only runs while the PC is on) and a Cloudflare Worker.
+
+- The request: `POST https://api.github.com/repos/RowanFlynnPilot/mancity-charge-ledger/actions/workflows/updates.yml/dispatches`, body `{"ref":"main"}`, headers `Authorization: Bearer <token>`, `Accept: application/vnd.github+json` and `Content-Type: application/json`. GitHub answers 200 or 204; anything else is a failure, and cron-job.org emails Rowan.
+- The token is a fine-grained personal access token on the `RowanFlynnPilot` account, limited to this repository, with one permission: Actions, read and write. It can start, re-run and cancel workflows here and nothing else: it cannot read or change code. It is stored only in cron-job.org.
+- The token expires. When it does, GitHub refuses the request and cron-job.org reports failures. Make a new one with the same settings and paste it into the job's `Authorization` header.
+- How to tell it is working: the repo's Actions list shows `Fetch updates` runs with the event `workflow_dispatch` about once an hour. Runs from GitHub's schedule show `schedule`.
+- Runs that overlap queue behind each other (the workflow's concurrency group), so two triggers in the same hour cannot clash.
+- Free accounts on cron-job.org are allowed 100 requests a day. This job uses 24.
 - Every action is pinned to a commit, with its release in a comment beside it. `.github/dependabot.yml` proposes the next pin, and package updates, once a month. Each proposal is a pull request and runs the full check.
 
 ## Pipeline: `check_links.py`
