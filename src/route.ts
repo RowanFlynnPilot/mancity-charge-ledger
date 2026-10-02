@@ -21,9 +21,11 @@ const isView = (id: string): id is ViewId => VIEWS.some((v) => v.id === id);
 
 // A view name opens that view. A record id opens the view that holds it.
 // Anything else (#method, #content) is an anchor on the page and leaves the view alone.
-export function resolve(hash: string, previous: Route, viewOfRecord: Record<string, ViewId>): Route {
-  const id = decodeURIComponent(hash.replace(/^#/, ""));
+// Ids are letters, digits and hyphens, so the fragment is compared as written. A reader
+// can type anything after the #, and none of it may stop the page from rendering.
+export function resolve(hash: string, previous: Route, viewOfRecord: ReadonlyMap<string, ViewId>): Route {
+  const id = hash.replace(/^#/, "");
   if (id === "") return HOME;
   if (isView(id)) return { view: id, target: id };
-  return { view: viewOfRecord[id] ?? previous.view, target: id };
+  return { view: viewOfRecord.get(id) ?? previous.view, target: id };
 }

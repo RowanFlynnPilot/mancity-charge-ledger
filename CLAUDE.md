@@ -152,7 +152,7 @@ The charge ledger counts the case two ways, behind a switch:
 
 How the views are built:
 
-- The views are links, not ARIA tabs, so the back button and shared URLs work. `src/route.ts` resolves the fragment.
+- The views are links, not ARIA tabs, so the back button and shared URLs work. `src/route.ts` resolves the fragment. It compares the fragment as written, without decoding it, and looks records up in a `Map`: a reader can type anything after the `#`, and a malformed escape or a name such as `toString` must not stop the page rendering.
 - The timeline's lane rail is the page's one distinctive device: a vertical line per case, a dot per event, a tie where an event sits in two lanes, a dashed end for a case that is still open. Cases City brought (`cityRole: "claimant"`) are drawn with open dots, which is how editorial rule 6 shows in the UI.
 - The ledger shows City's position (from `cityPositionEventId`), the appeal state counted from the charges' `appeal` fields, and the next pending item, above the table. A ruling or sanction in the timeline carries a "City's position" line for the same reason.
 - An `appeal` of `overturned` strikes through the finding badge.

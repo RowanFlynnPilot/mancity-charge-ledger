@@ -25,7 +25,7 @@ export const caseById = Object.fromEntries(cases.map((c) => [c.id, c])) as Recor
 export const eventById = new Map(events.map((e) => [e.id, e]));
 
 // Which view holds each linkable record (#pl-core-decision, #1A).
-export const viewOfRecord: Record<string, ViewId> = Object.fromEntries([
+export const viewOfRecord = new Map<string, ViewId>([
   ...events.map((e) => [e.id, "timeline"] as const),
   ...charges.map((c) => [c.id, "ledger"] as const),
   ...pending.map((p) => [p.id, "next"] as const),
