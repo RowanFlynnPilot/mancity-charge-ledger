@@ -4,7 +4,7 @@
     "caseIds": [
       "uefa-2014"
     ],
-    "date": "2014-05",
+    "date": "2014-05-16",
     "type": "settlement",
     "headline": "City and UEFA sign a Financial Fair Play settlement",
     "summary": "UEFA had questioned some of City's sponsorship agreements and whether the club met its break-even requirement. No findings were made. The two sides settled, with City accepting a fine, part of it suspended, and a reduced Champions League squad for 2014/15.",
@@ -13,6 +13,18 @@
         "title": "Independent Commission: Redacted Core Decision",
         "publisher": "Premier League",
         "url": "https://resources.premierleague.pulselive.com/premierleague/document/2026/09/29/9bb3f063-6312-4d15-a1f1-77280d356a49/Premier-League-Manchester-City-independent-Commission-Redacted-Core-Decision.pdf",
+        "kind": "primary"
+      },
+      {
+        "title": "Nine clubs sign settlement agreements (16 May 2014)",
+        "publisher": "UEFA",
+        "url": "https://www.uefa.com/news-media/news/0215-0e8adbd08893-e7621e000cde-1000--nine-clubs-sign-settlement-agreements/",
+        "kind": "primary"
+      },
+      {
+        "title": "Arbitral award: CAS 2019/A/6298 Manchester City FC v. UEFA (15 Nov 2019)",
+        "publisher": "Court of Arbitration for Sport",
+        "url": "https://www.tas-cas.org/generated/assets/lists/feb900ba-1137-4b78-a9ff-d68af7869087/Award_CAS_6298_internet.pdf",
         "kind": "primary"
       },
       {
@@ -77,6 +89,12 @@
     "summary": "UEFA opened a formal investigation into whether City had broken its financial rules. City said it welcomed the chance to end the speculation and called the accusations false.",
     "sources": [
       {
+        "title": "Investigatory Chamber opens investigation into Manchester City (7 Mar 2019)",
+        "publisher": "UEFA",
+        "url": "https://www.uefa.com/news-media/news/024f-0f8e68fda5e4-b62e9aa4dad8-1000--investigatory-chamber-opens-investigation-into-manchester/",
+        "kind": "primary"
+      },
+      {
         "title": "Timeline: How Man City's Financial Case Went From Leaked Emails To Verdict",
         "publisher": "Associated Press via Fox Sports",
         "url": "https://www.foxsports.com/stories/soccer/timeline-of-the-premier-league-vs-manchester-city",
@@ -89,11 +107,23 @@
     "caseIds": [
       "uefa-2020"
     ],
-    "date": "2019-05-16",
+    "date": "2019-05-15",
     "type": "investigation",
     "headline": "UEFA investigator refers City for adjudication",
-    "summary": "The chief investigator of UEFA's financial control body finished his investigation and referred the case to its adjudicatory chamber.",
+    "summary": "The chief investigator of UEFA's financial control body finished his investigation and referred the case to its adjudicatory chamber. UEFA announced the referral the next day.",
     "sources": [
+      {
+        "title": "Manchester City referred to CFCB adjudicatory chamber (16 May 2019)",
+        "publisher": "UEFA",
+        "url": "https://www.uefa.com/news-media/news/0251-0f8e6b85f20a-d835ae1a3884-1000--manchester-city-referred-to-cfcb-adjudicatory-chamber/",
+        "kind": "primary"
+      },
+      {
+        "title": "Arbitral award: CAS 2019/A/6298 Manchester City FC v. UEFA (15 Nov 2019)",
+        "publisher": "Court of Arbitration for Sport",
+        "url": "https://www.tas-cas.org/generated/assets/lists/feb900ba-1137-4b78-a9ff-d68af7869087/Award_CAS_6298_internet.pdf",
+        "kind": "primary"
+      },
       {
         "title": "City timeline",
         "publisher": "Manchester Evening News",
@@ -110,8 +140,14 @@
     "date": "2019-11-15",
     "type": "ruling",
     "headline": "CAS rejects City's bid to halt the UEFA case",
-    "summary": "City had asked the Court of Arbitration for Sport in June 2019 to throw out UEFA's case before it was decided. CAS turned the request down.",
+    "summary": "City had appealed to the Court of Arbitration for Sport in May 2019 against the decision to refer its case, before UEFA had ruled on it. CAS found the appeal inadmissible, because UEFA's own process had not finished.",
     "sources": [
+      {
+        "title": "Arbitral award: CAS 2019/A/6298 Manchester City FC v. UEFA (15 Nov 2019)",
+        "publisher": "Court of Arbitration for Sport",
+        "url": "https://www.tas-cas.org/generated/assets/lists/feb900ba-1137-4b78-a9ff-d68af7869087/Award_CAS_6298_internet.pdf",
+        "kind": "primary"
+      },
       {
         "title": "City timeline",
         "publisher": "Manchester Evening News",
@@ -131,6 +167,18 @@
     "summary": "UEFA found serious breaches of its spending rules and a failure to cooperate with investigators, and imposed a two-season ban and a €30 million fine. City called the investigation flawed and appealed to CAS.",
     "sources": [
       {
+        "title": "Club Financial Control Body Adjudicatory Chamber decision on Manchester City Football Club (14 Feb 2020)",
+        "publisher": "UEFA",
+        "url": "https://www.uefa.com/news-media/news/025a-0f8e7535cab3-07272066f9f6-1000--club-financial-control-body-adjudicatory-chamber-decision-on/",
+        "kind": "primary"
+      },
+      {
+        "title": "Club statement (14 Feb 2020)",
+        "publisher": "Manchester City",
+        "url": "https://www.mancity.com/news/club-news/club-news/2020/february/manchester-city-club-statement",
+        "kind": "primary"
+      },
+      {
         "title": "Timeline: How Man City's Financial Case Went From Leaked Emails To Verdict",
         "publisher": "Associated Press via Fox Sports",
         "url": "https://www.foxsports.com/stories/soccer/timeline-of-the-premier-league-vs-manchester-city",
@@ -148,6 +196,18 @@
     "headline": "CAS overturns the UEFA ban",
     "summary": "CAS upheld City's appeal, finding some of UEFA's allegations not proven and others time-barred. It lifted the ban and set a €10 million fine for failing to cooperate with investigators.",
     "sources": [
+      {
+        "title": "Media release: CAS decision in Manchester City FC v. UEFA (13 Jul 2020)",
+        "publisher": "Court of Arbitration for Sport",
+        "url": "https://www.tas-cas.org/generated/assets/lists/dceab111-07bc-435f-b5f9-de88eff9db72/CAS_Media_Release_6785_decision.pdf",
+        "kind": "primary"
+      },
+      {
+        "title": "Arbitral award: CAS 2020/A/6785 Manchester City FC v. UEFA",
+        "publisher": "Court of Arbitration for Sport",
+        "url": "https://www.tas-cas.org/generated/assets/lists/feb900ba-1137-4b78-a9ff-d68af7869087/CAS_Award_6785___internet__.pdf",
+        "kind": "primary"
+      },
       {
         "title": "Timeline: How Man City's Financial Case Went From Leaked Emails To Verdict",
         "publisher": "Associated Press via Fox Sports",
@@ -220,6 +280,18 @@
     "headline": "Tribunal publishes its first award on the APT rules",
     "summary": "In a challenge brought by City, an arbitration tribunal found three aspects of the League's Associated Party Transaction rules unlawful, including the exclusion of shareholder loans. The League said City's wider challenge had largely failed.",
     "sources": [
+      {
+        "title": "Partial Final Award: Manchester City v Premier League (25 Sep 2024)",
+        "publisher": "Premier League",
+        "url": "https://resources.premierleague.com/premierleague/document/2024/10/07/898efab9-9f51-449b-a393-1a0c05b48824/Manchester-City-and-Premier-League-Partial-Final-Award-071024.pdf",
+        "kind": "primary"
+      },
+      {
+        "title": "Premier League statement (7 Oct 2024)",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/news/4144828",
+        "kind": "primary"
+      },
       {
         "title": "Manchester City and Premier League settle their dispute over APT rules",
         "publisher": "The Lawyer",
@@ -334,6 +406,18 @@
     "headline": "City and the Premier League settle the APT dispute",
     "summary": "Both sides agreed to end the arbitration. City accepted that the current APT rules are valid and binding. The settlement did not affect the separate Commission case.",
     "sources": [
+      {
+        "title": "Premier League statement (8 Sep 2025)",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/news/4407130/premier-league-statement",
+        "kind": "primary"
+      },
+      {
+        "title": "Club Statement (8 Sep 2025)",
+        "publisher": "Manchester City",
+        "url": "https://www.mancity.com/news/club/club-statement-manchester-city-premier-league-63892937",
+        "kind": "primary"
+      },
       {
         "title": "Manchester City settles dispute with Premier League over Associated Party Transaction Rules",
         "publisher": "Farrer & Co",

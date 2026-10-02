@@ -196,6 +196,25 @@ Dates. The decision confirms dates already in `events.json`: proceedings began F
 
 Figures the decision states exactly (now held in `data/funding.json`, season by season): £949.94 million recorded as sponsorship income from Abu Dhabi sponsors across 2009/10 to 2017/18, of which £119.25 million was paid by the sponsors and £830.69 million by ADUG (para 72, with a season-by-season table in footnote 8).
 
+## What the UEFA, CAS and APT documents establish
+
+Read on 2 Oct 2026, when the primary documents were added to the events that had cited press only. Every event now cites a primary document except `athletic-verdict-report`, which is a press report by nature and still cites the AP timeline, not The Athletic's own article.
+
+- **2014 settlement.** UEFA's statement of 16 May 2014 names City among nine clubs that signed settlement agreements. The first CAS award (para 6) says the agreement was entered into on 16 May 2014 and that City did not admit a breach. The event is dated to the day on that basis. UEFA's statement does not give City's individual terms; those still rest on press.
+- **Investigation opened.** UEFA's statement and the CAS award (para 9) both give 7 March 2019.
+- **Referral.** The chief investigator issued the referral decision on the evening of 15 May 2019 (CAS award, paras 11 and 16). UEFA announced it on 16 May. The event is dated 15 May and says the announcement came the next day.
+- **First CAS award, CAS 2019/A/6298.** City filed its appeal on 24 May 2019 against the referral decision and the refusal to pause the investigation over leaks. CAS ruled it inadmissible on 15 November 2019: a referral is not a final decision, so the appeal was premature (paras 90 and 95). An earlier version of the event said June 2019, following a press timeline.
+- **UEFA's decision.** The Adjudicatory Chamber's statement of 14 February 2020 gives the findings, the two seasons (2020/21 and 2021/22) and the €30 million fine. City's statement the same day is the source for its response.
+- **Second CAS award, CAS 2020/A/6785.** The media release of 13 July 2020 says most of the alleged breaches were either not established or time-barred, and sets the fine at €10 million for failing to cooperate. The published award is a 93-page scan with no text layer.
+- **APT first award.** The Partial Final Award is dated 25 September 2024 and was published on 7 October 2024. Its declarations: the rules were unlawful because they excluded shareholder loans, because of pricing changes made in the amended rules, and because a club could not comment on the comparable transaction data before a decision. It also set aside two of the League's decisions on City's transactions. The League's statement of 7 October 2024 is the source for its view that most of City's challenge failed. City's statement of the same day says its claim succeeded; the event does not yet record that.
+- **APT settlement.** The League and City published the same text on 8 September 2025.
+
+Things to know when checking these links:
+
+- `tas-cas.org` answers 200 with an HTML page for a file that does not exist. A link check must look at the content type, not the status.
+- `mancity.com` refuses scripted requests with 403, and `uefa.com` times them out. Both load in a browser.
+- UEFA's old `newsid=` addresses redirect. Cite the address the page redirects to.
+
 ## Visual identity
 
 Its own, neutral. Reference-book plain: the documents are the content.
