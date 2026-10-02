@@ -2,29 +2,26 @@
 // arrive at. A data edit that breaks a join between records fails here, in the
 // check, and not as a blank page on the site.
 import { renderToStaticMarkup } from "react-dom/server";
-import { afterAll, expect, test, vi } from "vitest";
-import { App } from "./App";
+import { expect, test } from "vitest";
+import { App, Page } from "./App";
 import { APPEAL_LABEL, FINDING_LABEL } from "./components/Badges";
 import { Ledger } from "./components/Ledger";
 import { Opening } from "./components/Opening";
 import { ROLE_LABEL, TYPE_LABEL } from "./components/Timeline";
-import { cases, charges, events, viewOfRecord } from "./data";
+import { cases, charges, events, moved, viewOfRecord } from "./data";
 import { STATUS_LABEL } from "./labels";
-import { VIEWS } from "./route";
+import { HOME, NOT_FOUND, resolve, VIEWS } from "./route";
 
 const rendered = new Map<string, string>();
 
-// The page as it stands on arriving at a fragment. Rendering to markup runs no
-// effects, so the address is the only thing the page reads from the browser.
+// The page as it stands on arriving at a fragment.
 function page(fragment: string): string {
   if (!rendered.has(fragment)) {
-    vi.stubGlobal("window", { location: { hash: `#${fragment}` } });
-    rendered.set(fragment, renderToStaticMarkup(<App />));
+    const route = resolve(`#${fragment}`, HOME, viewOfRecord, moved);
+    rendered.set(fragment, renderToStaticMarkup(<Page route={route} />));
   }
   return rendered.get(fragment)!;
 }
-
-afterAll(() => vi.unstubAllGlobals());
 
 const hasElement = (html: string, id: string) => html.includes(` id="${id}"`);
 
@@ -37,11 +34,30 @@ test.each(views)("the %s view renders", (view) => {
   expect(hasElement(page(view), view)).toBe(true);
 });
 
+// The build renders the app with no browser. If the app read the address or the
+// clock while rendering, this would throw or differ.
+test("the page the build writes is the timeline", () => {
+  expect(renderToStaticMarkup(<App />)).toBe(page(""));
+  expect(hasElement(page(""), "timeline")).toBe(true);
+});
+
 test("every record's address opens the page with that record on it", () => {
   expect(viewOfRecord.size).toBeGreaterThan(0);
   for (const id of viewOfRecord.keys()) {
     expect(hasElement(page(id), id), `#${id}`).toBe(true);
   }
+});
+
+test("an address that has moved opens the record it moved to", () => {
+  for (const [old, now] of moved) {
+    expect(hasElement(page(old), now), `#${old}`).toBe(true);
+    expect(hasElement(page(old), NOT_FOUND), `#${old}`).toBe(false);
+  }
+});
+
+test("an address that names nothing says so, and no other does", () => {
+  expect(hasElement(page("no-such-entry"), NOT_FOUND)).toBe(true);
+  for (const p of pages) expect(hasElement(page(p), NOT_FOUND), `#${p}`).toBe(false);
 });
 
 test("every link within the page leads to something on it", () => {

@@ -43,6 +43,7 @@ export type EventType =
 
 // Record ids double as URL fragments (#pl-core-decision, #1A): letters, digits
 // and single hyphens, unique across cases, events, charges, pending items and seasons.
+// An id that leaves the record goes into data/moved.json and is never used again.
 
 // data/events.json: hand-curated, sorted by date ascending.
 export interface CaseEvent {
@@ -119,6 +120,11 @@ export interface PendingItem {
   detail: string;
   sources: Source[];
 }
+
+// data/moved.json: ids that have left the record, each with the id of the record
+// it became. A pending item that happens becomes an event under a new id, and a
+// link someone shared to the old one must still arrive.
+export type Moved = Record<string, string>;
 
 // data/seasons.json: written by pipeline/build_seasons.py from the Premier
 // League's final tables, sorted ascending. One row per season the charges cover.

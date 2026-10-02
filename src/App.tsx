@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Latest } from "./components/Latest";
 import { Ledger } from "./components/Ledger";
 import { Mark } from "./components/Mark";
@@ -7,22 +7,13 @@ import { Opening } from "./components/Opening";
 import { Seasons } from "./components/Seasons";
 import { Timeline } from "./components/Timeline";
 import { WhatsNext } from "./components/WhatsNext";
-import { viewOfRecord } from "./data";
-import { HOME, resolve, VIEWS, type Route } from "./route";
+import { moved, viewOfRecord } from "./data";
+import { HOME, NOT_FOUND, resolve, VIEWS, type Route } from "./route";
 import { EDIT_HISTORY, LICENCE, REPO, SITE } from "./site";
 
-function useRoute(): Route {
-  const [route, setRoute] = useState(() => resolve(window.location.hash, HOME, viewOfRecord));
-  useEffect(() => {
-    const onHashChange = () => setRoute((previous) => resolve(window.location.hash, previous, viewOfRecord));
-    window.addEventListener("hashchange", onHashChange);
-    return () => window.removeEventListener("hashchange", onHashChange);
-  }, []);
-  return route;
-}
-
-export function App() {
-  const route = useRoute();
+// The page for one route. It reads nothing from the browser while it renders,
+// so the build can render it to markup and a test can render every address.
+export function Page({ route }: { route: Route }) {
   const view = VIEWS.find((v) => v.id === route.view)!;
 
   useEffect(() => {
@@ -41,6 +32,11 @@ export function App() {
   // already missed. Do it here.
   useEffect(() => {
     if (route.target === null) return;
+    // An id that has moved resolves to the record it became. Put that id in the
+    // address, so the address a reader copies from here is the current one.
+    if (route.target !== NOT_FOUND && window.location.hash !== `#${route.target}`) {
+      window.history.replaceState(null, "", `#${route.target}`);
+    }
     const element = document.getElementById(route.target);
     if (element === null) return;
     element.scrollIntoView();
@@ -63,6 +59,15 @@ export function App() {
           </ul>
         </div>
       </nav>
+
+      {route.target === NOT_FOUND && (
+        <div className="page">
+          <p id={NOT_FOUND} tabIndex={-1} className="notice">
+            This address does not lead to an entry in the record. The entry may have been renamed
+            or removed.
+          </p>
+        </div>
+      )}
 
       <div className="page">
         <Opening />
@@ -94,4 +99,18 @@ export function App() {
       </footer>
     </>
   );
+}
+
+// The route follows the address. It starts at the timeline, which is what the
+// build renders into the page, and moves to the address as soon as the app is
+// running, before the browser paints again.
+export function App() {
+  const [route, setRoute] = useState(HOME);
+  useLayoutEffect(() => {
+    const follow = () => setRoute((previous) => resolve(window.location.hash, previous, viewOfRecord, moved));
+    follow();
+    window.addEventListener("hashchange", follow);
+    return () => window.removeEventListener("hashchange", follow);
+  }, []);
+  return <Page route={route} />;
 }

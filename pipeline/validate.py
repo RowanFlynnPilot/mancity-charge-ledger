@@ -18,9 +18,9 @@ DATE = re.compile(r"^\d{4}-(0[1-9]|1[0-2])(-(0[1-9]|[12]\d|3[01]))?$")
 ISO_UTC = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 # Ids become URL fragments (#pl-core-decision, #1A).
 ID = re.compile(r"^[A-Za-z0-9]+(-[A-Za-z0-9]+)*$")
-# Fragments the app uses for its own views. No record may take one.
+# Fragments the app uses for its own views and for places on the page. No record may take one.
 RESERVED_IDS = {"timeline", "ledger", "seasons", "next", "latest", "method", "funding",
-                "allegations"}
+                "allegations", "content", "not-found"}
 SEASON = re.compile(r"^(\d{4})/(\d{2})$")
 # A Premier League rule as the charge statement cites it: "B.13", "B.14.6", or a
 # range, "E.52 to E.60".
@@ -82,7 +82,7 @@ def check_ids(records: list[dict], where: str) -> None:
     require(len(ids) == len(set(ids)), f"{where}: duplicate id")
 
 
-def check_fragments(*groups: list[dict]) -> None:
+def check_fragments(*groups: list[dict]) -> set[str]:
     """Every record id is a usable, unambiguous URL fragment across all files."""
     seen = set(RESERVED_IDS)
     for group in groups:
@@ -91,6 +91,19 @@ def check_fragments(*groups: list[dict]) -> None:
             require(ID.match(fragment) is not None, f"id {fragment!r}: not a valid URL fragment")
             require(fragment not in seen, f"id {fragment!r}: reserved or used by another record")
             seen.add(fragment)
+    return seen - RESERVED_IDS
+
+
+def validate_moved(moved: dict, in_use: set[str], linkable: set[str]) -> None:
+    """An id that left the record points at a record a reader can be taken to,
+    and is not used again."""
+    require(isinstance(moved, dict), "moved: must be an object of old id to current id")
+    for old, now in moved.items():
+        where = f"moved/{old}"
+        require(ID.match(old) is not None, f"{where}: not a valid URL fragment")
+        require(old not in in_use and old not in RESERVED_IDS,
+                f"{where}: still in use, so it has not moved")
+        require(now in linkable, f"{where}: {now!r} is not an event, charge, pending item or season")
 
 
 def check_sources(sources: list[dict], where: str, primary_only: bool = False) -> None:
@@ -290,7 +303,8 @@ def validate_updates(updates: list[dict]) -> None:
 
 
 def validate(cases: list[dict], events: list[dict], charges: list[dict], pending: list[dict],
-             seasons: list[dict], funding: dict, allegations: dict, updates: list[dict]) -> None:
+             seasons: list[dict], funding: dict, allegations: dict, moved: dict,
+             updates: list[dict]) -> None:
     case_ids = validate_cases(cases)
     validate_events(events, case_ids)
     validate_charges(charges, case_ids)
@@ -299,7 +313,9 @@ def validate(cases: list[dict], events: list[dict], charges: list[dict], pending
     validate_seasons(seasons)
     validate_funding(funding, charges)
     validate_allegations(allegations, charges)
-    check_fragments(cases, events, charges, pending, seasons)
+    in_use = check_fragments(cases, events, charges, pending, seasons)
+    # Cases have ids but no place on the page, so nothing can move to one.
+    validate_moved(moved, in_use, in_use - case_ids)
     check_source_consistency(events, charges, pending, seasons, [
         funding | {"id": "funding"},
         allegations | {"id": "allegations"},
@@ -310,7 +326,8 @@ def validate(cases: list[dict], events: list[dict], charges: list[dict], pending
 
 def main() -> None:
     validate(load("cases"), load("events"), load("charges"), load("pending"),
-             load("seasons"), load("funding"), load("allegations"), load("updates", FEED))
+             load("seasons"), load("funding"), load("allegations"), load("moved"),
+             load("updates", FEED))
     print("data ok")
 
 
