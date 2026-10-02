@@ -55,6 +55,7 @@ data/allegations.json     the League's statement, rule by season   hand-edited, 
 data/funding.json         sponsorship money by season         hand-edited, from the Core Decision
 data/seasons.json         final tables, 2009/10 to 2017/18    written by build_seasons.py only
 data/moved.json           ids that left the record → the record each became   hand-edited
+data/archives.json        cited address → its copy on the Wayback Machine      hand-edited, after reading the copy
 feed/updates.json         news feed, newest first             written by the pipeline only
 pipeline/validate.py      raises on first contract violation
 pipeline/fetch_updates.py RSS → feed/updates.json
@@ -65,6 +66,7 @@ src/render.test.tsx       renders the whole page with the real data, for every a
 src/static.tsx            what the build writes besides the app: the page as markup, the Atom feed
 src/atom.ts               the record's own feed, one entry per event
 src/today.ts              today's date in London, known only in the browser
+src/opinion.ts            which press headlines are opinion, as far as a headline shows it
 scripts/write-static.mjs  last step of the build: writes the page, atom.xml and data/ into dist/
 src/data.ts               the JSON, typed, plus lookups
 src/route.ts              URL fragment → view and entry
@@ -111,6 +113,9 @@ The pipeline uses the Python standard library only. There is no `requirements.tx
 - Record ids are URL fragments. They use letters, digits and single hyphens, and are unique across cases, events, charges, pending items and seasons. `timeline`, `ledger`, `seasons`, `next`, `latest`, `method`, `funding`, `allegations`, `content` and `not-found` are reserved for the app.
 - `Case.cityPositionEventId` points at the `statement` event that records City's position. It is required for any case that has charges; the validator fails otherwise. This is how editorial rule 3 is enforced: the ledger and the timeline read City's position from that event. When City's position changes, add a new statement event and repoint the field.
 - One URL is always cited with the same title, publisher and kind. The validator fails on a mismatch.
+- `archives.json` maps a cited address to the same page as the Wayback Machine held it at one moment. The source list shows it as "Archived copy". The validator checks that the address is one the record cites and that the copy is `https://web.archive.org/web/<14 digits>/` followed by that address. An address with no entry shows no link.
+- Read an archived copy before adding it. It must show what the record cites the page for. Three kinds of copy were left out on 2 Oct 2026 for failing that: the League's table pages, whose copies are empty shells because the table is loaded by script; a BBC report whose only copy was taken before the report was rewritten to cover the appeal; and pages the Archive holds no copy of, which is most of them (7 of 37 addresses have a copy). Nothing has been submitted to the Archive; only copies it already held are linked.
+- `check_links.py` does not request the archived copies.
 - `Update.publishedAt` is UTC, `YYYY-MM-DDTHH:MM:SSZ`, so string order is time order. `Update.id` must equal the sha1 of `Update.url`.
 
 ## Pipeline: `fetch_updates.py`
@@ -123,6 +128,7 @@ One job: read RSS feeds, keep the items about these cases, write `feed/updates.j
   - `https://www.theguardian.com/football/manchestercity/rss` (The Guardian, Manchester City).
 - Keep an item when title + description mention the club (`Man City` or `Manchester City`) and at least one case term: `charges`, `commission`, `appeal`, `sanction`, `verdict`, `breach`, `tribunal`, `APT`, `points deduction`, `expulsion`, `financial rules`, `guilty`, `ruling`, `findings`, `hearing`. Terms match at the start of a word (`appeal` catches `appeals`). `APT` is case-sensitive and whole-word, so it does not hit `captain` or `apt`. Markup is stripped before matching.
 - The filter is loose by design. It lets through the odd unrelated item that mentions the club and a term in passing. The Latest view is labelled as unchecked press coverage for that reason.
+- Opinion columns stay in the feed and are tagged "Opinion" in the Latest view. The tag is worked out in the app (`src/opinion.ts`), not stored: a Guardian headline that ends with a bar and a writer's name, or with `Editorial` or `Letters`. BBC and Sky do not mark their columns in a way a feed carries, so theirs are not tagged, and the view says so. Decided by Rowan on 2 Oct 2026, over leaving them out.
 - `title`, `link` and `pubDate` are required and a missing one raises. `description` may be empty; publishers do send that.
 - Sky stamps dates with `BST`, which is not an RFC 822 zone. The fetcher maps it to `+0100` and raises on any other zone name it cannot resolve.
 - The URL is stored without its query string (BBC appends tracking parameters). `id` is the sha1 of that URL. Merge with the existing file, sort newest first, keep the latest 200.
@@ -335,8 +341,7 @@ The social card and the README say nothing about where a case stands, so neither
 
 - The corrections email address for the methodology note. Not yet supplied. Leave the contact line out until it is.
 - Whether Premier League and club statements, which have no RSS, are worth an HTML scrape. Until decided they enter by hand as events.
-- Whether opinion pieces belong in the Latest view. The Guardian's feed carries columns (titles ending `| Author Name`), and their headlines appear beside news reports with no label. The choices are to label them, leave them out, or leave them as they are.
-- Whether each source should carry an archived copy (a Wayback Machine address), so a citation survives the page it points to. It needs a field on `Source`, a link in the source list, and a snapshot of each page.
+- Whether to ask the Wayback Machine to save the 30 cited pages it holds no usable copy of. Rowan chose on 2 Oct 2026 to link only copies it already held. Saving the rest would mean sending each address to archive.org.
 - `athletic-verdict-report` cites the AP timeline, not The Athletic's own article. Add the article's address when it is to hand.
 - There is no error boundary. If a render throws in the browser the page goes blank. The render test and the build both render every address first, which is the guard. A boundary was left out because it would be a fallback path.
 

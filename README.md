@@ -57,11 +57,12 @@ flowchart LR
 There is no database, no server and no login. The record is a handful of JSON files, and the site is built from them.
 
 - **One contract, enforced twice.** [`src/types.ts`](src/types.ts) defines the shape of the data. [`pipeline/validate.py`](pipeline/validate.py) enforces the same rules on the files and stops at the first violation. It runs before every deploy, so a bad edit cannot reach the site.
-- **The record and the coverage are kept apart.** A scheduled workflow reads three news feeds and keeps the headlines that mention the cases. They are stored in `feed/`, outside the record, and shown under their own label. A headline becomes part of the record only when a person writes a sourced entry for it.
+- **The record and the coverage are kept apart.** A scheduled workflow reads three news feeds and keeps the headlines that mention the cases. They are stored in `feed/`, outside the record, and shown under their own label, with opinion columns tagged where the publisher marks them. A headline becomes part of the record only when a person writes a sourced entry for it.
 - **The edit history is public.** The record changes only through commits to `data/`, and the site links to [that history](https://github.com/RowanFlynnPilot/mancity-charge-ledger/commits/main/data).
 - **Published numbers are pinned.** The count of alleged breaches is computed from the transcribed statement, not typed in, and a test holds it at its published value so a data edit cannot change it unnoticed.
 - **Every address is rendered before a deploy.** A test builds the whole page from the real data for each view and each entry, and follows every link within it. A data edit that would leave an entry unreachable fails the check.
 - **Sources are checked weekly.** A workflow requests each document the record cites and fails if one has gone. A few sites refuse automated requests; those are listed for checking by hand.
+- **Archived copies, where they hold up.** A source links to its copy on the Internet Archive when one exists and has been read to confirm it shows what is cited.
 - **The page is in the HTML.** The build renders the timeline into the page it serves, and the app takes that markup over. The record does not wait for a script, and a reader without JavaScript still gets it.
 - **Links outlive edits.** Every entry has an address. When an entry is replaced, its old address is recorded and leads to what replaced it. An address that names nothing says so.
 - **No third-party requests.** Fonts are served from the site itself. There are no trackers and no analytics.
@@ -71,7 +72,7 @@ There is no database, no server and no login. The record is a handful of JSON fi
 
 | Path | What it is |
 | --- | --- |
-| `data/` | The record: cases, events, charges, pending items, the League's statement, funding figures, season table, and the ids that have moved. |
+| `data/` | The record: cases, events, charges, pending items, the League's statement, funding figures, season table, the ids that have moved, and archived copies of sources. |
 | `feed/updates.json` | Press headlines. Written by the pipeline only. |
 | `pipeline/` | The validator, the feed fetcher, the season-table builder, the link checker, and their tests. Python standard library only. |
 | `src/` | The site: React components, the data contract, routing by URL fragment, one stylesheet. |
