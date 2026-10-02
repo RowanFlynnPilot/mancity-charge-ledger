@@ -4,11 +4,17 @@ import "@fontsource-variable/archivo/wdth.css";
 import "./styles.css";
 
 import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import { createRoot, hydrateRoot } from "react-dom/client";
 import { App } from "./App";
 
-createRoot(document.getElementById("root")!).render(
+const root = document.getElementById("root")!;
+const app = (
   <StrictMode>
     <App />
-  </StrictMode>,
+  </StrictMode>
 );
+
+// The build renders the page into index.html, and the app takes that markup
+// over. The dev server serves an empty root, so there the app renders it.
+if (root.hasChildNodes()) hydrateRoot(root, app);
+else createRoot(root).render(app);

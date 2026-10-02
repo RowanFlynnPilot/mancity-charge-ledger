@@ -6,6 +6,7 @@ import { cx } from "../cx";
 import { allegations, cases, charges, recordRunsTo } from "../data";
 import { formatDate } from "../dates";
 import { STATUS_LABEL } from "../labels";
+import { SITE, STANDFIRST } from "../site";
 import type { Case, Charge } from "../types";
 import { APPEAL_LABEL, FINDING_LABEL } from "./Badges";
 import { CityPosition, FindingsTally } from "./CityPosition";
@@ -87,12 +88,9 @@ function CaseStanding({ standingCase }: { standingCase: Case }) {
 export function Opening() {
   return (
     <header className="opening">
-      <h1>The Charge Ledger</h1>
+      <h1>{SITE}</h1>
       <div className="opening-intro">
-        <p className="standfirst">
-          A sourced record of the financial-rules cases involving Manchester City: what was alleged,
-          what was decided and by whom, and what happens next.
-        </p>
+        <p className="standfirst">{STANDFIRST}</p>
         <p className="opening-meta">
           Record runs to <time dateTime={recordRunsTo}>{formatDate(recordRunsTo, "long")}</time>.{" "}
           <a href="#method">How this record is kept</a>
