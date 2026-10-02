@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
 import { groupByNumber, money, shortRef, total } from "./board";
+import { funding } from "./data";
 import type { Charge, FundingSeason } from "./types";
 
 const charge = (id: string, ref: string): Charge => ({
@@ -34,4 +35,14 @@ test("totals come out to the penny despite floating point", () => {
   expect(money(total(seasons, "recorded"))).toBe("399.96");
   expect(money(total(seasons, "paidByOwner"))).toBe("356.96");
   expect(money(4.5)).toBe("4.50");
+});
+
+// The published totals. The validator checks that each season's two parts add
+// up, which a slip in one season's figures can still pass. The decision states
+// these three totals itself, at paragraph 72.
+test("the funding figures come to the totals the decision states", () => {
+  expect(funding.seasons).toHaveLength(9);
+  expect(money(total(funding.seasons, "recorded"))).toBe("949.94");
+  expect(money(total(funding.seasons, "paidBySponsors"))).toBe("119.25");
+  expect(money(total(funding.seasons, "paidByOwner"))).toBe("830.69");
 });
