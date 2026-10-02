@@ -2,29 +2,64 @@
    Ledger paper and ink. The only hues are the finding and appeal badges. */
 
 :root {
+  /* Surfaces and ink */
   --paper: #f2f4ef;
   --sheet: #fbfcfa;
   --ink: #1a1d1b;
   --ink-soft: #505752;
   --rule: #ccd3ca;
   --rule-strong: #79827a;
-  --mark: #e3e9df;
+  --mark: #e3e9df; /* a linked entry */
+  --mark-arrive: #c9d5c3; /* where its highlight starts */
 
+  /* Badge hues */
   --finding: #53306f;
   --finding-tint: #eadff2;
-  --on-finding: #ffffff;
+  --on-finding: #fbfcfa;
   --appeal: #6b4700;
   --appeal-tint: #f3e6c6;
-  --on-appeal: #ffffff;
+  --on-appeal: #fbfcfa;
 
+  /* Type: five serif sizes for reading, three sans sizes for the apparatus */
   --serif: "Literata Variable", Georgia, serif;
   --sans: "Archivo Variable", system-ui, sans-serif;
+  --condensed: 92%;
+  --t-display: clamp(2.5rem, 6vw, 4rem);
+  --t-title: 1.875rem;
+  --t-year: 1.5rem;
+  --t-lead: 1.25rem;
+  --t-body: 1.0625rem;
+  --u-large: 0.9375rem;
+  --u: 0.875rem;
+  --u-small: 0.8125rem;
 
+  /* Space: a 4px scale */
+  --s1: 0.25rem;
+  --s2: 0.5rem;
+  --s3: 0.75rem;
+  --s4: 1rem;
+  --s5: 1.25rem;
+  --s6: 1.5rem;
+  --s7: 2rem;
+  --s8: 3rem;
+  --s9: 4rem;
+  --s10: 6rem;
+
+  /* Layout */
+  --measure: 36rem;
   --margin-col: 8.5rem;
+  --aside-col: 16rem;
   --lane-w: 1.25rem;
-  --row-pad: 1.15rem;
-  --dot-y: calc(var(--row-pad) + 0.62rem);
-  --nav-h: 3rem;
+  --row-pad: var(--s5);
+  --dot-y: calc(var(--row-pad) + 0.6rem);
+  --bar-h: 3rem;
+  --radius: 3px;
+
+  /* Layers. A component that layers inside itself uses isolation: isolate. */
+  --z-bar: 10;
+  --z-skip: 20;
+
+  --ease: 140ms ease-out;
 
   color-scheme: light dark;
 }
@@ -38,6 +73,7 @@
     --rule: #333a35;
     --rule-strong: #646e67;
     --mark: #252c26;
+    --mark-arrive: #364037;
 
     --finding: #cdb9e4;
     --finding-tint: #33263f;
@@ -64,7 +100,7 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--serif);
-  font-size: 1.0625rem;
+  font-size: var(--t-body);
   line-height: 1.6;
   font-optical-sizing: auto;
   font-variant-numeric: lining-nums;
@@ -75,8 +111,21 @@ h1, h2, h3, p, ul, ol, dl, dd, table {
   padding: 0;
 }
 
+h1, h2, h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
 ul, ol {
   list-style: none;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--paper);
 }
 
 a {
@@ -85,11 +134,22 @@ a {
   text-decoration-thickness: 1px;
   text-underline-offset: 0.18em;
   text-decoration-color: var(--rule-strong);
+  transition: text-decoration-color var(--ease);
 }
 
 a:hover {
   text-decoration-color: currentColor;
-  text-decoration-thickness: 2px;
+}
+
+a:active {
+  color: var(--ink-soft);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color var(--ease), color var(--ease);
 }
 
 :focus-visible {
@@ -103,99 +163,154 @@ a:hover {
 }
 
 [id] {
-  scroll-margin-top: calc(var(--nav-h) + 0.75rem);
-}
-
-button {
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
+  scroll-margin-top: calc(var(--bar-h) + var(--s3));
 }
 
 .page {
   width: 100%;
   max-width: 68rem;
   margin-inline: auto;
-  padding-inline: clamp(1rem, 4vw, 2.5rem);
+  padding-inline: clamp(var(--s4), 4vw, 2.5rem);
 }
 
 .skip {
   position: absolute;
-  left: 1rem;
+  left: var(--s4);
   top: -4rem;
-  z-index: 10;
-  padding: 0.5rem 0.8rem;
+  z-index: var(--z-skip);
+  padding: var(--s2) var(--s3);
   background: var(--ink);
   color: var(--paper);
   font-family: var(--sans);
+  font-stretch: var(--condensed);
+  font-size: var(--u-large);
 }
 
 .skip:focus {
-  top: 0.75rem;
+  top: var(--s3);
 }
 
-/* ---------- Masthead ---------- */
+.mark {
+  display: block;
+  flex: none;
+}
+
+/* ---------- Masthead: the name on the left, the open case on the right ---------- */
 
 .masthead {
-  padding-top: clamp(2rem, 6vw, 4.5rem);
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: var(--s8) var(--s9);
+  align-items: start;
+  padding-block: clamp(var(--s7), 6vw, var(--s9)) var(--s8);
 }
 
 .masthead h1 {
-  font-size: clamp(2.6rem, 8vw, 4.75rem);
+  font-size: var(--t-display);
   font-weight: 480;
-  line-height: 0.98;
+  line-height: 1;
   letter-spacing: -0.02em;
 }
 
 .standfirst {
-  max-width: 34em;
-  margin-top: 1.1rem;
-  font-size: 1.2rem;
-  line-height: 1.5;
+  max-width: 26em;
+  margin-top: var(--s5);
+  font-size: var(--t-lead);
+  line-height: 1.45;
 }
 
-.masthead .standing {
-  margin-top: clamp(1.75rem, 4vw, 2.75rem);
-  /* A ledger's double rule. */
-  border-top: 3px double var(--ink);
+.masthead-meta {
+  margin-top: var(--s5);
+  font-family: var(--sans);
+  font-stretch: var(--condensed);
+  font-size: var(--u);
+  color: var(--ink-soft);
 }
 
-/* ---------- Margin-and-entry blocks (masthead, position, method) ---------- */
+.masthead-meta a {
+  color: var(--ink);
+}
+
+.masthead-status {
+  display: grid;
+  gap: var(--s4);
+}
+
+/* Panels: a sheet on the paper, edged with a hairline. */
+.status,
+.notice {
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.status {
+  padding: var(--s6);
+}
+
+.status-label {
+  font-family: var(--sans);
+  font-stretch: var(--condensed);
+  font-size: var(--u);
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.status-case {
+  margin-top: var(--s1);
+  font-size: var(--t-lead);
+  font-weight: 560;
+  line-height: 1.3;
+}
+
+.status-case + p {
+  margin-top: var(--s2);
+}
+
+.status .standing-meta {
+  margin-top: var(--s4);
+  padding-top: var(--s4);
+  border-top: 1px solid var(--rule);
+}
+
+/* ---------- Margin-and-entry blocks (City's position, method) ---------- */
 
 .standing > div {
   display: grid;
   grid-template-columns: var(--margin-col) minmax(0, 1fr);
-  padding-block: 0.9rem;
+  padding-block: var(--s4);
   border-bottom: 1px solid var(--rule);
 }
 
 .standing dt {
-  padding-right: 1rem;
+  padding-right: var(--s4);
   font-family: var(--sans);
-  font-stretch: 90%;
-  font-size: 0.86rem;
+  font-stretch: var(--condensed);
+  font-size: var(--u);
   font-weight: 600;
-  line-height: 1.9;
+  /* One line of the entry beside it, so the two first lines sit together. */
+  line-height: 1.7rem;
 }
 
 .standing dd {
-  max-width: 44rem;
+  max-width: var(--measure);
 }
 
 .standing dd > * + * {
-  margin-top: 0.35rem;
+  margin-top: var(--s2);
 }
 
 .standing-lead {
-  font-size: 1.15rem;
+  font-size: var(--t-lead);
   font-weight: 560;
   line-height: 1.35;
 }
 
 .standing-meta {
   font-family: var(--sans);
-  font-stretch: 92%;
-  font-size: 0.9rem;
+  font-stretch: var(--condensed);
+  font-size: var(--u);
+  line-height: 1.5;
   color: var(--ink-soft);
 }
 
@@ -205,20 +320,22 @@ button {
 
 .due-flag {
   display: inline-block;
-  margin-left: 0.6em;
-  padding: 0.05em 0.5em;
+  margin-left: var(--s2);
+  padding: 0 var(--s2);
   border: 1px solid var(--rule-strong);
   border-radius: 2px;
   color: var(--ink);
+  font-size: var(--u-small);
   font-weight: 600;
   line-height: 1.5;
 }
 
 .due-flag.due-passed {
   display: block;
-  margin: 0.3rem 0 0;
+  margin: var(--s1) 0 0;
   padding: 0;
   border: 0;
+  font-size: inherit;
   font-weight: 400;
 }
 
@@ -227,39 +344,71 @@ button {
 .views {
   position: sticky;
   top: 0;
-  z-index: 5;
-  margin-top: 2rem;
+  z-index: var(--z-bar);
   background: var(--paper);
+  border-top: 1px solid var(--rule);
   border-bottom: 1px solid var(--ink);
+}
+
+.views-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--s5);
+  height: var(--bar-h);
+}
+
+.views-home {
+  display: flex;
+  flex: none;
+  margin-left: calc(-1 * var(--s1));
+  padding: var(--s1);
+  border-radius: var(--radius);
+  transition: background-color var(--ease);
+}
+
+.views-home:hover {
+  background: var(--sheet);
+}
+
+.views-home:active {
+  background: var(--mark);
 }
 
 .views ul {
   display: flex;
-  gap: clamp(1rem, 3vw, 2rem);
-  height: var(--nav-h);
+  flex: 1;
+  gap: clamp(var(--s4), 2.5vw, var(--s7));
+  min-width: 0;
+  height: 100%;
   overflow-x: auto;
   scrollbar-width: none;
 }
 
-.views a {
+.views ul::-webkit-scrollbar {
+  display: none;
+}
+
+.views li a {
   display: flex;
   align-items: center;
   height: 100%;
   border-bottom: 3px solid transparent;
   font-family: var(--sans);
-  font-stretch: 90%;
-  font-size: 0.98rem;
+  font-stretch: var(--condensed);
+  font-size: var(--u-large);
   font-weight: 500;
   color: var(--ink-soft);
   text-decoration: none;
   white-space: nowrap;
+  transition: color var(--ease), border-color var(--ease);
 }
 
-.views a:hover {
+.views li a:hover {
   color: var(--ink);
+  border-bottom-color: var(--rule-strong);
 }
 
-.views a[aria-current="page"] {
+.views li a[aria-current="page"] {
   border-bottom-color: var(--ink);
   color: var(--ink);
   font-weight: 650;
@@ -272,44 +421,51 @@ button {
 /* ---------- Views ---------- */
 
 .view {
-  padding-top: 2.25rem;
+  padding-top: var(--s8);
 }
 
 .view > h2,
 .method > h2 {
-  font-size: 1.9rem;
+  font-size: var(--t-title);
   font-weight: 520;
   line-height: 1.15;
   letter-spacing: -0.01em;
 }
 
 .view-intro {
-  max-width: 42rem;
-  margin-top: 0.6rem;
+  max-width: var(--measure);
+  margin-top: var(--s3);
   color: var(--ink-soft);
 }
 
+.view-intro a {
+  color: var(--ink);
+}
+
 .case-title {
-  margin-top: 1.25rem;
-  font-size: 1.3rem;
+  margin-top: var(--s6);
+  font-size: var(--t-lead);
   font-weight: 560;
+  line-height: 1.3;
+}
+
+.case-title + .view-intro {
+  margin-top: var(--s1);
 }
 
 .view .standing {
-  margin-top: 1.5rem;
+  margin-top: var(--s6);
   border-top: 1px solid var(--ink);
 }
 
 .notice {
-  max-width: 44rem;
-  margin-top: 1rem;
-  padding: 0.85rem 1rem;
-  border: 1px solid var(--ink);
-  background: var(--sheet);
+  max-width: calc(var(--measure) + 2 * var(--s5));
+  margin-top: var(--s5);
+  padding: var(--s4) var(--s5);
 }
 
 .empty {
-  margin-top: 1.5rem;
+  margin-top: var(--s6);
   color: var(--ink-soft);
 }
 
@@ -318,7 +474,7 @@ button {
 .cases {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-top: 1.25rem;
+  margin-top: var(--s5);
   border-top: 1px solid var(--ink);
   border-bottom: 1px solid var(--rule);
 }
@@ -326,12 +482,15 @@ button {
 .case {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
-  padding: 0.9rem 0.9rem 1rem;
+  gap: var(--s1);
+  padding: var(--s3) var(--s4) var(--s4);
   border: 0;
   border-left: 1px solid var(--rule);
+  /* Like the view links: the chosen case is marked along one edge. */
+  border-top: 3px solid transparent;
   background: none;
   text-align: left;
+  transition: border-color var(--ease);
 }
 
 .case:first-child {
@@ -339,16 +498,16 @@ button {
   padding-left: 0;
 }
 
-.case:hover .case-name {
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.18em;
+.case:hover {
+  border-top-color: var(--rule-strong);
+}
+
+.case:active {
+  border-top-color: var(--ink-soft);
 }
 
 .case[aria-pressed="true"] {
-  padding-left: 0.9rem;
-  background: var(--sheet);
-  box-shadow: inset 0 3px 0 var(--ink);
+  border-top-color: var(--ink);
 }
 
 .case-name {
@@ -359,33 +518,34 @@ button {
 .case-meta,
 .case-outcome {
   font-family: var(--sans);
-  font-stretch: 90%;
-  font-size: 0.85rem;
+  font-stretch: var(--condensed);
+  font-size: var(--u-small);
   line-height: 1.4;
   color: var(--ink-soft);
 }
 
 .case-outcome {
-  margin-top: 0.25rem;
+  margin-top: var(--s2);
+  font-size: var(--u);
   color: var(--ink);
 }
 
 .lane-key {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
-  height: 0.9rem;
-  margin-bottom: 0.15rem;
+  gap: var(--s1);
+  height: var(--s3);
+  margin-bottom: var(--s1);
 }
 
 .lane-key-tick {
-  width: 0.62rem;
+  width: 0.625rem;
   height: 1.5px;
   background: var(--rule-strong);
 }
 
 .lane-key-on {
-  height: 0.62rem;
+  height: 0.625rem;
   border: 1.5px solid var(--ink);
   border-radius: 50%;
   background: var(--ink);
@@ -402,25 +562,46 @@ button {
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem 1.5rem;
-  margin-top: 1rem;
+  gap: var(--s3) var(--s6);
+  margin-top: var(--s4);
   font-family: var(--sans);
-  font-stretch: 92%;
-  font-size: 0.9rem;
+  font-stretch: var(--condensed);
+  font-size: var(--u);
 }
 
 .toolbar-status {
   color: var(--ink-soft);
 }
 
-.text-button {
+.text-button,
+.copy-link {
   padding: 0;
   border: 0;
   background: none;
-  color: var(--ink);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.18em;
+  text-decoration-color: var(--rule-strong);
+  transition: color var(--ease), text-decoration-color var(--ease);
+}
+
+.text-button {
+  color: var(--ink);
+}
+
+.copy-link {
+  color: var(--ink-soft);
+}
+
+.text-button:hover,
+.copy-link:hover {
+  color: var(--ink);
+  text-decoration-color: currentColor;
+}
+
+.text-button:active,
+.copy-link:active {
+  color: var(--ink-soft);
 }
 
 .segmented {
@@ -428,14 +609,27 @@ button {
 }
 
 .segmented button {
-  padding: 0.3rem 0.75rem;
+  padding: var(--s1) var(--s3);
   border: 1px solid var(--ink);
   background: none;
   font-weight: 500;
 }
 
-.segmented button + button {
+.segmented button:first-child {
+  border-radius: var(--radius) 0 0 var(--radius);
+}
+
+.segmented button:last-child {
   border-left: 0;
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.segmented button:hover {
+  background: var(--sheet);
+}
+
+.segmented button:active {
+  background: var(--mark);
 }
 
 .segmented button[aria-pressed="true"] {
@@ -446,7 +640,7 @@ button {
 /* ---------- Rows: a margin column and an entry ---------- */
 
 .rows {
-  margin-top: 1.25rem;
+  margin-top: var(--s5);
   border-bottom: 1px solid var(--rule);
 }
 
@@ -468,11 +662,10 @@ button {
 .row-margin {
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
-  padding-right: 1rem;
+  padding-right: var(--s4);
   font-family: var(--sans);
-  font-stretch: 90%;
-  font-size: 0.9rem;
+  font-stretch: var(--condensed);
+  font-size: var(--u);
   line-height: 1.4;
   font-variant-numeric: tabular-nums lining-nums;
 }
@@ -489,80 +682,118 @@ button {
   color: var(--ink);
 }
 
-.row-body > * {
-  max-width: 43rem;
+.row-main > *,
+.row-body > p {
+  max-width: var(--measure);
 }
 
 .row-body h3 {
-  font-size: 1.22rem;
+  font-size: var(--t-lead);
   font-weight: 600;
   line-height: 1.3;
   letter-spacing: -0.005em;
 }
 
 .row-body h3 + p {
-  margin-top: 0.4rem;
+  margin-top: var(--s2);
 }
 
 .position-line {
-  margin-top: 0.6rem;
-  padding-left: 0.8rem;
+  margin-top: var(--s3);
+  padding-left: var(--s3);
   border-left: 3px solid var(--ink);
+}
+
+.row-aside {
+  margin-top: var(--s3);
 }
 
 .row-foot {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 0.25rem 1.5rem;
-  margin-top: 0.75rem;
+  gap: var(--s1) var(--s6);
+  margin-top: var(--s3);
   font-family: var(--sans);
-  font-stretch: 92%;
-  font-size: 0.84rem;
+  font-stretch: var(--condensed);
+  font-size: var(--u-small);
+  line-height: 1.5;
   color: var(--ink-soft);
 }
 
-.copy-link {
+.row-foot .copy-link {
   margin-left: auto;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--ink-soft);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.18em;
-  text-decoration-color: var(--rule-strong);
 }
 
-.copy-link:hover {
-  color: var(--ink);
-  text-decoration-color: currentColor;
+/* Wide screens: sources sit beside the entry, like a note in the margin. */
+@media (min-width: 62.01rem) {
+  .row-split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--aside-col);
+    column-gap: var(--s7);
+  }
+
+  .row-aside {
+    /* Drop the first line of the aside onto the headline's baseline. */
+    margin-top: 0;
+    padding-top: 0.2rem;
+  }
+
+  .row-aside .sources {
+    gap: var(--s3);
+    margin-top: 0;
+  }
+
+  .row-aside .sources li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s1);
+  }
+
+  .row-aside .row-foot {
+    flex-direction: column;
+    gap: var(--s1);
+    padding-top: var(--s3);
+    border-top: 1px solid var(--rule);
+  }
+
+  .row-aside .row-foot .copy-link {
+    margin-left: 0;
+    text-align: left;
+  }
 }
 
+/* A linked entry: marked, with the mark settling in as you arrive. */
 .is-target > .row-margin,
 .is-target > .row-body,
 tr.is-target > * {
   background: var(--mark);
+  animation: arrive 900ms ease-out;
+}
+
+@keyframes arrive {
+  from {
+    background-color: var(--mark-arrive);
+  }
 }
 
 .is-target > .row-margin {
   box-shadow: inset 4px 0 0 var(--ink);
-  padding-left: 0.75rem;
+  padding-left: var(--s3);
 }
 
 .is-target > .row-body {
-  padding-right: 0.75rem;
+  padding-right: var(--s3);
 }
 
 /* Year headings and the open end of the timeline */
 
 .row-year .row-margin {
   grid-column: 2 / -1;
-  padding-block: 1.6rem 0.5rem;
+  padding-block: var(--s7) var(--s2);
   border-top: 1px solid var(--ink);
   font-family: var(--serif);
   font-stretch: normal;
-  font-size: 1.5rem;
+  font-size: var(--t-year);
   font-weight: 480;
   line-height: 1;
 }
@@ -575,7 +806,7 @@ tr.is-target > * {
 .row-ongoing .row-margin,
 .row-ongoing .row-body {
   border-top: 0;
-  padding-bottom: 1.4rem;
+  padding-bottom: var(--s6);
 }
 
 .row-ongoing .row-margin {
@@ -586,9 +817,10 @@ tr.is-target > * {
 
 .rail {
   position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: repeat(var(--lanes), var(--lane-w));
-  margin-right: 1rem;
+  margin-right: var(--s4);
 }
 
 .lane {
@@ -619,11 +851,11 @@ tr.is-target > * {
 }
 
 .lane-ongoing.lane-below::after {
-  top: 0.5rem;
+  top: var(--s2);
 }
 
 .lane-ongoing.lane-above::before {
-  height: calc(100% - 0.5rem);
+  height: calc(100% - var(--s2));
 }
 
 .dot {
@@ -631,8 +863,8 @@ tr.is-target > * {
   z-index: 1;
   left: 50%;
   top: var(--dot-y);
-  width: 0.68rem;
-  height: 0.68rem;
+  width: 0.6875rem;
+  height: 0.6875rem;
   border: 1.5px solid var(--ink);
   border-radius: 50%;
   background: var(--ink);
@@ -656,32 +888,32 @@ tr.is-target > * {
 
 .sources {
   display: grid;
-  gap: 0.3rem;
-  margin-top: 0.8rem;
+  gap: var(--s1);
+  margin-top: var(--s3);
   font-family: var(--sans);
-  font-stretch: 92%;
-  font-size: 0.88rem;
+  font-stretch: var(--condensed);
+  font-size: var(--u);
   line-height: 1.45;
 }
 
 .sources li {
   display: grid;
-  grid-template-columns: 8.4rem minmax(0, 1fr);
+  grid-template-columns: 8.5rem minmax(0, 1fr);
   align-items: baseline;
 }
 
 .source-kind {
+  font-size: var(--u-small);
   color: var(--ink-soft);
 }
 
 .source-kind-primary {
   justify-self: start;
-  padding: 0 0.4em;
+  padding: 0 var(--s1);
   border: 1px solid var(--ink);
   border-radius: 2px;
   color: var(--ink);
   font-weight: 600;
-  font-size: 0.8rem;
 }
 
 .source-publisher {
@@ -694,12 +926,12 @@ tr.is-target > * {
   display: inline-flex;
   align-items: center;
   gap: 0.45em;
-  padding: 0.18em 0.6em;
+  padding: 0.125rem var(--s2);
   border: 1px solid;
   border-radius: 2px;
   font-family: var(--sans);
-  font-stretch: 90%;
-  font-size: 0.84rem;
+  font-stretch: var(--condensed);
+  font-size: var(--u-small);
   font-weight: 600;
   line-height: 1.5;
   white-space: nowrap;
@@ -723,9 +955,10 @@ tr.is-target > * {
   text-decoration: line-through;
 }
 
+/* A disc that is full, half full or empty. */
 .finding-glyph {
-  width: 0.62em;
-  height: 0.62em;
+  width: 0.625rem;
+  height: 0.625rem;
   border: 1.5px solid currentColor;
   border-radius: 50%;
 }
@@ -735,7 +968,7 @@ tr.is-target > * {
 }
 
 .finding-proven-in-part .finding-glyph {
-  background: linear-gradient(90deg, currentColor 50%, transparent 50%);
+  box-shadow: inset calc(0.3125rem - 1.5px) 0 0 currentColor;
 }
 
 .appeal {
@@ -767,46 +1000,46 @@ tr.is-target > * {
 .tally {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
+  gap: var(--s2) var(--s6);
   font-family: var(--sans);
-  font-stretch: 92%;
-  font-size: 0.9rem;
+  font-stretch: var(--condensed);
+  font-size: var(--u);
   font-variant-numeric: tabular-nums lining-nums;
 }
 
 .tally-findings {
-  margin-top: 1.75rem;
+  margin-top: var(--s7);
 }
 
 .tally li {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--s2);
 }
 
 /* ---------- Ruled tables: the charge ledger and the seasons ---------- */
 
 :is(.ledger, .seasons) {
   width: 100%;
-  margin-top: 0.9rem;
+  margin-top: var(--s4);
   border-collapse: collapse;
   border-bottom: 1px solid var(--rule);
 }
 
 :is(.ledger, .seasons) :is(th, td) {
-  padding: var(--row-pad) 1rem var(--row-pad) 0;
+  padding: var(--row-pad) var(--s4) var(--row-pad) 0;
   border-top: 1px solid var(--rule);
   text-align: left;
   vertical-align: top;
 }
 
 :is(.ledger, .seasons) thead th {
-  padding-block: 0.5rem;
+  padding-block: var(--s2);
   border-top: 1px solid var(--ink);
   border-bottom: 1px solid var(--ink);
   font-family: var(--sans);
-  font-stretch: 90%;
-  font-size: 0.84rem;
+  font-stretch: var(--condensed);
+  font-size: var(--u-small);
   font-weight: 600;
   color: var(--ink-soft);
 }
@@ -820,8 +1053,8 @@ tr.is-target > * {
 .seasons-key {
   width: var(--margin-col);
   font-family: var(--sans);
-  font-stretch: 90%;
-  font-size: 0.95rem;
+  font-stretch: var(--condensed);
+  font-size: var(--u-large);
   font-weight: 650;
   white-space: nowrap;
   font-variant-numeric: tabular-nums lining-nums;
@@ -829,38 +1062,43 @@ tr.is-target > * {
 
 /* The ruled margin of a ledger page: a double line after the key column. */
 :is(.ledger, .seasons) :is(.ledger-body, .seasons-position) {
-  padding-left: 1rem;
+  padding-left: var(--s4);
   border-left: 3px double var(--rule-strong);
 }
 
 :is(.ledger, .seasons) thead th:nth-child(2) {
-  padding-left: 1rem;
+  padding-left: var(--s4);
+}
+
+tr.is-target > :is(.ledger-ref, .seasons-key) {
+  box-shadow: inset 4px 0 0 var(--ink);
+  padding-left: var(--s3);
 }
 
 /* ---------- Charge ledger ---------- */
 
 .ledger-subject {
-  font-size: 1.12rem;
+  font-size: var(--t-lead);
   font-weight: 600;
   line-height: 1.3;
 }
 
 .ledger-body > * {
-  max-width: 43rem;
+  max-width: var(--measure);
 }
 
 .ledger-period {
-  margin-top: 0.15rem;
+  margin-top: var(--s1);
   font-family: var(--sans);
-  font-stretch: 90%;
-  font-size: 0.9rem;
+  font-stretch: var(--condensed);
+  font-size: var(--u);
   color: var(--ink-soft);
   font-variant-numeric: tabular-nums lining-nums;
 }
 
 .ledger-period + p,
 .ledger-subject + p:not(.ledger-period) {
-  margin-top: 0.35rem;
+  margin-top: var(--s2);
 }
 
 .ledger-finding,
@@ -873,21 +1111,16 @@ tr.is-target > * {
   padding-right: 0;
 }
 
-tr.is-target > :is(.ledger-ref, .seasons-key) {
-  box-shadow: inset 4px 0 0 var(--ink);
-  padding-left: 0.75rem;
-}
-
 /* ---------- Seasons ---------- */
 
 .seasons :is(th, td) {
-  padding-block: 0.8rem;
+  padding-block: var(--s3);
 }
 
 .seasons-position {
   width: 7.5rem;
   font-family: var(--sans);
-  font-stretch: 90%;
+  font-stretch: var(--condensed);
   font-weight: 650;
   font-variant-numeric: tabular-nums lining-nums;
 }
@@ -907,14 +1140,15 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
 /* ---------- Latest coverage ---------- */
 
 .day {
-  margin-top: 2rem;
+  margin-top: var(--s7);
 }
 
 .day-title {
-  padding-bottom: 0.5rem;
+  padding-bottom: var(--s2);
   border-bottom: 1px solid var(--ink);
-  font-size: 1.25rem;
-  font-weight: 520;
+  font-size: var(--t-lead);
+  font-weight: 560;
+  line-height: 1.3;
 }
 
 .day .rows {
@@ -927,7 +1161,7 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
 
 .row-update .row-margin,
 .row-update .row-body {
-  padding-block: 0.7rem;
+  padding-block: var(--s3);
 }
 
 .row-update .row-body a {
@@ -937,27 +1171,70 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
 /* ---------- Method and colophon ---------- */
 
 .method {
-  margin-top: 5rem;
-  padding-top: 2rem;
+  margin-top: var(--s10);
+  padding-top: var(--s7);
   border-top: 3px double var(--ink);
 }
 
 .method .standing {
-  margin-top: 1.25rem;
+  margin-top: var(--s5);
   border-top: 1px solid var(--rule);
 }
 
 .colophon {
-  padding-block: 2rem 3rem;
+  margin-top: var(--s9);
+  padding-block: var(--s7) var(--s9);
+  border-top: 1px solid var(--rule);
   font-family: var(--sans);
-  font-stretch: 92%;
-  font-size: 0.88rem;
+  font-stretch: var(--condensed);
+  font-size: var(--u);
+  line-height: 1.5;
   color: var(--ink-soft);
+}
+
+.colophon-inner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--s4) var(--s8);
+  align-items: start;
+}
+
+.colophon-name {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  font-family: var(--serif);
+  font-stretch: normal;
+  font-size: var(--t-body);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.colophon-inner > p:not(.colophon-name) {
+  max-width: 28rem;
+  padding-top: var(--s1);
+}
+
+.colophon ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1) var(--s5);
+  padding-top: var(--s1);
+}
+
+.colophon a {
+  color: var(--ink);
 }
 
 /* ---------- Narrow screens ---------- */
 
 @media (max-width: 62rem) {
+  .masthead {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s7);
+  }
+
   .cases {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -968,11 +1245,11 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
   }
 
   .case:nth-child(n + 3) {
-    border-top: 1px solid var(--rule);
+    box-shadow: 0 -1px 0 var(--rule);
   }
 
-  .case[aria-pressed="true"] {
-    padding-left: 0.9rem;
+  .colophon-inner {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   /* Each table becomes one block per row. */
@@ -1001,7 +1278,7 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
       "ref ref"
       "finding appeal"
       "body body";
-    gap: 0.6rem 0.75rem;
+    gap: var(--s2) var(--s3);
     align-items: center;
   }
 
@@ -1017,7 +1294,7 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
 
   /* A season: its label, then each fact with the column heading beside it. */
   .seasons tr {
-    gap: 0.3rem;
+    gap: var(--s1);
   }
 
   .seasons td[data-label] {
@@ -1029,14 +1306,14 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
   .seasons td[data-label]::before {
     content: attr(data-label);
     font-family: var(--sans);
-    font-stretch: 90%;
-    font-size: 0.86rem;
+    font-stretch: var(--condensed);
+    font-size: var(--u);
     font-weight: 400;
     color: var(--ink-soft);
   }
 
   .seasons .seasons-source {
-    margin-top: 0.3rem;
+    margin-top: var(--s1);
   }
 
   .ledger-ref { grid-area: ref; }
@@ -1055,7 +1332,11 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
   tr.is-target {
     background: var(--mark);
     box-shadow: inset 4px 0 0 var(--ink);
-    padding-inline: 0.75rem;
+    padding-inline: var(--s3);
+  }
+
+  tr.is-target > * {
+    animation: none;
   }
 
   tr.is-target > :is(.ledger-ref, .seasons-key) {
@@ -1065,31 +1346,29 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
 }
 
 @media (max-width: 44rem) {
-  body {
-    font-size: 1rem;
+  :root {
+    --t-body: 1rem;
+    --t-lead: 1.125rem;
+    --t-title: 1.625rem;
+    --lane-w: 0.875rem;
+    --row-pad: var(--s4);
   }
 
-  :root {
-    --lane-w: 0.9rem;
-    --row-pad: 1rem;
+  .status {
+    padding: var(--s5);
   }
 
   .cases {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .case,
-  .case:first-child {
+  .case {
     border-left: 0;
-    padding-left: 0;
+    padding-inline: 0;
   }
 
   .case + .case {
-    border-top: 1px solid var(--rule);
-  }
-
-  .case[aria-pressed="true"] {
-    padding-left: 0.9rem;
+    box-shadow: 0 -1px 0 var(--rule);
   }
 
   /* The margin column moves above its entry. */
@@ -1098,42 +1377,42 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .standing dt {
+    line-height: 1.5;
+  }
+
   .rows-rail .row {
     grid-template-columns: auto minmax(0, 1fr);
   }
 
   .rail {
     grid-row: 1 / span 2;
-    margin-right: 0.75rem;
+    margin-right: var(--s3);
   }
 
   .row-margin {
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 0 0.6rem;
+    gap: 0 var(--s2);
     padding-bottom: 0;
   }
 
   .row-body {
-    padding-top: 0.3rem;
+    padding-top: var(--s1);
     border-top: 0;
   }
 
   .row-year .row-margin {
     grid-column: 2;
-    padding-bottom: 0.5rem;
-  }
-
-  .row-ongoing .row-margin {
-    padding-bottom: 0;
-  }
-
-  .row-ongoing .row-body {
-    padding-top: 0.2rem;
+    padding-bottom: var(--s2);
   }
 
   .row-year + .row > .row-margin {
     border-top: 0;
+  }
+
+  .row-ongoing .row-margin {
+    padding-bottom: 0;
   }
 
   .row-update .row-margin {
@@ -1141,21 +1420,29 @@ tr.is-target > :is(.ledger-ref, .seasons-key) {
   }
 
   .row-update .row-body {
-    padding-top: 0.15rem;
+    padding-top: 0;
   }
 
   .is-target > .row-margin,
   .is-target > .row-body {
-    padding-inline: 0.75rem;
+    padding-inline: var(--s3);
   }
 
   .sources li {
     grid-template-columns: minmax(0, 1fr);
-    gap: 0.1rem;
   }
 
   .sources li + li {
-    margin-top: 0.35rem;
+    margin-top: var(--s1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
   }
 }
 

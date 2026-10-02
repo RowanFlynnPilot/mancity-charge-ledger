@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Latest } from "./components/Latest";
 import { Ledger } from "./components/Ledger";
+import { Mark } from "./components/Mark";
 import { Masthead } from "./components/Masthead";
 import { Method } from "./components/Method";
 import { Seasons } from "./components/Seasons";
@@ -8,8 +9,7 @@ import { Timeline } from "./components/Timeline";
 import { WhatsNext } from "./components/WhatsNext";
 import { viewOfRecord } from "./data";
 import { HOME, resolve, VIEWS, type Route } from "./route";
-
-const SITE = "The Charge Ledger";
+import { EDIT_HISTORY, REPO, SITE } from "./site";
 
 function useRoute(): Route {
   const [route, setRoute] = useState(() => resolve(window.location.hash, HOME, viewOfRecord));
@@ -55,13 +55,16 @@ export function App() {
       </div>
 
       <nav className="views" aria-label="Views">
-        <ul className="page" ref={links}>
-          {VIEWS.map((v) => (
-            <li key={v.id}>
-              <a href={`#${v.id}`} aria-current={v.id === route.view ? "page" : undefined}>{v.label}</a>
-            </li>
-          ))}
-        </ul>
+        <div className="page views-inner">
+          <a className="views-home" href="#" aria-label={`${SITE}: back to the top`}><Mark /></a>
+          <ul ref={links}>
+            {VIEWS.map((v) => (
+              <li key={v.id}>
+                <a href={`#${v.id}`} aria-current={v.id === route.view ? "page" : undefined}>{v.label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
       </nav>
 
       <main id="content" tabIndex={-1} className="page">
@@ -73,8 +76,19 @@ export function App() {
         <Method />
       </main>
 
-      <footer className="page colophon">
-        <p>{SITE} is an independent personal project by Rowan Flynn.</p>
+      <footer className="colophon">
+        <div className="page colophon-inner">
+          <p className="colophon-name"><Mark /> {SITE}</p>
+          <p>
+            An independent personal project by Rowan Flynn. It is not affiliated with any club,
+            league or governing body.
+          </p>
+          <ul>
+            <li><a href="#method">How this record is kept</a></li>
+            <li><a href={EDIT_HISTORY} rel="noopener">Edit history</a></li>
+            <li><a href={REPO} rel="noopener">Source code</a></li>
+          </ul>
+        </div>
       </footer>
     </>
   );

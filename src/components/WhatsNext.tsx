@@ -28,14 +28,18 @@ export function WhatsNext({ target }: { target: string | null }) {
                   : <span className="row-kind">No date published</span>}
                 {note && <span className={cx("row-kind", note.passed && "due-passed")}>{note.text}</span>}
               </div>
-              <article className="row-body">
-                <h3>{item.label}</h3>
-                <p>{item.detail}</p>
-                <SourceList sources={item.sources} />
-                <p className="row-foot">
-                  <span className="case-names">{caseById[item.caseId].name}</span>
-                  <CopyLink id={item.id} />
-                </p>
+              <article className="row-body row-split">
+                <div className="row-main">
+                  <h3>{item.label}</h3>
+                  <p>{item.detail}</p>
+                </div>
+                <div className="row-aside">
+                  <SourceList sources={item.sources} />
+                  <p className="row-foot">
+                    <span className="case-names">{caseById[item.caseId].name}</span>
+                    <CopyLink id={item.id} />
+                  </p>
+                </div>
               </article>
             </li>
           );

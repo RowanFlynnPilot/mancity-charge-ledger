@@ -178,7 +178,15 @@ Its own, neutral. Reference-book plain: the documents are the content.
   - Appeal badges are bronze `#6b4700`: grey outline for none, tinted for pending, solid for upheld, solid ink for overturned.
   - Every text and badge pairing is at least 6:1 contrast in both themes.
   - Type: Literata (variable, optical size) for reading and headings, italic for case names as law reports set them. Archivo (variable, slightly condensed) for dates, references, labels and controls. Both are self-hosted through `@fontsource-variable`, so the site makes no third-party requests.
-  - Layout: a left margin column carries the key (date, charge reference, label) and the body carries the entry, on every view. Rows are ruled. A double rule marks the masthead, the ledger's reference column and the methodology note.
+  - Layout: a left margin column carries the key (date, charge reference, label) and the body carries the entry, on every view. Rows are ruled. A double rule marks the key column of the two tables and the methodology note.
+- Refined 2 Oct 2026. Rules the stylesheet now follows:
+  - Spacing comes from one 4px scale (`--s1` to `--s10`). Type comes from five serif sizes (`--t-*`) and three sans sizes (`--u-*`). Do not add one-off values; use a token.
+  - Reading text is held to `--measure` (36rem, about 70 characters). On wide screens an entry's sources sit in a side column so the text stays at that width.
+  - The masthead puts the title on the left and the open case on the right, in a panel. Panels (the open case, the press-coverage notice) are a lighter sheet with a hairline edge. There are no shadows; structure comes from rules.
+  - The site has its own mark, a ledger page (`src/components/Mark.tsx`, also the favicon). It sits in the view bar and links back to the top.
+  - Every control has hover, pressed and keyboard-focus states. Motion is limited to those 140ms state changes and a brief highlight when arriving at a linked entry, and is switched off under `prefers-reduced-motion`.
+  - No gradients, no pure black or white, and the only `z-index` values are `--z-bar` and `--z-skip`.
+  - The footer says the project is independent and not affiliated with any club, league or governing body.
 
 ## Open decisions
 

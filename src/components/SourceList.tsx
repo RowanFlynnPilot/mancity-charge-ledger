@@ -5,6 +5,8 @@ const KIND_LABEL: Record<SourceKind, string> = {
   press: "Press report",
 };
 
+const isPdf = (url: string) => new URL(url).pathname.toLowerCase().endsWith(".pdf");
+
 export function SourceList({ sources }: { sources: Source[] }) {
   return (
     <ul className="sources" aria-label="Sources">
@@ -13,7 +15,9 @@ export function SourceList({ sources }: { sources: Source[] }) {
           <span className={`source-kind source-kind-${source.kind}`}>{KIND_LABEL[source.kind]}</span>
           <span>
             <a href={source.url} rel="noopener">{source.title}</a>
-            <span className="source-publisher">, {source.publisher}</span>
+            <span className="source-publisher">
+              {isPdf(source.url) && " (PDF)"}, {source.publisher}
+            </span>
           </span>
         </li>
       ))}

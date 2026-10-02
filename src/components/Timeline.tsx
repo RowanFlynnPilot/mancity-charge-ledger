@@ -80,19 +80,23 @@ function EventRow({ event, cells, lanes, isTarget }: {
         <time dateTime={event.date}>{formatDate(event.date)}</time>
         <span className="row-kind">{TYPE_LABEL[event.type]}</span>
       </div>
-      <article className="row-body">
-        <h3>{event.headline}</h3>
-        <p>{event.summary}</p>
-        {cityPositions(event).map((position) => (
-          <p key={position.id} className="position-line">
-            City&rsquo;s position: <a href={`#${position.id}`}>{position.headline}</a>
+      <article className="row-body row-split">
+        <div className="row-main">
+          <h3>{event.headline}</h3>
+          <p>{event.summary}</p>
+          {cityPositions(event).map((position) => (
+            <p key={position.id} className="position-line">
+              City&rsquo;s position: <a href={`#${position.id}`}>{position.headline}</a>
+            </p>
+          ))}
+        </div>
+        <div className="row-aside">
+          <SourceList sources={event.sources} />
+          <p className="row-foot">
+            <span className="case-names">{event.caseIds.map((id) => caseById[id].name).join("; ")}</span>
+            <CopyLink id={event.id} />
           </p>
-        ))}
-        <SourceList sources={event.sources} />
-        <p className="row-foot">
-          <span className="case-names">{event.caseIds.map((id) => caseById[id].name).join("; ")}</span>
-          <CopyLink id={event.id} />
-        </p>
+        </div>
       </article>
     </li>
   );

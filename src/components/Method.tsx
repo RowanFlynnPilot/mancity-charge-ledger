@@ -1,4 +1,4 @@
-const REPO = "https://github.com/RowanFlynnPilot/mancity-charge-ledger";
+import { EDIT_HISTORY } from "../site";
 
 export function Method() {
   return (
@@ -59,7 +59,7 @@ export function Method() {
           <dd>
             <p>
               Rowan Flynn keeps this record as a personal project. Every change to it is logged
-              in public: <a href={`${REPO}/commits/main/data`} rel="noopener">see the edit history</a>.
+              in public: <a href={EDIT_HISTORY} rel="noopener">see the edit history</a>.
             </p>
           </dd>
         </div>
