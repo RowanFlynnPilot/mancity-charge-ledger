@@ -33,7 +33,7 @@ These are not style preferences. They are what makes the tool publishable.
 
 ## Stack
 
-Python pipeline → static JSON in `data/` → GitHub Actions → React + Vite + TypeScript → GitHub Pages. It is a standalone site, not an embed.
+Python pipeline → static JSON in `data/` and `feed/` → GitHub Actions → React + Vite + TypeScript → GitHub Pages. It is a standalone site, not an embed.
 
 No database. No server. No auth.
 
@@ -49,9 +49,9 @@ data/pending.json         due but not yet happened            hand-edited
 data/allegations.json     the League's statement, rule by season   hand-edited, from the charge statement
 data/funding.json         sponsorship money by season         hand-edited, from the Core Decision
 data/seasons.json         final tables, 2009/10 to 2017/18    written by build_seasons.py only
-data/updates.json         news feed, newest first             written by the pipeline only
+feed/updates.json         news feed, newest first             written by the pipeline only
 pipeline/validate.py      raises on first contract violation
-pipeline/fetch_updates.py RSS → updates.json
+pipeline/fetch_updates.py RSS → feed/updates.json
 pipeline/build_seasons.py Premier League final tables → seasons.json, run by hand
 pipeline/test_*.py        unittest, stdlib only
 src/data.ts               the JSON, typed, plus lookups
@@ -70,7 +70,7 @@ src/styles.css            all styles and the design tokens
 ```
 python pipeline/validate.py              validate data/
 python -m unittest discover pipeline     pipeline tests
-python pipeline/fetch_updates.py         refresh data/updates.json from the feeds
+python pipeline/fetch_updates.py         refresh feed/updates.json from the feeds
 python pipeline/build_seasons.py         rebuild data/seasons.json from the League's tables
 npm run dev                              dev server (base path /mancity-charge-ledger/)
 npm test                                 app tests (vitest)
@@ -88,6 +88,7 @@ The pipeline uses the Python standard library only. There is no `requirements.tx
 - `Charge.period` is `null` until the period is read from the published decision or another primary document. `null` renders as nothing, not as a placeholder.
 - When a pending item happens, add it to `events.json` and delete it from `pending.json` in the same commit.
 - `updates.json` is never hand-edited. A feed item becomes part of the record only when a person writes an event for it.
+- `updates.json` lives in `feed/`, not `data/`. A workflow commits it every few hours, and the methodology note links to the commit history of `data/` as the record's edit history. Keeping the feed out of `data/` keeps that history to edits a person made.
 - `seasons.json` is never hand-edited. `build_seasons.py` reads the Premier League's own standings for each season and raises unless it gets a complete final table (20 clubs, 38 matches each). Each row cites that season's table page on premierleague.com as a primary source. The validator checks that `cityPosition` agrees with `champion` and `runnerUp`. The file records the tables as the League publishes them: if a decision ever alters a final table, re-run the script.
 - Charge ids are the Commission's number and letter (`1A`, `2`, `4B`). The validator enforces this, and the findings board groups charges by the number.
 - `funding.json` holds the season-by-season sponsorship figures behind one finding (`chargeId`), entered by hand from the decision. Each season's two parts must add up to the recorded figure; the validator fails otherwise. Amounts are £ million. `locator` says where in the source the figures are. It is a single object, not a list.
@@ -99,7 +100,7 @@ The pipeline uses the Python standard library only. There is no `requirements.tx
 
 ## Pipeline: `fetch_updates.py`
 
-One job: read RSS feeds, keep the items about these cases, write `data/updates.json`.
+One job: read RSS feeds, keep the items about these cases, write `feed/updates.json`.
 
 - Feeds are a fixed list at the top of the file. All three were requested on 1 Oct 2026 and returned valid RSS.
   - `https://www.skysports.com/rss/12040` (Sky Sports news, all sports). 20 items, spanning about 5.5 hours when checked, so a 3-hour cron does not miss items.
@@ -114,7 +115,7 @@ One job: read RSS feeds, keep the items about these cases, write `data/updates.j
 
 Workflows:
 
-- `updates.yml`: cron every 3 hours → `fetch_updates.py` → `validate.py` → commit `data/updates.json` if it changed → call `deploy.yml`. The call is needed because a push made with the workflow's own token does not trigger other workflows.
+- `updates.yml`: cron every 3 hours → `fetch_updates.py` → `validate.py` → commit `feed/updates.json` if it changed → call `deploy.yml`. The call is needed because a push made with the workflow's own token does not trigger other workflows.
 - `deploy.yml`: on push to `main`, pull request, manual run, or a call from `updates.yml`. Runs `validate.py`, the pipeline tests, the app tests and the build. Off pull requests it then deploys to Pages.
 
 ## UI

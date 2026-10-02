@@ -16,5 +16,5 @@
     "noUncheckedIndexedAccess": true,
     "skipLibCheck": true
   },
-  "include": ["src", "data", "vite.config.ts"]
+  "include": ["src", "data", "feed", "vite.config.ts"]
 }

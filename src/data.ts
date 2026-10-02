@@ -6,7 +6,7 @@ import eventsJson from "../data/events.json";
 import fundingJson from "../data/funding.json";
 import pendingJson from "../data/pending.json";
 import seasonsJson from "../data/seasons.json";
-import updatesJson from "../data/updates.json";
+import updatesJson from "../feed/updates.json";
 import type { ViewId } from "./route";
 import type {
   Allegations, Case, CaseEvent, CaseId, Charge, Funding, PendingItem, Season, Update,

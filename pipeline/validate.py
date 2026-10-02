@@ -1,4 +1,4 @@
-"""Validate data/*.json against the contract in src/types.ts.
+"""Validate data/*.json and feed/updates.json against the contract in src/types.ts.
 
 Raises on the first violation. Run before every commit and in CI:
     python pipeline/validate.py
@@ -9,7 +9,10 @@ import re
 from datetime import datetime
 from pathlib import Path
 
-DATA = Path(__file__).resolve().parent.parent / "data"
+ROOT = Path(__file__).resolve().parent.parent
+DATA = ROOT / "data"
+# The press feed is kept apart from the record, so the history of data/ is the record's own.
+FEED = ROOT / "feed"
 
 DATE = re.compile(r"^\d{4}-(0[1-9]|1[0-2])(-(0[1-9]|[12]\d|3[01]))?$")
 ISO_UTC = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
@@ -38,8 +41,8 @@ SOURCE_KINDS = {"primary", "press"}
 MAX_UPDATES = 200
 
 
-def load(name: str) -> list[dict] | dict:
-    return json.loads((DATA / f"{name}.json").read_text(encoding="utf-8"))
+def load(name: str, folder: Path = DATA) -> list[dict] | dict:
+    return json.loads((folder / f"{name}.json").read_text(encoding="utf-8"))
 
 
 def require(condition: bool, message: str) -> None:
@@ -307,7 +310,7 @@ def validate(cases: list[dict], events: list[dict], charges: list[dict], pending
 
 def main() -> None:
     validate(load("cases"), load("events"), load("charges"), load("pending"),
-             load("seasons"), load("funding"), load("allegations"), load("updates"))
+             load("seasons"), load("funding"), load("allegations"), load("updates", FEED))
     print("data ok")
 
 
