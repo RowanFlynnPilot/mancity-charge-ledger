@@ -1,0 +1,405 @@
+[
+  {
+    "id": "uefa-settlement-2014",
+    "caseIds": [
+      "uefa-2014"
+    ],
+    "date": "2014-05",
+    "type": "settlement",
+    "headline": "City and UEFA sign a Financial Fair Play settlement",
+    "summary": "UEFA had questioned some of City's sponsorship agreements and whether the club met its break-even requirement. No findings were made. The two sides settled, with City accepting a fine, part of it suspended, and a reduced Champions League squad for 2014/15.",
+    "sources": [
+      {
+        "title": "Independent Commission: Redacted Core Decision",
+        "publisher": "Premier League",
+        "url": "https://resources.premierleague.pulselive.com/premierleague/document/2026/09/29/9bb3f063-6312-4d15-a1f1-77280d356a49/Premier-League-Manchester-City-independent-Commission-Redacted-Core-Decision.pdf",
+        "kind": "primary"
+      },
+      {
+        "title": "City timeline",
+        "publisher": "Manchester Evening News",
+        "url": "https://www.pressreader.com/uk/manchester-evening-news/20200215/282965337110616",
+        "kind": "press"
+      }
+    ]
+  },
+  {
+    "id": "der-spiegel-football-leaks",
+    "caseIds": [
+      "uefa-2020",
+      "pl-2023"
+    ],
+    "date": "2018-11",
+    "type": "report",
+    "headline": "Der Spiegel publishes leaked City emails",
+    "summary": "The German outlet published internal club documents from the Football Leaks cache, alleging that money from City's owner had been presented as sponsorship income. City did not dispute that the emails were authentic, declined to comment on material it said had been hacked and stripped of context, and described the reporting as an attempt to damage its reputation.",
+    "sources": [
+      {
+        "title": "Timeline: How Man City's Financial Case Went From Leaked Emails To Verdict",
+        "publisher": "Associated Press via Fox Sports",
+        "url": "https://www.foxsports.com/stories/soccer/timeline-of-the-premier-league-vs-manchester-city",
+        "kind": "press"
+      },
+      {
+        "title": "Independent Commission: Redacted Core Decision",
+        "publisher": "Premier League",
+        "url": "https://resources.premierleague.pulselive.com/premierleague/document/2026/09/29/9bb3f063-6312-4d15-a1f1-77280d356a49/Premier-League-Manchester-City-independent-Commission-Redacted-Core-Decision.pdf",
+        "kind": "primary"
+      }
+    ]
+  },
+  {
+    "id": "pl-investigation-opens",
+    "caseIds": [
+      "pl-2023"
+    ],
+    "date": "2018-12",
+    "type": "investigation",
+    "headline": "Premier League opens its investigation",
+    "summary": "The League began investigating City's financial arrangements after the Der Spiegel reports. The investigation ran for four years.",
+    "sources": [
+      {
+        "title": "Premier League Statement: Manchester City FC (29 Sep 2026)",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/news/4727779/premier-league-statement-manchester-city-fc",
+        "kind": "primary"
+      }
+    ]
+  },
+  {
+    "id": "uefa-investigation-opens",
+    "caseIds": [
+      "uefa-2020"
+    ],
+    "date": "2019-03-07",
+    "type": "investigation",
+    "headline": "UEFA opens a formal investigation",
+    "summary": "UEFA opened a formal investigation into whether City had broken its financial rules. City said it welcomed the chance to end the speculation and called the accusations false.",
+    "sources": [
+      {
+        "title": "Timeline: How Man City's Financial Case Went From Leaked Emails To Verdict",
+        "publisher": "Associated Press via Fox Sports",
+        "url": "https://www.foxsports.com/stories/soccer/timeline-of-the-premier-league-vs-manchester-city",
+        "kind": "press"
+      }
+    ]
+  },
+  {
+    "id": "uefa-referral-adjudicatory",
+    "caseIds": [
+      "uefa-2020"
+    ],
+    "date": "2019-05-16",
+    "type": "investigation",
+    "headline": "UEFA investigator refers City for adjudication",
+    "summary": "The chief investigator of UEFA's financial control body finished his investigation and referred the case to its adjudicatory chamber.",
+    "sources": [
+      {
+        "title": "City timeline",
+        "publisher": "Manchester Evening News",
+        "url": "https://www.pressreader.com/uk/manchester-evening-news/20200215/282965337110616",
+        "kind": "press"
+      }
+    ]
+  },
+  {
+    "id": "cas-rejects-early-challenge",
+    "caseIds": [
+      "uefa-2020"
+    ],
+    "date": "2019-11-15",
+    "type": "ruling",
+    "headline": "CAS rejects City's bid to halt the UEFA case",
+    "summary": "City had asked the Court of Arbitration for Sport in June 2019 to throw out UEFA's case before it was decided. CAS turned the request down.",
+    "sources": [
+      {
+        "title": "City timeline",
+        "publisher": "Manchester Evening News",
+        "url": "https://www.pressreader.com/uk/manchester-evening-news/20200215/282965337110616",
+        "kind": "press"
+      }
+    ]
+  },
+  {
+    "id": "uefa-ban",
+    "caseIds": [
+      "uefa-2020"
+    ],
+    "date": "2020-02-14",
+    "type": "sanction",
+    "headline": "UEFA bans City from European competition for two seasons",
+    "summary": "UEFA found serious breaches of its spending rules and a failure to cooperate with investigators, and imposed a two-season ban and a €30 million fine. City called the investigation flawed and appealed to CAS.",
+    "sources": [
+      {
+        "title": "Timeline: How Man City's Financial Case Went From Leaked Emails To Verdict",
+        "publisher": "Associated Press via Fox Sports",
+        "url": "https://www.foxsports.com/stories/soccer/timeline-of-the-premier-league-vs-manchester-city",
+        "kind": "press"
+      }
+    ]
+  },
+  {
+    "id": "cas-overturns-ban",
+    "caseIds": [
+      "uefa-2020"
+    ],
+    "date": "2020-07-13",
+    "type": "ruling",
+    "headline": "CAS overturns the UEFA ban",
+    "summary": "CAS upheld City's appeal, finding some of UEFA's allegations not proven and others time-barred. It lifted the ban and set a €10 million fine for failing to cooperate with investigators.",
+    "sources": [
+      {
+        "title": "Timeline: How Man City's Financial Case Went From Leaked Emails To Verdict",
+        "publisher": "Associated Press via Fox Sports",
+        "url": "https://www.foxsports.com/stories/soccer/timeline-of-the-premier-league-vs-manchester-city",
+        "kind": "press"
+      }
+    ]
+  },
+  {
+    "id": "pl-charges",
+    "caseIds": [
+      "pl-2023"
+    ],
+    "date": "2023-02-06",
+    "type": "charge",
+    "headline": "Premier League charges City and refers the case to an independent Commission",
+    "summary": "The League alleged more than 100 breaches of its rules across 2009/10 to 2017/18, plus failures to cooperate with its investigation. City denied every charge and said the evidence supported its position.",
+    "sources": [
+      {
+        "title": "Independent Commission: Redacted Core Decision",
+        "publisher": "Premier League",
+        "url": "https://resources.premierleague.pulselive.com/premierleague/document/2026/09/29/9bb3f063-6312-4d15-a1f1-77280d356a49/Premier-League-Manchester-City-independent-Commission-Redacted-Core-Decision.pdf",
+        "kind": "primary"
+      },
+      {
+        "title": "Man City charged by Premier League for multiple financial fair play breaches",
+        "publisher": "ESPN",
+        "url": "https://global.espn.com/football/story/_/id/37636124/man-city-charged-multiple-ffp-breaches",
+        "kind": "press"
+      }
+    ]
+  },
+  {
+    "id": "pl-hearing-begins",
+    "caseIds": [
+      "pl-2023"
+    ],
+    "date": "2024-09-16",
+    "type": "hearing",
+    "headline": "Commission hearing begins",
+    "summary": "A three-member independent Commission began hearing the charges in private in London.",
+    "sources": [
+      {
+        "title": "Independent Commission: Redacted Core Decision",
+        "publisher": "Premier League",
+        "url": "https://resources.premierleague.pulselive.com/premierleague/document/2026/09/29/9bb3f063-6312-4d15-a1f1-77280d356a49/Premier-League-Manchester-City-independent-Commission-Redacted-Core-Decision.pdf",
+        "kind": "primary"
+      },
+      {
+        "title": "Timeline: How Man City's Financial Case Went From Leaked Emails To Verdict",
+        "publisher": "Associated Press via Fox Sports",
+        "url": "https://www.foxsports.com/stories/soccer/timeline-of-the-premier-league-vs-manchester-city",
+        "kind": "press"
+      }
+    ]
+  },
+  {
+    "id": "apt-first-award",
+    "caseIds": [
+      "apt"
+    ],
+    "date": "2024-10-07",
+    "type": "ruling",
+    "headline": "Tribunal publishes its first award on the APT rules",
+    "summary": "In a challenge brought by City, an arbitration tribunal found three aspects of the League's Associated Party Transaction rules unlawful, including the exclusion of shareholder loans. The League said City's wider challenge had largely failed.",
+    "sources": [
+      {
+        "title": "Manchester City and Premier League settle their dispute over APT rules",
+        "publisher": "The Lawyer",
+        "url": "https://www.thelawyer.com/manchester-city-and-premier-league-settle-their-dispute-over-the-leagues-apt-rules/",
+        "kind": "press"
+      },
+      {
+        "title": "Manchester City's legal action against the Premier League's APT rules",
+        "publisher": "Lawyer Monthly",
+        "url": "https://lawyer-monthly.com/?p=46643",
+        "kind": "press"
+      }
+    ]
+  },
+  {
+    "id": "apt-rules-amended",
+    "caseIds": [
+      "apt"
+    ],
+    "date": "2024-11",
+    "type": "rule-change",
+    "headline": "Clubs vote amended APT rules into force",
+    "summary": "Premier League clubs approved new APT rules intended to fix the aspects the tribunal had found unlawful, including bringing shareholder loans into fair market value assessment.",
+    "sources": [
+      {
+        "title": "Premier League statement (14 Feb 2025)",
+        "publisher": "Premier League",
+        "url": "https://premierleague.com/news/4244928",
+        "kind": "primary"
+      },
+      {
+        "title": "Manchester City and Premier League settle their dispute over APT rules",
+        "publisher": "The Lawyer",
+        "url": "https://www.thelawyer.com/manchester-city-and-premier-league-settle-their-dispute-over-the-leagues-apt-rules/",
+        "kind": "press"
+      }
+    ]
+  },
+  {
+    "id": "pl-hearing-ends",
+    "caseIds": [
+      "pl-2023"
+    ],
+    "date": "2024-12-06",
+    "type": "hearing",
+    "headline": "Commission hearing ends",
+    "summary": "The hearing closed after 42 sitting days, with evidence from 27 factual witnesses. No date was given for a decision.",
+    "sources": [
+      {
+        "title": "Independent Commission: Redacted Core Decision",
+        "publisher": "Premier League",
+        "url": "https://resources.premierleague.pulselive.com/premierleague/document/2026/09/29/9bb3f063-6312-4d15-a1f1-77280d356a49/Premier-League-Manchester-City-independent-Commission-Redacted-Core-Decision.pdf",
+        "kind": "primary"
+      },
+      {
+        "title": "Timeline: How Man City's Financial Case Went From Leaked Emails To Verdict",
+        "publisher": "Associated Press via Fox Sports",
+        "url": "https://www.foxsports.com/stories/soccer/timeline-of-the-premier-league-vs-manchester-city",
+        "kind": "press"
+      }
+    ]
+  },
+  {
+    "id": "apt-second-challenge",
+    "caseIds": [
+      "apt"
+    ],
+    "date": "2025-01",
+    "type": "filing",
+    "headline": "City challenges the amended APT rules",
+    "summary": "City began a second arbitration, this time against the rules adopted in November 2024.",
+    "sources": [
+      {
+        "title": "Premier League statement (14 Feb 2025)",
+        "publisher": "Premier League",
+        "url": "https://premierleague.com/news/4244928",
+        "kind": "primary"
+      }
+    ]
+  },
+  {
+    "id": "apt-second-award",
+    "caseIds": [
+      "apt"
+    ],
+    "date": "2025-02-13",
+    "type": "ruling",
+    "headline": "Tribunal rules the previous APT rules unenforceable",
+    "summary": "The tribunal decided the three unlawful aspects could not be separated from the rest, making the previous APT rules unenforceable as a whole. It made no finding on the amended rules, which the League said remained in force.",
+    "sources": [
+      {
+        "title": "Premier League statement (14 Feb 2025)",
+        "publisher": "Premier League",
+        "url": "https://premierleague.com/news/4244928",
+        "kind": "primary"
+      },
+      {
+        "title": "Manchester City Arbitration: Premier League's Former APT Rules Declared Void",
+        "publisher": "Football Legal",
+        "url": "https://www.football-legal.com/content/manchester-city-arbitration-premier-leagues-former-apt-rules-declared-void",
+        "kind": "press"
+      }
+    ]
+  },
+  {
+    "id": "apt-settlement",
+    "caseIds": [
+      "apt"
+    ],
+    "date": "2025-09-08",
+    "type": "settlement",
+    "headline": "City and the Premier League settle the APT dispute",
+    "summary": "Both sides agreed to end the arbitration. City accepted that the current APT rules are valid and binding. The settlement did not affect the separate Commission case.",
+    "sources": [
+      {
+        "title": "Manchester City settles dispute with Premier League over Associated Party Transaction Rules",
+        "publisher": "Farrer & Co",
+        "url": "https://www.farrer.co.uk/news-and-insights/manchester-city-settles-dispute-with-premier-league-over-associated-party-transaction-rules/",
+        "kind": "press"
+      },
+      {
+        "title": "Manchester City and Premier League settle their dispute over APT rules",
+        "publisher": "The Lawyer",
+        "url": "https://www.thelawyer.com/manchester-city-and-premier-league-settle-their-dispute-over-the-leagues-apt-rules/",
+        "kind": "press"
+      }
+    ]
+  },
+  {
+    "id": "athletic-verdict-report",
+    "caseIds": [
+      "pl-2023"
+    ],
+    "date": "2026-09-25",
+    "type": "report",
+    "headline": "The Athletic reports the Commission's verdict",
+    "summary": "The Athletic reported that City had been found guilty of all but one of the charges, four days before the League published the decision.",
+    "sources": [
+      {
+        "title": "Timeline: How Man City's Financial Case Went From Leaked Emails To Verdict",
+        "publisher": "Associated Press via Fox Sports",
+        "url": "https://www.foxsports.com/stories/soccer/timeline-of-the-premier-league-vs-manchester-city",
+        "kind": "press"
+      }
+    ]
+  },
+  {
+    "id": "pl-core-decision",
+    "caseIds": [
+      "pl-2023"
+    ],
+    "date": "2026-09-29",
+    "type": "ruling",
+    "headline": "Commission finds the charges proven, bar one",
+    "summary": "The League published the Commission's redacted Core Decision. It found every charge proven except Charge 4(B). The Commission found that City ran a disguised funding scheme in which Abu Dhabi sponsors paid only part of their recorded fees and the club's owner paid the rest, overstating income by more than £830 million, and that the club exceeded both UEFA's and the League's spending limits once its accounts were restated. Sanction is to be decided at a separate hearing.",
+    "sources": [
+      {
+        "title": "Independent Commission: Redacted Core Decision",
+        "publisher": "Premier League",
+        "url": "https://resources.premierleague.pulselive.com/premierleague/document/2026/09/29/9bb3f063-6312-4d15-a1f1-77280d356a49/Premier-League-Manchester-City-independent-Commission-Redacted-Core-Decision.pdf",
+        "kind": "primary"
+      },
+      {
+        "title": "Premier League Statement: Manchester City FC (29 Sep 2026)",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/news/4727779/premier-league-statement-manchester-city-fc",
+        "kind": "primary"
+      }
+    ]
+  },
+  {
+    "id": "city-response-to-decision",
+    "caseIds": [
+      "pl-2023"
+    ],
+    "date": "2026-09-29",
+    "type": "statement",
+    "headline": "City rejects the decision and says it will appeal",
+    "summary": "City said it is innocent, called the decision legally and factually wrong, and said it will pursue the appeal routes open to it.",
+    "sources": [
+      {
+        "title": "Man City to appeal guilty verdict in Premier League breaches case",
+        "publisher": "ESPN",
+        "url": "https://www.espn.com/soccer/story/_/id/50065250/man-city-appeal-guilty-verdict-premier-league-breaches-case",
+        "kind": "press"
+      }
+    ]
+  }
+]

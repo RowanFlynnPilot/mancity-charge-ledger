@@ -1,0 +1,53 @@
+[
+  {
+    "id": "appeal-deadline",
+    "caseId": "pl-2023",
+    "label": "Deadline for City to appeal the Commission's findings",
+    "due": "2026-10-02",
+    "detail": "City has said it will appeal. An appeal is heard by a three-member Appeal Board under Section W of the League's rules.",
+    "sources": [
+      {
+        "title": "Premier League Statement: Manchester City FC (29 Sep 2026)",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/news/4727779/premier-league-statement-manchester-city-fc",
+        "kind": "primary"
+      },
+      {
+        "title": "Man City to appeal guilty verdict in Premier League breaches case",
+        "publisher": "ESPN",
+        "url": "https://www.espn.com/soccer/story/_/id/50065250/man-city-appeal-guilty-verdict-premier-league-breaches-case",
+        "kind": "press"
+      }
+    ]
+  },
+  {
+    "id": "sanction-hearing",
+    "caseId": "pl-2023",
+    "label": "Sanction hearing",
+    "due": null,
+    "detail": "The Commission decides the sanction at a further hearing, held in private. No date has been published.",
+    "sources": [
+      {
+        "title": "Premier League Statement: Manchester City FC (29 Sep 2026)",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/news/4727779/premier-league-statement-manchester-city-fc",
+        "kind": "primary"
+      }
+    ]
+  },
+  {
+    "id": "appendices-publication",
+    "caseId": "pl-2023",
+    "label": "Publication of the full decision and appendices",
+    "due": null,
+    "detail": "Only a redacted Core Decision is public. The League says it will publish the appendices as soon as its rules allow.",
+    "sources": [
+      {
+        "title": "Premier League Statement: Manchester City FC (29 Sep 2026)",
+        "publisher": "Premier League",
+        "url": "https://www.premierleague.com/en/news/4727779/premier-league-statement-manchester-city-fc",
+        "kind": "primary"
+      }
+    ]
+  }
+]

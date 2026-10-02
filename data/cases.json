@@ -1,0 +1,34 @@
+[
+  {
+    "id": "uefa-2014",
+    "name": "UEFA Financial Fair Play settlement",
+    "body": "UEFA Club Financial Control Body",
+    "cityRole": "respondent",
+    "status": "closed",
+    "outcome": "Settled in May 2014 with no findings made."
+  },
+  {
+    "id": "uefa-2020",
+    "name": "UEFA Financial Fair Play case and CAS appeal",
+    "body": "UEFA Club Financial Control Body; Court of Arbitration for Sport",
+    "cityRole": "respondent",
+    "status": "closed",
+    "outcome": "Two-season ban overturned by CAS in July 2020; fine cut to €10 million for failing to cooperate."
+  },
+  {
+    "id": "pl-2023",
+    "name": "Premier League v Manchester City",
+    "body": "Premier League independent Commission (Section W)",
+    "cityRole": "respondent",
+    "status": "open",
+    "outcome": "Charges found proven in September 2026, bar Charge 4(B). Sanction not yet decided. City denies wrongdoing and has said it will appeal."
+  },
+  {
+    "id": "apt",
+    "name": "Associated Party Transaction rules arbitration",
+    "body": "Premier League arbitration tribunal",
+    "cityRole": "claimant",
+    "status": "closed",
+    "outcome": "Previous rules ruled unenforceable; settled in September 2025 with City accepting the current rules as valid."
+  }
+]
