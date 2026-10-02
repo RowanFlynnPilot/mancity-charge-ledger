@@ -1,0 +1,18 @@
+# Proposes updates as pull requests, once a month. Each one runs the full check
+# before it can be merged.
+version: 2
+updates:
+  # The workflows pin each action to a commit. This moves the pin.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+
+  # One pull request for all the site's packages, not one each.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      packages:
+        patterns: ["*"]
