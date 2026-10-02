@@ -14,13 +14,16 @@ from urllib.parse import urlsplit
 from fetch_updates import TIMEOUT_SECONDS, USER_AGENT
 from validate import load
 
-# Sites that refuse requests from a script, so their links cannot be checked
-# here. They are printed as "not checked" for a person to open. Add a host only
-# after seeing it refuse this script while the page opens in a browser.
+# Sites that refuse this script, so their links cannot be checked here. They are
+# printed as "not checked" for a person to open. Add a host only after seeing it
+# refuse the script while the page opens in a browser.
 UNCHECKED_HOSTS = {
     "www.mancity.com",  # answers 403
     "www.uefa.com",  # resets the connection or never answers
     "www.farrer.co.uk",  # answers 403
+    # These two answer from a home connection and refuse GitHub's runners with 403.
+    "www.pressreader.com",
+    "www.thelawyer.com",
 }
 
 PDF_SIGNATURE = b"%PDF"

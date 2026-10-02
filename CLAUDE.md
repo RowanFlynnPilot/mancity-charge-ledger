@@ -134,7 +134,7 @@ One job: request every source address in `data/` and say which are dead. The pre
 - Alive means a 2xx answer. For an address ending in `.pdf` the body must also start with `%PDF`, because `tas-cas.org` answers 200 with a web page for a file that has gone.
 - Anything else is dead: any other status, no such host, a refused connection, a timeout. There is no retry. A site that was down for a moment makes a red run; run it again.
 - It uses the same `User-Agent` as the feed fetcher, which names the project. It does not pose as a browser.
-- `UNCHECKED_HOSTS` lists the sites that refuse scripts: `www.mancity.com`, `www.uefa.com` and `www.farrer.co.uk`. Their links are printed as "not checked" and are not requested. Nothing checks them automatically; open them by hand when the weekly run is read. Add a host only after seeing it refuse the script while the page opens in a browser.
+- `UNCHECKED_HOSTS` lists the sites that refuse the script: `www.mancity.com`, `www.uefa.com` and `www.farrer.co.uk` everywhere, and `www.pressreader.com` and `www.thelawyer.com` when it runs on GitHub's runners (they answer from a home connection). On 2 Oct 2026 that was 11 of the 37 addresses cited, among them every UEFA and club statement. Their links are printed as "not checked" and are not requested. Nothing checks them automatically; open them by hand when the weekly run is read. Add a host only after seeing it refuse the script while the page opens in a browser.
 - A redirect counts as alive. The script does not report where a link ended up.
 
 ## App tests: `render.test.tsx`
