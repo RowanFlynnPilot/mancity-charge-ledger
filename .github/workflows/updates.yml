@@ -6,6 +6,11 @@ name: Fetch updates
 # Hourly, because GitHub drops scheduled runs when it is busy: on a three-hour
 # schedule the gaps reached eight hours, longer than the shortest feed holds its
 # items. A run that finds nothing new commits nothing and deploys nothing.
+#
+# GitHub's own schedule went five hours without firing even when hourly, so the
+# runs that count come from outside: cron-job.org calls the workflow_dispatch
+# endpoint at 47 minutes past each hour (see CLAUDE.md). The schedule below
+# stays as a second source; a run it adds does no harm.
 on:
   schedule:
     - cron: "17 * * * *"
